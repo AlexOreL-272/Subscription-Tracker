@@ -1,3 +1,6 @@
+-- Database schema on Figma
+-- https://www.figma.com/design/cHjTNiuvX6GYrGH1HJUlGe/Diploma?node-id=14-2
+
 CREATE SCHEMA IF NOT EXISTS "subscription_tracker";
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."users" (
