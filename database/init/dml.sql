@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
     tag VARCHAR(30),
     category VARCHAR(30),
     cost REAL NOT NULL,
+    currency VARCHAR(3) NOT NULL,
     first_pay TIMESTAMP NOT NULL,
     interval REAL NOT NULL,     -- in days
     comment TEXT,

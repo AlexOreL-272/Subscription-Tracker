@@ -5,7 +5,14 @@ import (
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
 	logutils "github.com/AlexOreL-272/Subscription-Tracker/internal/logger"
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	// read config
