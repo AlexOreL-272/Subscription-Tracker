@@ -1,0 +1,11 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: subscription_tracker_db
+    restart: always
+    env_file:
+      - ./database/.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ./database/init:/docker-entrypoint-initdb.d
