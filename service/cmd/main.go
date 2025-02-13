@@ -1,8 +1,12 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/application"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
 	logutils "github.com/AlexOreL-272/Subscription-Tracker/internal/logger"
 	"github.com/joho/godotenv"
@@ -32,6 +36,20 @@ func main() {
 	}()
 
 	// setup application
+	appConfig := application.Config{
+		GatewayHost: cfg.Gateway.Host,
+		GatewayPort: cfg.Gateway.Port,
+	}
+
+	app := application.New(appConfig, logger)
 
 	// run application
+	app.MustStart()
+	defer app.Shutdown()
+
+	// make graceful shutdown
+	shutdownSig := make(chan os.Signal, 1)
+	signal.Notify(shutdownSig, os.Interrupt, syscall.SIGTERM)
+
+	<-shutdownSig
 }

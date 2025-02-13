@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	Gateway  Gateway  `yaml:"gateway" env-required:"true"`
 	Database Database `yaml:"database" env-required:"true"`
 	Logger   Logger   `yaml:"logger" env-required:"true"`
 }
@@ -19,9 +20,9 @@ const (
 	ProdEnv  EnvType = "production"
 )
 
-type Logger struct {
-	Env    EnvType `yaml:"env" env:"ENV" env-default:"development"`
-	LogDir string  `yaml:"log_dir" env:"LOG_DIR" env-default:"./logs"`
+type Gateway struct {
+	Host string `yaml:"host" env:"GATEWAY_HOST" env-default:"localhost"`
+	Port int    `yaml:"port" env:"GATEWAY_PORT" env-default:"8080"`
 }
 
 type Database struct {
@@ -30,6 +31,11 @@ type Database struct {
 	User     string `yaml:"user" env:"DB_USER" env-default:"postgres"`
 	Password string `yaml:"password" env:"DB_PASSWORD" env-default:"postgres"`
 	Name     string `yaml:"name" env:"DB_NAME" env-default:"subscription_tracker"`
+}
+
+type Logger struct {
+	Env    EnvType `yaml:"env" env:"ENV" env-default:"development"`
+	LogDir string  `yaml:"log_dir" env:"LOG_DIR" env-default:"./logs"`
 }
 
 func MustLoad() *Config {

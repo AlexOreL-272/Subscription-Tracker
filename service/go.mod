@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/go-chi/chi v1.5.5
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	go.uber.org/multierr v1.10.0 // indirect
 )
