@@ -5,31 +5,56 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
 
 type Application struct {
-	gatewayServer *http.Server
-	logger        *zap.Logger
+	gatewayServer  *http.Server
+	keycloakClient *keycloak.KeycloakClient
+	logger         *zap.Logger
+}
+
+type GatewayConfig struct {
+	Host string
+	Port int
+
+	KeycloakAddress      string
+	KeycloakRealm        string
+	KeycloakRealmAdmin   string
+	KeycloakClientID     string
+	KeycloakClientSecret string
+	KeycloakAdminUser    string
+	KeycloakAdminPass    string
 }
 
 func New(
-	host string,
-	port int,
+	cfg GatewayConfig,
 	logger *zap.Logger,
 ) *Application {
 	router := chi.NewRouter()
 	setupRouter(router)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", host, port),
+		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 		Handler: router,
 	}
 
+	keycloakClient := keycloak.New(
+		cfg.KeycloakAddress,
+		cfg.KeycloakRealm,
+		cfg.KeycloakRealmAdmin,
+		cfg.KeycloakClientID,
+		cfg.KeycloakClientSecret,
+		cfg.KeycloakAdminUser,
+		cfg.KeycloakAdminPass,
+	)
+
 	return &Application{
-		gatewayServer: srv,
-		logger:        logger,
+		gatewayServer:  srv,
+		keycloakClient: keycloakClient,
+		logger:         logger,
 	}
 }
 

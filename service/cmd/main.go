@@ -36,12 +36,7 @@ func main() {
 	}()
 
 	// setup application
-	appConfig := application.Config{
-		GatewayHost: cfg.Gateway.Host,
-		GatewayPort: cfg.Gateway.Port,
-	}
-
-	app := application.New(appConfig, logger)
+	app := application.New(cfg, logger)
 
 	// run application
 	app.MustStart()
