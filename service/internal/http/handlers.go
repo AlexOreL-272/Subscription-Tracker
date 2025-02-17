@@ -64,6 +64,9 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	// TODO: save user to database
 	// implementation
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	if err := json.NewEncoder(w).Encode(registerResp); err != nil {
 		h.logger.
 			With(zap.String("operation", handler)).
@@ -109,6 +112,9 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
 		h.logger.
