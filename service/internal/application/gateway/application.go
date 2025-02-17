@@ -7,7 +7,9 @@ import (
 	"net/http"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
 	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
+	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
@@ -18,39 +20,55 @@ type Application struct {
 }
 
 type GatewayConfig struct {
-	Host string
-	Port int
-
-	KeycloakAddress      string
-	KeycloakRealm        string
-	KeycloakRealmAdmin   string
-	KeycloakClientID     string
-	KeycloakClientSecret string
-	KeycloakAdminUser    string
-	KeycloakAdminPass    string
+	Gateway  config.Gateway
+	Keycloak config.Keycloak
+	Database config.Database
 }
 
 func New(
 	cfg GatewayConfig,
 	logger *zap.Logger,
 ) *Application {
+	const op = "gatewayapp.New"
+
 	keycloakClient := keycloak.New(
-		cfg.KeycloakAddress,
-		cfg.KeycloakRealm,
-		cfg.KeycloakRealmAdmin,
-		cfg.KeycloakClientID,
-		cfg.KeycloakClientSecret,
-		cfg.KeycloakAdminUser,
-		cfg.KeycloakAdminPass,
+		fmt.Sprintf("%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port),
+		cfg.Keycloak.Realm,
+		cfg.Keycloak.RealmAdmin,
+		cfg.Keycloak.ClientID,
+		cfg.Keycloak.ClientSecret,
+		cfg.Keycloak.AdminUser,
+		cfg.Keycloak.AdminPass,
 	)
 
-	handler := handler.New(keycloakClient, logger)
+	postgresDB, err := pgstorage.New(fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Database.Host,
+		cfg.Database.Port,
+		cfg.Database.User,
+		cfg.Database.Password,
+		cfg.Database.DBName,
+		cfg.Database.SSLMode,
+	))
+	if err != nil {
+		logger.
+			With(zap.String("operation", op)).
+			Error("failed to connect to database", zap.Error(err))
+	}
+
+	handler := handler.New(
+		keycloakClient,
+		postgresDB,
+		postgresDB,
+		postgresDB,
+		logger,
+	)
 
 	router := chi.NewRouter()
 	setupRouter(router, handler)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Addr:    fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port),
 		Handler: router,
 	}
 

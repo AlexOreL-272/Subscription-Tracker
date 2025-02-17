@@ -4,20 +4,33 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
 	"go.uber.org/zap"
 )
 
 type Handler struct {
-	logger         *zap.Logger
-	keycloakClient *keycloak.KeycloakClient
+	logger      *zap.Logger
+	authClient  auth.Auth
+	userSaver   storage.UserSaver
+	subSaver    storage.SubscriptionSaver
+	subProvider storage.SubscriptionProvider
 }
 
-func New(keycloakClient *keycloak.KeycloakClient, logger *zap.Logger) *Handler {
+func New(
+	authClient auth.Auth,
+	userSaver storage.UserSaver,
+	subSaver storage.SubscriptionSaver,
+	subProvider storage.SubscriptionProvider,
+	logger *zap.Logger,
+) *Handler {
 	return &Handler{
-		logger:         logger,
-		keycloakClient: keycloakClient,
+		logger:      logger,
+		authClient:  authClient,
+		userSaver:   userSaver,
+		subSaver:    subSaver,
+		subProvider: subProvider,
 	}
 }
 
@@ -25,6 +38,7 @@ func (h *Handler) Echo(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, world!"))
 }
 
+// TODO: make auth and storage saving in transaction
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	const handler = "http.Handler.Register"
 
@@ -47,8 +61,8 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	// save user to keycloak
-	registerResp, err := h.keycloakClient.Register(
+	// save user to auth service
+	registerResp, err := h.authClient.Register(
 		r.Context(),
 		userCredentials,
 	)
@@ -61,8 +75,21 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: save user to database
-	// implementation
+	// save user to database
+	_, err = h.userSaver.SaveUser(
+		registerResp.Id,
+		userCredentials.FullName,
+		userCredentials.Surname,
+		userCredentials.Email,
+	)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to save user to database", zap.Error(err))
+		http.Error(w, "failed to save user to database", http.StatusInternalServerError)
+
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -99,7 +126,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	loginResp, err := h.keycloakClient.Login(
+	loginResp, err := h.authClient.Login(
 		r.Context(),
 		loginCredentials.Email,
 		loginCredentials.Password,

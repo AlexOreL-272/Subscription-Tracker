@@ -27,11 +27,13 @@ type Gateway struct {
 }
 
 type Database struct {
+	Driver   string `yaml:"driver" env:"DB_DRIVER" env-default:"postgres"`
 	Host     string `yaml:"host" env:"DB_HOST" env-default:"localhost"`
 	Port     int    `yaml:"port" env:"DB_PORT" env-default:"5432"`
 	User     string `yaml:"user" env:"DB_USER" env-default:"postgres"`
 	Password string `yaml:"password" env:"DB_PASSWORD" env-default:"postgres"`
-	Name     string `yaml:"name" env:"DB_NAME" env-default:"database"`
+	DBName   string `yaml:"dbname" env:"DB_NAME" env-default:"database"`
+	SSLMode  string `yaml:"ssl_mode" env:"DB_SSL_MODE" env-default:"disable"`
 }
 
 type Keycloak struct {

@@ -7,7 +7,8 @@ import (
 )
 
 type UserSaver interface {
-	Save(
+	SaveUser(
+		id string,
 		fullName string,
 		surname string,
 		email string,
@@ -15,7 +16,7 @@ type UserSaver interface {
 }
 
 type SubscriptionSaver interface {
-	Save(
+	SaveSubscription(
 		caption string,
 		link string,
 		tag string,
