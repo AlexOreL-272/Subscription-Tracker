@@ -34,7 +34,7 @@ func New(
 	adminPass string,
 ) *KeycloakClient {
 	return &KeycloakClient{
-		baseURL:      fmt.Sprintf("http://%s/auth", address),
+		baseURL:      fmt.Sprintf("http://%s", address),
 		realm:        realm,
 		realmAdmin:   realmAdmin,
 		clientID:     clientID,

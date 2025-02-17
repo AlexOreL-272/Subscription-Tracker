@@ -1,19 +1,20 @@
 package gatewayapp
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
+	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
 
 type Application struct {
-	gatewayServer  *http.Server
-	keycloakClient *keycloak.KeycloakClient
-	logger         *zap.Logger
+	gatewayServer *http.Server
+	logger        *zap.Logger
 }
 
 type GatewayConfig struct {
@@ -33,14 +34,6 @@ func New(
 	cfg GatewayConfig,
 	logger *zap.Logger,
 ) *Application {
-	router := chi.NewRouter()
-	setupRouter(router)
-
-	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-		Handler: router,
-	}
-
 	keycloakClient := keycloak.New(
 		cfg.KeycloakAddress,
 		cfg.KeycloakRealm,
@@ -51,10 +44,19 @@ func New(
 		cfg.KeycloakAdminPass,
 	)
 
+	handler := handler.New(keycloakClient, logger)
+
+	router := chi.NewRouter()
+	setupRouter(router, handler)
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Handler: router,
+	}
+
 	return &Application{
-		gatewayServer:  srv,
-		keycloakClient: keycloakClient,
-		logger:         logger,
+		gatewayServer: srv,
+		logger:        logger,
 	}
 }
 
@@ -89,16 +91,21 @@ func (a *Application) Shutdown() {
 		With(zap.String("operation", op)).
 		Info("shutting down")
 
-	if err := a.gatewayServer.Shutdown(nil); err != nil {
+	ctx := context.Background()
+	if err := a.gatewayServer.Shutdown(ctx); err != nil {
 		a.logger.
 			With(zap.String("operation", op)).
 			Error("failed to shutdown", zap.Error(err))
 	}
 }
 
-func setupRouter(router *chi.Mux) {
+func setupRouter(
+	router *chi.Mux,
+	handler *handler.Handler,
+) {
 	// use URL paths and middlewares
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, world!"))
-	})
+	router.Get("/", handler.Echo)
+
+	router.Post("/register", handler.Register)
+	router.Post("/login", handler.Login)
 }
