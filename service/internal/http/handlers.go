@@ -160,7 +160,6 @@ func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
 
 	userId := r.URL.Query().Get("user_id")
 	resultType := r.URL.Query().Get("result_type")
-	category := r.URL.Query().Get("category")
 	offsetStr := r.URL.Query().Get("offset")
 	limitStr := r.URL.Query().Get("limit")
 
@@ -190,7 +189,6 @@ func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
 	subs, err := h.subProvider.GetSubscriptions(
 		userId,
 		storage.GetSubscriptionResultType(resultType),
-		category,
 		offset,
 		limit,
 	)

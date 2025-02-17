@@ -152,7 +152,6 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 func (p *PostgresStorage) GetSubscriptions(
 	id string,
 	resultType storage.GetSubscriptionResultType,
-	category string,
 	offset uint32,
 	limit uint32,
 ) ([]domain.Subscription, error) {
