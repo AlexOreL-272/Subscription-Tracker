@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -19,6 +20,24 @@ const (
 		INSERT INTO %s (id, full_name, surname, email)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id;
+	`
+
+	getFullSubscriptionsByUserIDRequest = `
+		SELECT subs.id, subs.caption, subs.link, subs.tag, subs.category, subs.cost, subs.currency, subs.first_pay, subs.interval, subs.comment, subs.color, subs.created_at
+		FROM %s subs
+		LEFT JOIN %s user_subs ON subs.id = user_subs.subs_id
+		WHERE user_subs.user_id = $1
+		ORDER BY subs.created_at DESC
+		LIMIT $2
+		OFFSET $3;
+	`
+
+	getShortSubscriptionsByUserIDRequest = `
+		SELECT subs_id AS id
+		FROM %s
+		WHERE user_id = $1
+		LIMIT $2
+		OFFSET $3;
 	`
 
 	saveSubscriptionRequest = `
@@ -132,12 +151,31 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 
 func (p *PostgresStorage) GetSubscriptions(
 	id string,
-	resultType string,
+	resultType storage.GetSubscriptionResultType,
 	category string,
 	offset uint32,
 	limit uint32,
 ) ([]domain.Subscription, error) {
-	return nil, nil
+	const op = "pgstorage.PostgresStorage.GetSubscriptions"
+
+	var request string
+
+	switch resultType {
+	case storage.FullType:
+		request = fmt.Sprintf(getFullSubscriptionsByUserIDRequest, subTableName, userSubTableName)
+	case storage.ShortType:
+		request = fmt.Sprintf(getShortSubscriptionsByUserIDRequest, userSubTableName)
+	default:
+		return nil, fmt.Errorf("%s:%w", op, storage.ErrInvalidResultType)
+	}
+
+	var subscriptions []domain.Subscription
+
+	if err := p.db.Select(&subscriptions, request, id, limit, offset); err != nil {
+		return nil, fmt.Errorf("%s:%w", op, err)
+	}
+
+	return subscriptions, nil
 }
 
 func (p *PostgresStorage) GetSubscriptionById(

@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"time"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
@@ -37,10 +38,21 @@ type SubscriptionSaver interface {
 
 // TODO: add subscription editor + deleter
 
+type GetSubscriptionResultType string
+
+const (
+	FullType  GetSubscriptionResultType = "full"
+	ShortType GetSubscriptionResultType = "short"
+)
+
+var (
+	ErrInvalidResultType = errors.New("invalid result type")
+)
+
 type SubscriptionProvider interface {
 	GetSubscriptions(
 		id string,
-		resultType string,
+		resultType GetSubscriptionResultType,
 		category string,
 		offset uint32,
 		limit uint32,

@@ -2,7 +2,9 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
@@ -153,6 +155,67 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.GetSubmissions"
+
+	userId := r.URL.Query().Get("user_id")
+	resultType := r.URL.Query().Get("result_type")
+	category := r.URL.Query().Get("category")
+	offsetStr := r.URL.Query().Get("offset")
+	limitStr := r.URL.Query().Get("limit")
+
+	var offset, limit uint32
+	var err error
+
+	if offsetStr != "" {
+		offset, err = strToUint32(offsetStr)
+		if err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to parse offset", zap.Error(err), zap.String("offset", offsetStr))
+			offset = 0
+		}
+	}
+
+	if limitStr != "" {
+		limit, err = strToUint32(limitStr)
+		if err != nil {
+			h.logger.
+				With(zap.String("operation", handler), zap.Error(err)).
+				Error("failed to parse limit", zap.Error(err), zap.String("limit", limitStr))
+			limit = 0
+		}
+	}
+
+	subs, err := h.subProvider.GetSubscriptions(
+		userId,
+		storage.GetSubscriptionResultType(resultType),
+		category,
+		offset,
+		limit,
+	)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to get subscriptions", zap.Error(err))
+		http.Error(w, "failed to get subscriptions", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(subs); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
+}
+
 func (h *Handler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	const handler = "http.Handler.CreateSubscription"
 
@@ -223,4 +286,15 @@ func (h *Handler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+}
+
+func strToUint32(str string) (uint32, error) {
+	const op = "strToUint32"
+
+	uint32Value, err := strconv.ParseUint(str, 10, 32)
+	if err != nil {
+		return 0, fmt.Errorf("%s:%w", op, err)
+	}
+
+	return uint32(uint32Value), nil
 }
