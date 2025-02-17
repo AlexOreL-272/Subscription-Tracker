@@ -9,11 +9,6 @@ type UserCredentials struct {
 	Password string `json:"password"`
 }
 
-type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type Subscription struct {
 	Id        string    `json:"id"`
 	Caption   string    `json:"caption"`

@@ -152,3 +152,75 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h *Handler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.CreateSubscription"
+
+	var createSubRequest domain.CreateSubscriptionRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&createSubRequest); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to decode subscription", zap.Error(err))
+		http.Error(w, "failed to decode subscription", http.StatusBadRequest)
+
+		return
+	}
+
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to close request body", zap.Error(err))
+		}
+	}()
+
+	subId, err := h.subSaver.SaveSubscription(
+		createSubRequest.Subscription.Caption,
+		createSubRequest.Subscription.Link,
+		createSubRequest.Subscription.Tag,
+		createSubRequest.Subscription.Category,
+		createSubRequest.Subscription.Cost,
+		createSubRequest.Subscription.Currency,
+		createSubRequest.Subscription.FirstPay,
+		createSubRequest.Subscription.Interval,
+		createSubRequest.Subscription.Comment,
+		createSubRequest.Subscription.Color,
+	)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to save subscription to database", zap.Error(err))
+		http.Error(w, "failed to save subscription to database", http.StatusInternalServerError)
+
+		return
+	}
+
+	if err := h.subSaver.AssignSubscriptionToUser(
+		createSubRequest.UserID,
+		subId,
+	); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to assign subscription to user", zap.Error(err))
+		http.Error(w, "failed to assign subscription to user", http.StatusInternalServerError)
+
+		return
+	}
+
+	response := domain.SaveSubscriptionResponse{
+		ID: subId,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
+}

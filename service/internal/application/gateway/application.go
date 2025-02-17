@@ -121,9 +121,13 @@ func setupRouter(
 	router *chi.Mux,
 	handler *handler.Handler,
 ) {
-	// use URL paths and middlewares
+	// TODO: use subrouter and assign middlewares to it
 	router.Get("/", handler.Echo)
 
+	// auth endpoints
 	router.Post("/register", handler.Register)
 	router.Post("/login", handler.Login)
+
+	// subscription endpoints
+	router.Post("/subscriptions", handler.CreateSubscription)
 }

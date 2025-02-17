@@ -5,18 +5,30 @@ import (
 	"time"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 const (
-	userTableName = "subscription_tracker.users"
-	subTableName  = "subscription_tracker.subscriptions"
+	userTableName    = "subscription_tracker.users"
+	subTableName     = "subscription_tracker.subscriptions"
+	userSubTableName = "subscription_tracker.user_subscription"
 
 	saveUserRequest = `
 		INSERT INTO %s (id, full_name, surname, email)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id;
+	`
+
+	saveSubscriptionRequest = `
+		INSERT INTO %s (id, caption, link, tag, category, cost, currency, first_pay, interval, comment, color)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+	`
+
+	assignSubscriptionToUserRequest = `
+		INSERT INTO %s (user_id, subs_id)
+		VALUES ($1, $2);
 	`
 )
 
@@ -25,9 +37,11 @@ type PostgresStorage struct {
 }
 
 func New(connString string) (*PostgresStorage, error) {
+	const op = "pgstorage.New"
+
 	db, err := sqlx.Connect("postgres", connString)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s:%w", op, err)
 	}
 
 	return &PostgresStorage{
@@ -71,7 +85,49 @@ func (p *PostgresStorage) SaveSubscription(
 	comment string,
 	color uint8,
 ) (string, error) {
-	return "", nil
+	const op = "pgstorage.PostgresStorage.SaveSubscription"
+
+	subID := uuid.New().String()
+	request := fmt.Sprintf(saveSubscriptionRequest, subTableName)
+
+	_, err := p.db.Exec(
+		request,
+		subID,
+		caption,
+		link,
+		tag,
+		category,
+		cost,
+		currency,
+		firstPay,
+		interval,
+		comment,
+		color,
+	)
+	if err != nil {
+		return "", fmt.Errorf("%s:%w", op, err)
+	}
+
+	return subID, nil
+}
+
+func (p *PostgresStorage) AssignSubscriptionToUser(
+	userID string,
+	subID string,
+) error {
+	const op = "pgstorage.PostgresStorage.AssignSubscriptionToUser"
+
+	request := fmt.Sprintf(assignSubscriptionToUserRequest, userSubTableName)
+
+	if _, err := p.db.Exec(
+		request,
+		userID,
+		subID,
+	); err != nil {
+		return fmt.Errorf("%s:%w", op, err)
+	}
+
+	return nil
 }
 
 func (p *PostgresStorage) GetSubscriptions(

@@ -28,7 +28,14 @@ type SubscriptionSaver interface {
 		comment string,
 		color uint8,
 	) (string, error)
+
+	AssignSubscriptionToUser(
+		userID string,
+		subID string,
+	) error
 }
+
+// TODO: add subscription editor + deleter
 
 type SubscriptionProvider interface {
 	GetSubscriptions(
