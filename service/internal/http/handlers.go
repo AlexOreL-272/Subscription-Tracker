@@ -9,6 +9,7 @@ import (
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
+	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
 
@@ -205,6 +206,34 @@ func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(subs); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
+}
+
+func (h *Handler) GetSubscriptionById(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.GetSubscriptionById"
+
+	subId := chi.URLParam(r, "sub_id")
+
+	sub, err := h.subProvider.GetSubscriptionById(subId)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to get subscription by id", zap.Error(err))
+		http.Error(w, "failed to get subscription by id", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(sub); err != nil {
 		h.logger.
 			With(zap.String("operation", handler)).
 			Error("failed to encode response", zap.Error(err))

@@ -130,5 +130,6 @@ func setupRouter(
 
 	// subscription endpoints
 	router.Get("/subscriptions", handler.GetSubscriptions)
+	router.Get("/subscriptions/{sub_id}", handler.GetSubscriptionById)
 	router.Post("/subscriptions", handler.CreateSubscription)
 }

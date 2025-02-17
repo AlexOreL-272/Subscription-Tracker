@@ -1,6 +1,8 @@
 package pgstorage
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -38,6 +40,12 @@ const (
 		WHERE user_id = $1
 		LIMIT $2
 		OFFSET $3;
+	`
+
+	getSubscriptionByIDRequest = `
+		SELECT id, caption, link, tag, category, cost, currency, first_pay, interval, comment, color, created_at
+		FROM %s
+		WHERE id = $1;
 	`
 
 	saveSubscriptionRequest = `
@@ -180,5 +188,18 @@ func (p *PostgresStorage) GetSubscriptions(
 func (p *PostgresStorage) GetSubscriptionById(
 	id string,
 ) (domain.Subscription, error) {
-	return domain.Subscription{}, nil
+	const op = "pgstorage.PostgresStorage.GetSubscriptionById"
+
+	request := fmt.Sprintf(getSubscriptionByIDRequest, subTableName)
+
+	var subscription domain.Subscription
+	if err := p.db.Get(&subscription, request, id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Subscription{}, fmt.Errorf("%s: subscription with ID %s not found", op, id)
+		}
+
+		return domain.Subscription{}, fmt.Errorf("%s:%w", op, err)
+	}
+
+	return subscription, nil
 }
