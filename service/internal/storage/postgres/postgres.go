@@ -1,6 +1,7 @@
 package pgstorage
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -43,10 +44,9 @@ func (p *PostgresStorage) SaveUser(
 ) (string, error) {
 	const op = "pgstorage.PostgresStorage.SaveUser"
 
-	var userID string
-
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// Build request
 	saveUserRequest := psql.Insert(userTableName).Columns(
 		"id",
 		"full_name",
@@ -59,6 +59,7 @@ func (p *PostgresStorage) SaveUser(
 		email,
 	)
 
+	// Insert user into database
 	sqlSaveUserRequest, args, err := saveUserRequest.ToSql()
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
@@ -68,7 +69,7 @@ func (p *PostgresStorage) SaveUser(
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
-	return userID, nil
+	return id, nil
 }
 
 func (p *PostgresStorage) SaveSubscription(
@@ -85,9 +86,11 @@ func (p *PostgresStorage) SaveSubscription(
 ) (string, error) {
 	const op = "pgstorage.PostgresStorage.SaveSubscription"
 
+	// Generate subscription ID
 	subID := uuid.New().String()
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// Build request
 	saveSubscriptionRequest := psql.Insert(subTableName).Columns(
 		"id",
 		"caption",
@@ -114,6 +117,7 @@ func (p *PostgresStorage) SaveSubscription(
 		color,
 	)
 
+	// Insert subscription into database
 	sqlSaveSubscriptionRequest, args, err := saveSubscriptionRequest.ToSql()
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
@@ -134,6 +138,7 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// Build request
 	assignSubscriptionToUserRequest := psql.Insert(userSubTableName).Columns(
 		"user_id",
 		"subs_id",
@@ -142,6 +147,7 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 		subID,
 	)
 
+	// Assign subscription to user
 	sqlAssignSubscriptionToUserRequest, args, err := assignSubscriptionToUserRequest.ToSql()
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -164,10 +170,12 @@ func (p *PostgresStorage) GetSubscriptions(
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// Build request baseline
 	var getSubscriptionsRequest squirrel.SelectBuilder
 
 	switch resultType {
 	case storage.FullType:
+		// Build request in case of full result type
 		getSubscriptionsRequest = psql.Select(
 			"subs.id",
 			"subs.caption",
@@ -188,7 +196,7 @@ func (p *PostgresStorage) GetSubscriptions(
 			OrderBy("subs.created_at DESC")
 
 	case storage.ShortType:
-		// request = fmt.Sprintf(getShortSubscriptionsByUserIDRequest, userSubTableName)
+		// Build request in case of short result type
 		getSubscriptionsRequest = psql.Select(
 			"subs_id AS id",
 		).
@@ -199,14 +207,17 @@ func (p *PostgresStorage) GetSubscriptions(
 		return nil, storage.ErrInvalidResultType
 	}
 
+	// Add limit if present
 	if limit != 0 {
 		getSubscriptionsRequest = getSubscriptionsRequest.Limit(uint64(limit))
 	}
 
+	// Add offset if present
 	if offset != 0 {
 		getSubscriptionsRequest = getSubscriptionsRequest.Offset(uint64(offset))
 	}
 
+	// Select subscriptions
 	sqlGetSubscriptionsRequest, args, err := getSubscriptionsRequest.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -228,6 +239,7 @@ func (p *PostgresStorage) GetSubscriptionById(
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// Build request
 	getSubscriptionByIDRequest := psql.Select(
 		"id",
 		"caption",
@@ -245,6 +257,7 @@ func (p *PostgresStorage) GetSubscriptionById(
 		From(subTableName).
 		Where(squirrel.Eq{"id": id})
 
+	// Select subscription by ID
 	sqlGetSubscriptionByIDRequest, args, err := getSubscriptionByIDRequest.ToSql()
 	if err != nil {
 		return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
@@ -256,6 +269,7 @@ func (p *PostgresStorage) GetSubscriptionById(
 		return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
 	}
 
+	// If subscription is not found
 	if len(subscription) == 0 {
 		return domain.Subscription{}, storage.ErrNotFound
 	}
@@ -280,8 +294,10 @@ func (p *PostgresStorage) EditSubscription(
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
+	// Build update request
 	updateSubscriptionRequest := psql.Update(subTableName).Where(squirrel.Eq{"id": id})
 
+	// Add fields to update
 	if caption != "" {
 		updateSubscriptionRequest = updateSubscriptionRequest.Set("caption", caption)
 	}
@@ -325,12 +341,63 @@ func (p *PostgresStorage) EditSubscription(
 	// TODO: make trigger on update
 	updateSubscriptionRequest = updateSubscriptionRequest.Set("updated_at", time.Now())
 
+	// Update subscription
 	sqlUpdateSubscriptionRequest, args, err := updateSubscriptionRequest.ToSql()
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	if _, err := p.db.Exec(sqlUpdateSubscriptionRequest, args...); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (p *PostgresStorage) DeleteSubscription(
+	id string,
+) error {
+	op := "pgstorage.PostgresStorage.DeleteSubscription"
+
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// Build delete requests
+	deleteUserSubscriptionRequest := psql.Delete(userSubTableName).Where(squirrel.Eq{"subs_id": id})
+	deleteSubscriptionRequest := psql.Delete(subTableName).Where(squirrel.Eq{"id": id})
+
+	ctx := context.Background()
+
+	// Begin transaction
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	// Defer rollback in case anything fails
+	defer tx.Rollback()
+
+	// Delete user subscription
+	sqlDeleteUserSubscriptionRequest, args, err := deleteUserSubscriptionRequest.ToSql()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if _, err := tx.Exec(sqlDeleteUserSubscriptionRequest, args...); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	// Delete subscription
+	sqlDeleteSubscriptionRequest, args, err := deleteSubscriptionRequest.ToSql()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if _, err := tx.Exec(sqlDeleteSubscriptionRequest, args...); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
