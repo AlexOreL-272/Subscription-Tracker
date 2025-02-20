@@ -9,6 +9,19 @@ type UserCredentials struct {
 	Password string `json:"password"`
 }
 
+type EditableSubscription struct {
+	Caption  string    `json:"caption,omitempty"`
+	Link     string    `json:"link,omitempty"`
+	Tag      string    `json:"tag,omitempty"`
+	Category string    `json:"category,omitempty"`
+	Cost     float64   `json:"cost,omitempty"`
+	Currency string    `json:"currency,omitempty"`
+	FirstPay time.Time `json:"first_pay,omitempty"`
+	Interval float64   `json:"interval,omitempty"`
+	Comment  string    `json:"comment,omitempty"`
+	Color    uint8     `json:"color,omitempty"`
+}
+
 type Subscription struct {
 	Id        string    `json:"id,omitempty" db:"id"`
 	Caption   string    `json:"caption,omitempty" db:"caption"`

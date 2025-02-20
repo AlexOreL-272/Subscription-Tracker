@@ -19,6 +19,8 @@ type Handler struct {
 	userSaver   storage.UserSaver
 	subSaver    storage.SubscriptionSaver
 	subProvider storage.SubscriptionProvider
+	subEditor   storage.SubscriptionEditor
+	subDeleter  storage.SubscriptionDeleter
 }
 
 func New(
@@ -26,6 +28,8 @@ func New(
 	userSaver storage.UserSaver,
 	subSaver storage.SubscriptionSaver,
 	subProvider storage.SubscriptionProvider,
+	subEditor storage.SubscriptionEditor,
+	subDeleter storage.SubscriptionDeleter,
 	logger *zap.Logger,
 ) *Handler {
 	return &Handler{
@@ -34,6 +38,8 @@ func New(
 		userSaver:   userSaver,
 		subSaver:    subSaver,
 		subProvider: subProvider,
+		subEditor:   subEditor,
+		subDeleter:  subDeleter,
 	}
 }
 
@@ -306,6 +312,93 @@ func (h *Handler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
+}
+
+func (h *Handler) EditSubscription(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.EditSubscription"
+
+	subId := chi.URLParam(r, "sub_id")
+
+	var editSubRequest domain.EditableSubscription
+
+	if err := json.NewDecoder(r.Body).Decode(&editSubRequest); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to decode subscription", zap.Error(err))
+		http.Error(w, "failed to decode subscription", http.StatusBadRequest)
+
+		return
+	}
+
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to close request body", zap.Error(err))
+		}
+	}()
+
+	err := h.subEditor.EditSubscription(
+		subId,
+		editSubRequest.Caption,
+		editSubRequest.Link,
+		editSubRequest.Tag,
+		editSubRequest.Category,
+		editSubRequest.Cost,
+		editSubRequest.Currency,
+		editSubRequest.FirstPay,
+		editSubRequest.Interval,
+		editSubRequest.Comment,
+		editSubRequest.Color,
+	)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to edit subscription", zap.Error(err))
+		http.Error(w, "failed to edit subscription", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(editSubRequest); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
+}
+
+func (h *Handler) DeleteSubscription(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.DeleteSubscription"
+
+	subId := chi.URLParam(r, "sub_id")
+
+	err := h.subDeleter.DeleteSubscription(subId)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to delete subscription", zap.Error(err))
+		http.Error(w, "failed to delete subscription", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(subId); err != nil {
 		h.logger.
 			With(zap.String("operation", handler)).
 			Error("failed to encode response", zap.Error(err))
