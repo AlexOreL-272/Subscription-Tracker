@@ -36,7 +36,27 @@ type SubscriptionSaver interface {
 	) error
 }
 
-// TODO: add subscription editor + deleter
+type SubscriptionEditor interface {
+	EditSubscription(
+		id string,
+		caption string,
+		link string,
+		tag string,
+		category string,
+		cost float64,
+		currency string,
+		firstPay time.Time,
+		interval float64,
+		comment string,
+		color uint8,
+	) error
+}
+
+type SubscriptionDeleter interface {
+	DeleteSubscription(
+		id string,
+	) error
+}
 
 type GetSubscriptionResultType string
 
@@ -47,6 +67,7 @@ const (
 
 var (
 	ErrInvalidResultType = errors.New("invalid result type")
+	ErrNotFound          = errors.New("not found")
 )
 
 type SubscriptionProvider interface {

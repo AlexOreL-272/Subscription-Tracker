@@ -1,13 +1,12 @@
 package pgstorage
 
 import (
-	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
+	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -17,46 +16,6 @@ const (
 	userTableName    = "subscription_tracker.users"
 	subTableName     = "subscription_tracker.subscriptions"
 	userSubTableName = "subscription_tracker.user_subscription"
-
-	saveUserRequest = `
-		INSERT INTO %s (id, full_name, surname, email)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id;
-	`
-
-	getFullSubscriptionsByUserIDRequest = `
-		SELECT subs.id, subs.caption, subs.link, subs.tag, subs.category, subs.cost, subs.currency, subs.first_pay, subs.interval, subs.comment, subs.color, subs.created_at
-		FROM %s subs
-		LEFT JOIN %s user_subs ON subs.id = user_subs.subs_id
-		WHERE user_subs.user_id = $1
-		ORDER BY subs.created_at DESC
-		LIMIT $2
-		OFFSET $3;
-	`
-
-	getShortSubscriptionsByUserIDRequest = `
-		SELECT subs_id AS id
-		FROM %s
-		WHERE user_id = $1
-		LIMIT $2
-		OFFSET $3;
-	`
-
-	getSubscriptionByIDRequest = `
-		SELECT id, caption, link, tag, category, cost, currency, first_pay, interval, comment, color, created_at
-		FROM %s
-		WHERE id = $1;
-	`
-
-	saveSubscriptionRequest = `
-		INSERT INTO %s (id, caption, link, tag, category, cost, currency, first_pay, interval, comment, color)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
-	`
-
-	assignSubscriptionToUserRequest = `
-		INSERT INTO %s (user_id, subs_id)
-		VALUES ($1, $2);
-	`
 )
 
 type PostgresStorage struct {
@@ -68,7 +27,7 @@ func New(connString string) (*PostgresStorage, error) {
 
 	db, err := sqlx.Connect("postgres", connString)
 	if err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &PostgresStorage{
@@ -85,16 +44,28 @@ func (p *PostgresStorage) SaveUser(
 	const op = "pgstorage.PostgresStorage.SaveUser"
 
 	var userID string
-	request := fmt.Sprintf(saveUserRequest, userTableName)
 
-	if err := p.db.QueryRow(
-		request,
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	saveUserRequest := psql.Insert(userTableName).Columns(
+		"id",
+		"full_name",
+		"surname",
+		"email",
+	).Values(
 		id,
 		fullName,
 		surname,
 		email,
-	).Scan(&userID); err != nil {
-		return "", fmt.Errorf("%s:%w", op, err)
+	)
+
+	sqlSaveUserRequest, args, err := saveUserRequest.ToSql()
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	if _, err := p.db.Exec(sqlSaveUserRequest, args...); err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	return userID, nil
@@ -115,10 +86,21 @@ func (p *PostgresStorage) SaveSubscription(
 	const op = "pgstorage.PostgresStorage.SaveSubscription"
 
 	subID := uuid.New().String()
-	request := fmt.Sprintf(saveSubscriptionRequest, subTableName)
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	_, err := p.db.Exec(
-		request,
+	saveSubscriptionRequest := psql.Insert(subTableName).Columns(
+		"id",
+		"caption",
+		"link",
+		"tag",
+		"category",
+		"cost",
+		"currency",
+		"first_pay",
+		"interval",
+		"comment",
+		"color",
+	).Values(
 		subID,
 		caption,
 		link,
@@ -131,8 +113,14 @@ func (p *PostgresStorage) SaveSubscription(
 		comment,
 		color,
 	)
+
+	sqlSaveSubscriptionRequest, args, err := saveSubscriptionRequest.ToSql()
 	if err != nil {
-		return "", fmt.Errorf("%s:%w", op, err)
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	if _, err := p.db.Exec(sqlSaveSubscriptionRequest, args...); err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	return subID, nil
@@ -144,14 +132,23 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 ) error {
 	const op = "pgstorage.PostgresStorage.AssignSubscriptionToUser"
 
-	request := fmt.Sprintf(assignSubscriptionToUserRequest, userSubTableName)
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	if _, err := p.db.Exec(
-		request,
+	assignSubscriptionToUserRequest := psql.Insert(userSubTableName).Columns(
+		"user_id",
+		"subs_id",
+	).Values(
 		userID,
 		subID,
-	); err != nil {
-		return fmt.Errorf("%s:%w", op, err)
+	)
+
+	sqlAssignSubscriptionToUserRequest, args, err := assignSubscriptionToUserRequest.ToSql()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if _, err := p.db.Exec(sqlAssignSubscriptionToUserRequest, args...); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil
@@ -165,21 +162,60 @@ func (p *PostgresStorage) GetSubscriptions(
 ) ([]domain.Subscription, error) {
 	const op = "pgstorage.PostgresStorage.GetSubscriptions"
 
-	var request string
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	var getSubscriptionsRequest squirrel.SelectBuilder
 
 	switch resultType {
 	case storage.FullType:
-		request = fmt.Sprintf(getFullSubscriptionsByUserIDRequest, subTableName, userSubTableName)
+		getSubscriptionsRequest = psql.Select(
+			"subs.id",
+			"subs.caption",
+			"subs.link",
+			"subs.tag",
+			"subs.category",
+			"subs.cost",
+			"subs.currency",
+			"subs.first_pay",
+			"subs.interval",
+			"subs.comment",
+			"subs.color",
+			"subs.created_at",
+		).
+			From(fmt.Sprintf("%s subs", subTableName)).
+			LeftJoin(fmt.Sprintf("%s user_subs ON %s", userSubTableName, "subs.id = user_subs.subs_id")).
+			Where(squirrel.Eq{"user_subs.user_id": id}).
+			OrderBy("subs.created_at DESC")
+
 	case storage.ShortType:
-		request = fmt.Sprintf(getShortSubscriptionsByUserIDRequest, userSubTableName)
+		// request = fmt.Sprintf(getShortSubscriptionsByUserIDRequest, userSubTableName)
+		getSubscriptionsRequest = psql.Select(
+			"subs_id AS id",
+		).
+			From(userSubTableName).
+			Where(squirrel.Eq{"user_id": id})
+
 	default:
-		return nil, fmt.Errorf("%s:%w", op, storage.ErrInvalidResultType)
+		return nil, storage.ErrInvalidResultType
+	}
+
+	if limit != 0 {
+		getSubscriptionsRequest = getSubscriptionsRequest.Limit(uint64(limit))
+	}
+
+	if offset != 0 {
+		getSubscriptionsRequest = getSubscriptionsRequest.Offset(uint64(offset))
+	}
+
+	sqlGetSubscriptionsRequest, args, err := getSubscriptionsRequest.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	var subscriptions []domain.Subscription
 
-	if err := p.db.Select(&subscriptions, request, id, limit, offset); err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
+	if err := p.db.Select(&subscriptions, sqlGetSubscriptionsRequest, args...); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return subscriptions, nil
@@ -190,16 +226,113 @@ func (p *PostgresStorage) GetSubscriptionById(
 ) (domain.Subscription, error) {
 	const op = "pgstorage.PostgresStorage.GetSubscriptionById"
 
-	request := fmt.Sprintf(getSubscriptionByIDRequest, subTableName)
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	var subscription domain.Subscription
-	if err := p.db.Get(&subscription, request, id); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Subscription{}, fmt.Errorf("%s: subscription with ID %s not found", op, id)
-		}
+	getSubscriptionByIDRequest := psql.Select(
+		"id",
+		"caption",
+		"link",
+		"tag",
+		"category",
+		"cost",
+		"currency",
+		"first_pay",
+		"interval",
+		"comment",
+		"color",
+		"created_at",
+	).
+		From(subTableName).
+		Where(squirrel.Eq{"id": id})
 
-		return domain.Subscription{}, fmt.Errorf("%s:%w", op, err)
+	sqlGetSubscriptionByIDRequest, args, err := getSubscriptionByIDRequest.ToSql()
+	if err != nil {
+		return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return subscription, nil
+	var subscription []domain.Subscription
+
+	if err := p.db.Select(&subscription, sqlGetSubscriptionByIDRequest, args...); err != nil {
+		return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if len(subscription) == 0 {
+		return domain.Subscription{}, storage.ErrNotFound
+	}
+
+	return subscription[0], nil
+}
+
+func (p *PostgresStorage) EditSubscription(
+	id string,
+	caption string,
+	link string,
+	tag string,
+	category string,
+	cost float64,
+	currency string,
+	firstPay time.Time,
+	interval float64,
+	comment string,
+	color uint8,
+) error {
+	const op = "pgstorage.PostgresStorage.EditSubscription"
+
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	updateSubscriptionRequest := psql.Update(subTableName).Where(squirrel.Eq{"id": id})
+
+	if caption != "" {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("caption", caption)
+	}
+
+	if link != "" {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("link", link)
+	}
+
+	if tag != "" {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("tag", tag)
+	}
+
+	if category != "" {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("category", category)
+	}
+
+	if cost != 0 {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("cost", cost)
+	}
+
+	if currency != "" {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("currency", currency)
+	}
+
+	if !firstPay.IsZero() {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("first_pay", firstPay)
+	}
+
+	if interval != 0 {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("interval", interval)
+	}
+
+	if comment != "" {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("comment", comment)
+	}
+
+	if color != 0 {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("color", color)
+	}
+
+	// TODO: make trigger on update
+	updateSubscriptionRequest = updateSubscriptionRequest.Set("updated_at", time.Now())
+
+	sqlUpdateSubscriptionRequest, args, err := updateSubscriptionRequest.ToSql()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if _, err := p.db.Exec(sqlUpdateSubscriptionRequest, args...); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }
