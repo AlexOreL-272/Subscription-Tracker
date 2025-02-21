@@ -40,11 +40,8 @@ type Keycloak struct {
 	Host         string `yaml:"host" env:"KEYCLOAK_HOST" env-default:"localhost"`
 	Port         int    `yaml:"port" env:"KEYCLOAK_PORT" env-default:"8180"`
 	Realm        string `yaml:"realm" env:"KEYCLOAK_REALM" env-default:""`
-	RealmAdmin   string `yaml:"realmAdmin" env:"KEYCLOAK_REALM_ADMIN" env-default:""`
 	ClientID     string `yaml:"clientId" env:"KEYCLOAK_CLIENT_ID" env-default:""`
 	ClientSecret string `yaml:"clientSecret" env:"KEYCLOAK_CLIENT_SECRET" env-default:""`
-	AdminUser    string `yaml:"adminUser" env:"KEYCLOAK_ADMIN_USER" env-default:""`
-	AdminPass    string `yaml:"adminPass" env:"KEYCLOAK_ADMIN_PASS" env-default:""`
 }
 
 type Logger struct {

@@ -17,30 +17,21 @@ var (
 type KeycloakClient struct {
 	baseURL      string
 	realm        string
-	realmAdmin   string
 	clientID     string
 	clientSecret string
-	adminUser    string
-	adminPass    string
 }
 
 func New(
 	address string,
 	realm string,
-	realmAdmin string,
 	clientID string,
 	clientSecret string,
-	adminUser string,
-	adminPass string,
 ) *KeycloakClient {
 	return &KeycloakClient{
 		baseURL:      fmt.Sprintf("http://%s", address),
 		realm:        realm,
-		realmAdmin:   realmAdmin,
 		clientID:     clientID,
 		clientSecret: clientSecret,
-		adminUser:    adminUser,
-		adminPass:    adminPass,
 	}
 }
 
@@ -52,14 +43,14 @@ func (k *KeycloakClient) Register(
 
 	keycloakClient := gocloak.NewClient(k.baseURL)
 
-	token, err := keycloakClient.LoginAdmin(
+	token, err := keycloakClient.LoginClient(
 		ctx,
-		k.adminUser,
-		k.adminPass,
-		k.realmAdmin,
+		k.clientID,
+		k.clientSecret,
+		k.realm,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	user := gocloak.User{
@@ -78,7 +69,7 @@ func (k *KeycloakClient) Register(
 
 	id, err := keycloakClient.CreateUser(ctx, token.AccessToken, k.realm, user)
 	if err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &auth.RegisterResponse{
@@ -95,11 +86,6 @@ func (k *KeycloakClient) Login(
 
 	keycloakClient := gocloak.NewClient(k.baseURL)
 
-	client, err := keycloakClient.LoginClient(ctx, k.clientID, k.clientSecret, k.realm)
-	if err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
-	}
-
 	token, err := keycloakClient.Login(
 		ctx,
 		k.clientID,
@@ -109,27 +95,20 @@ func (k *KeycloakClient) Login(
 		password,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	users, err := keycloakClient.GetUsers(
+	user, err := keycloakClient.GetUserInfo(
 		ctx,
-		client.AccessToken,
+		token.AccessToken,
 		k.realm,
-		gocloak.GetUsersParams{
-			Email: &email,
-		},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s:%w", op, err)
-	}
-
-	if len(users) == 0 {
-		return nil, fmt.Errorf("%s:%w", op, ErrNoSuchUser)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &auth.LoginResponse{
-		Id:           *users[0].ID,
+		Id:           *user.Sub,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}, nil
@@ -150,7 +129,7 @@ func (k *KeycloakClient) Logout(
 		k.realm,
 		refreshToken,
 	); err != nil {
-		return fmt.Errorf("%s:%w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

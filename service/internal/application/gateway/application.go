@@ -35,11 +35,8 @@ func New(
 	keycloakClient := keycloak.New(
 		fmt.Sprintf("%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port),
 		cfg.Keycloak.Realm,
-		cfg.Keycloak.RealmAdmin,
 		cfg.Keycloak.ClientID,
 		cfg.Keycloak.ClientSecret,
-		cfg.Keycloak.AdminUser,
-		cfg.Keycloak.AdminPass,
 	)
 
 	postgresDB, err := pgstorage.New(fmt.Sprintf(
