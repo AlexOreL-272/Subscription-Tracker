@@ -9,6 +9,7 @@ import (
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
 	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
+	httpmiddleware "github.com/AlexOreL-272/Subscription-Tracker/internal/http/middlewares"
 	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
@@ -66,8 +67,14 @@ func New(
 		logger,
 	)
 
+	loggingMiddleware := httpmiddleware.NewLoggingInterceptor(logger)
+
 	router := chi.NewRouter()
-	setupRouter(router, handler)
+	setupRouter(
+		router,
+		handler,
+		loggingMiddleware.Intercept,
+	)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port),
@@ -122,7 +129,11 @@ func (a *Application) Shutdown() {
 func setupRouter(
 	router *chi.Mux,
 	handler *handler.Handler,
+	middlewares ...func(next http.Handler) http.Handler,
 ) {
+	// middlewares
+	router.Use(middlewares...)
+
 	// TODO: use subrouter and assign middlewares to it
 	router.Get("/", handler.Echo)
 
