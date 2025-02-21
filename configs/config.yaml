@@ -1,3 +1,0 @@
-logger:
-  env: development
-  log_dir: ./logs

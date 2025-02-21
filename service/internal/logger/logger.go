@@ -79,7 +79,7 @@ func updateLogFile(logDir string) error {
 
 	logFilePath := filepath.Join(logDir, fmt.Sprintf("%s.log", currentDate))
 
-	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("cannot open log file: %w", err)
 	}
