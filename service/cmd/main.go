@@ -14,7 +14,7 @@ import (
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		// panic(err)
+		// TODO: panic(err)
 		// nop
 	}
 }

@@ -20,7 +20,7 @@ const (
 	// TODO: use prefix for all endpoints for versioning
 	// urlPrefix = "/api/v1"
 
-	yandexAuthRedirectPath = "/callback"
+	yandexAuthRedirectPath = "/yandex/callback"
 )
 
 type Application struct {
@@ -63,12 +63,10 @@ func New(
 			Error("failed to connect to database", zap.Error(err))
 	}
 
-	gatewayBaseURL := fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port)
-
 	yandexAuth := yandexauth.New(
 		cfg.Yandex.ClientID,
 		cfg.Yandex.ClientSecret,
-		fmt.Sprintf("%s%s", gatewayBaseURL, yandexAuthRedirectPath),
+		fmt.Sprintf("http://alexorel.ru%s", yandexAuthRedirectPath),
 	)
 
 	handler := handler.New(
@@ -93,7 +91,7 @@ func New(
 	)
 
 	srv := &http.Server{
-		Addr:    gatewayBaseURL,
+		Addr:    fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port),
 		Handler: router,
 	}
 
@@ -157,7 +155,7 @@ func setupRouter(
 	router.Post("/register", handler.Register)
 	router.Post("/login", handler.Login)
 
-	router.Get("/yandex_login", handler.LoginWithYandex)
+	router.Get("/yandex/login", handler.LoginWithYandex)
 	router.Get(yandexAuthRedirectPath, handler.YandexCallback)
 
 	// subscription endpoints
