@@ -34,7 +34,7 @@ type Database struct {
 	User     string `yaml:"user" env:"DB_USER" env-default:"postgres"`
 	Password string `yaml:"password" env:"DB_PASSWORD" env-default:"postgres"`
 	DBName   string `yaml:"dbname" env:"DB_NAME" env-default:"database"`
-	SSLMode  string `yaml:"ssl_mode" env:"DB_SSL_MODE" env-default:"disable"`
+	SSLMode  string `yaml:"sslMode" env:"DB_SSL_MODE" env-default:"disable"`
 }
 
 type Keycloak struct {
@@ -52,7 +52,7 @@ type Yandex struct {
 
 type Logger struct {
 	Env    EnvType `yaml:"env" env:"ENV" env-default:"development"`
-	LogDir string  `yaml:"log_dir" env:"LOG_DIR" env-default:"./logs"`
+	LogDir string  `yaml:"logDir" env:"LOG_DIR" env-default:"./logs"`
 }
 
 func MustLoad() *Config {
@@ -78,7 +78,7 @@ func fetchConfigPath() string {
 	path := os.Getenv("CONFIG_PATH")
 
 	if path == "" {
-		path = "./configs/config.yaml"
+		path = "/opt/wasubi/configs/service/config.yaml"
 	}
 
 	return path
