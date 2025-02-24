@@ -18,6 +18,7 @@ func New(
 		Gateway:  cfg.Gateway,
 		Keycloak: cfg.Keycloak,
 		Database: cfg.Database,
+		Yandex:   cfg.Yandex,
 	}
 
 	apiGateway := gatewayapp.New(gatewayConfig, logger)

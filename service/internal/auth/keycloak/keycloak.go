@@ -15,7 +15,7 @@ var (
 )
 
 type KeycloakClient struct {
-	baseURL      string
+	client       *gocloak.GoCloak
 	realm        string
 	clientID     string
 	clientSecret string
@@ -27,8 +27,10 @@ func New(
 	clientID string,
 	clientSecret string,
 ) *KeycloakClient {
+	baseURL := fmt.Sprintf("http://%s", address)
+
 	return &KeycloakClient{
-		baseURL:      fmt.Sprintf("http://%s", address),
+		client:       gocloak.NewClient(baseURL),
 		realm:        realm,
 		clientID:     clientID,
 		clientSecret: clientSecret,
@@ -41,9 +43,7 @@ func (k *KeycloakClient) Register(
 ) (*auth.RegisterResponse, error) {
 	const op = "keycloak.Register"
 
-	keycloakClient := gocloak.NewClient(k.baseURL)
-
-	token, err := keycloakClient.LoginClient(
+	token, err := k.client.LoginClient(
 		ctx,
 		k.clientID,
 		k.clientSecret,
@@ -67,7 +67,7 @@ func (k *KeycloakClient) Register(
 		},
 	}
 
-	id, err := keycloakClient.CreateUser(ctx, token.AccessToken, k.realm, user)
+	id, err := k.client.CreateUser(ctx, token.AccessToken, k.realm, user)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -84,9 +84,7 @@ func (k *KeycloakClient) Login(
 ) (*auth.LoginResponse, error) {
 	const op = "keycloak.Login"
 
-	keycloakClient := gocloak.NewClient(k.baseURL)
-
-	token, err := keycloakClient.Login(
+	token, err := k.client.Login(
 		ctx,
 		k.clientID,
 		k.clientSecret,
@@ -98,7 +96,7 @@ func (k *KeycloakClient) Login(
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	user, err := keycloakClient.GetUserInfo(
+	user, err := k.client.GetUserInfo(
 		ctx,
 		token.AccessToken,
 		k.realm,
@@ -120,9 +118,7 @@ func (k *KeycloakClient) Logout(
 ) error {
 	const op = "keycloak.Logout"
 
-	keycloakClient := gocloak.NewClient(k.baseURL)
-
-	if err := keycloakClient.Logout(
+	if err := k.client.Logout(
 		ctx,
 		k.clientID,
 		k.clientSecret,

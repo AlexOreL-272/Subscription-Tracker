@@ -11,6 +11,7 @@ type Config struct {
 	Database Database `yaml:"database" env-required:"true"`
 	Keycloak Keycloak `yaml:"keycloak" env-required:"true"`
 	Logger   Logger   `yaml:"logger" env-required:"true"`
+	Yandex   Yandex   `yaml:"yandex" env-required:"true"`
 }
 
 type EnvType string
@@ -42,6 +43,11 @@ type Keycloak struct {
 	Realm        string `yaml:"realm" env:"KEYCLOAK_REALM" env-default:""`
 	ClientID     string `yaml:"clientId" env:"KEYCLOAK_CLIENT_ID" env-default:""`
 	ClientSecret string `yaml:"clientSecret" env:"KEYCLOAK_CLIENT_SECRET" env-default:""`
+}
+
+type Yandex struct {
+	ClientID     string `yaml:"clientId" env:"YANDEX_CLIENT_ID" env-default:""`
+	ClientSecret string `yaml:"clientSecret" env:"YANDEX_CLIENT_SECRET" env-default:""`
 }
 
 type Logger struct {

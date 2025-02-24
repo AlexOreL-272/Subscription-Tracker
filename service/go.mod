@@ -29,4 +29,5 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
 	go.uber.org/multierr v1.10.0 // indirect
+	golang.org/x/oauth2 v0.26.0
 )
