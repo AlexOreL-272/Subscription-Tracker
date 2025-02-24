@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
+	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
 	"github.com/go-chi/chi"
@@ -21,6 +22,9 @@ type Handler struct {
 	subProvider storage.SubscriptionProvider
 	subEditor   storage.SubscriptionEditor
 	subDeleter  storage.SubscriptionDeleter
+
+	// TODO: use in keycloak
+	yandexAuth *yandexauth.YandexAuth
 }
 
 func New(
@@ -31,6 +35,8 @@ func New(
 	subEditor storage.SubscriptionEditor,
 	subDeleter storage.SubscriptionDeleter,
 	logger *zap.Logger,
+
+	yandexAuth *yandexauth.YandexAuth,
 ) *Handler {
 	return &Handler{
 		logger:      logger,
@@ -40,6 +46,7 @@ func New(
 		subProvider: subProvider,
 		subEditor:   subEditor,
 		subDeleter:  subDeleter,
+		yandexAuth:  yandexAuth,
 	}
 }
 
@@ -160,6 +167,40 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+}
+
+func (h *Handler) LoginWithYandex(w http.ResponseWriter, r *http.Request) {
+	url := h.yandexAuth.AuthCodeURL(true)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func (h *Handler) YandexCallback(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.YandexCallback"
+
+	state := r.FormValue("state")
+	code := r.FormValue("code")
+
+	user, err := h.yandexAuth.GetUserInfo(state, code)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to get user info", zap.Error(err))
+		http.Error(w, "failed to get user info", http.StatusInternalServerError)
+
+		return
+	}
+
+	fmt.Printf("%+v\n", user)
+
+	// info := struct {
+	// 	Email    string `json:"email"`
+	// 	Password string `json:"password"`
+	// }{
+	// 	Email:    user.Email,
+	// 	Password: user.PsuId,
+	// }
+
+	// http.Post("/login", "application/json", bytes.NewBuffer())
 }
 
 func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {

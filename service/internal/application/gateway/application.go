@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
 	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
@@ -13,6 +14,13 @@ import (
 	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
+)
+
+const (
+	// TODO: use prefix for all endpoints for versioning
+	// urlPrefix = "/api/v1"
+
+	yandexAuthRedirectPath = "/callback"
 )
 
 type Application struct {
@@ -24,6 +32,7 @@ type GatewayConfig struct {
 	Gateway  config.Gateway
 	Keycloak config.Keycloak
 	Database config.Database
+	Yandex   config.Yandex
 }
 
 func New(
@@ -35,11 +44,8 @@ func New(
 	keycloakClient := keycloak.New(
 		fmt.Sprintf("%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port),
 		cfg.Keycloak.Realm,
-		cfg.Keycloak.RealmAdmin,
 		cfg.Keycloak.ClientID,
 		cfg.Keycloak.ClientSecret,
-		cfg.Keycloak.AdminUser,
-		cfg.Keycloak.AdminPass,
 	)
 
 	postgresDB, err := pgstorage.New(fmt.Sprintf(
@@ -57,6 +63,14 @@ func New(
 			Error("failed to connect to database", zap.Error(err))
 	}
 
+	gatewayBaseURL := fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port)
+
+	yandexAuth := yandexauth.New(
+		cfg.Yandex.ClientID,
+		cfg.Yandex.ClientSecret,
+		fmt.Sprintf("%s%s", gatewayBaseURL, yandexAuthRedirectPath),
+	)
+
 	handler := handler.New(
 		keycloakClient,
 		postgresDB,
@@ -65,6 +79,8 @@ func New(
 		postgresDB,
 		postgresDB,
 		logger,
+
+		yandexAuth,
 	)
 
 	loggingMiddleware := httpmiddleware.NewLoggingInterceptor(logger)
@@ -77,7 +93,7 @@ func New(
 	)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port),
+		Addr:    gatewayBaseURL,
 		Handler: router,
 	}
 
@@ -140,6 +156,9 @@ func setupRouter(
 	// auth endpoints
 	router.Post("/register", handler.Register)
 	router.Post("/login", handler.Login)
+
+	router.Get("/yandex_login", handler.LoginWithYandex)
+	router.Get(yandexAuthRedirectPath, handler.YandexCallback)
 
 	// subscription endpoints
 	router.Get("/subscriptions", handler.GetSubscriptions)
