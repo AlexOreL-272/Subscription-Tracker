@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
+	idprovider "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers"
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
@@ -17,6 +18,7 @@ import (
 type Handler struct {
 	logger      *zap.Logger
 	authClient  auth.Auth
+	idPManager  idprovider.IdentityProviderManager
 	userSaver   storage.UserSaver
 	subSaver    storage.SubscriptionSaver
 	subProvider storage.SubscriptionProvider
@@ -29,6 +31,7 @@ type Handler struct {
 
 func New(
 	authClient auth.Auth,
+	idPManager idprovider.IdentityProviderManager,
 	userSaver storage.UserSaver,
 	subSaver storage.SubscriptionSaver,
 	subProvider storage.SubscriptionProvider,
@@ -41,6 +44,7 @@ func New(
 	return &Handler{
 		logger:      logger,
 		authClient:  authClient,
+		idPManager:  idPManager,
 		userSaver:   userSaver,
 		subSaver:    subSaver,
 		subProvider: subProvider,
@@ -160,6 +164,67 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
+}
+
+func (h *Handler) AuthWithIdentityProvider(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.AuthWithIdentityProvider"
+
+	provider := r.FormValue("provider")
+
+	url, err := h.idPManager.GetRedirectURL(idprovider.IdProviderType(provider))
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to get redirect url", zap.Error(err))
+		http.Error(w, fmt.Sprintf("unknown provider %q", provider), http.StatusBadRequest)
+
+		return
+	}
+
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.AuthCallback"
+
+	// get user from identity provider
+	user, err := h.idPManager.HandleIdPCallback(r.FormValue("code"))
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to handle idp callback", zap.Error(err))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
+	// save user to database
+	_, err = h.userSaver.SaveUser(
+		user.Id,
+		user.GivenName,
+		user.FamilyName,
+		user.Email,
+	)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to save user to database", zap.Error(err))
+		http.Error(w, "failed to save user to database", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(user); err != nil {
 		h.logger.
 			With(zap.String("operation", handler)).
 			Error("failed to encode response", zap.Error(err))

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	idpmanager "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/keycloak"
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
@@ -14,12 +15,14 @@ import (
 	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
+	"golang.org/x/oauth2"
 )
 
-const (
+var (
 	// TODO: use prefix for all endpoints for versioning
 	// urlPrefix = "/api/v1"
 
+	authRedirectPath       = "/auth/callback"
 	yandexAuthRedirectPath = "/yandex/callback"
 )
 
@@ -41,11 +44,31 @@ func New(
 ) *Application {
 	const op = "gatewayapp.New"
 
+	keycloakAddr := fmt.Sprintf("http://%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port)
+
 	keycloakClient := keycloak.New(
-		fmt.Sprintf("%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port),
+		keycloakAddr,
 		cfg.Keycloak.Realm,
 		cfg.Keycloak.ClientID,
 		cfg.Keycloak.ClientSecret,
+	)
+
+	keycloakRedirectURL := fmt.Sprintf("http://alexorel.ru:%d%s", cfg.Gateway.Port, authRedirectPath)
+
+	keycloakOauth2Config := oauth2.Config{
+		ClientID:     cfg.Keycloak.ClientID,
+		ClientSecret: cfg.Keycloak.ClientSecret,
+		RedirectURL:  keycloakRedirectURL,
+		Scopes:       []string{"openid", "profile", "email"},
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  fmt.Sprintf("%s/realms/%s/protocol/openid-connect/auth", keycloakAddr, cfg.Keycloak.Realm),
+			TokenURL: fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token", keycloakAddr, cfg.Keycloak.Realm),
+		},
+	}
+
+	keycloakIdPManager := idpmanager.New(
+		&keycloakOauth2Config,
+		fmt.Sprintf("%s/realms/%s/protocol/openid-connect/userinfo", keycloakAddr, cfg.Keycloak.Realm),
 	)
 
 	postgresDB, err := pgstorage.New(fmt.Sprintf(
@@ -71,6 +94,7 @@ func New(
 
 	handler := handler.New(
 		keycloakClient,
+		keycloakIdPManager,
 		postgresDB,
 		postgresDB,
 		postgresDB,
@@ -154,6 +178,9 @@ func setupRouter(
 	// auth endpoints
 	router.Post("/register", handler.Register)
 	router.Post("/login", handler.Login)
+
+	router.Get("/auth", handler.AuthWithIdentityProvider)
+	router.Get(authRedirectPath, handler.AuthCallback)
 
 	router.Get("/yandex/login", handler.LoginWithYandex)
 	router.Get(yandexAuthRedirectPath, handler.YandexCallback)

@@ -60,7 +60,7 @@ func (y *YandexAuth) AuthCodeURL(useForce bool) string {
 func (y *YandexAuth) GetUserInfo(
 	state string,
 	code string,
-) (*domain.User, error) {
+) (*domain.YandexUser, error) {
 	if state != y.randomState {
 		return nil, idprovider.ErrStateInvalid
 	}
@@ -82,7 +82,7 @@ func (y *YandexAuth) GetUserInfo(
 
 	defer resp.Body.Close()
 
-	var user domain.User
+	var user domain.YandexUser
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
 		return nil, err
 	}
