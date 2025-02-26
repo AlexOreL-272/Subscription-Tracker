@@ -44,6 +44,7 @@ func New(
 	return &Handler{
 		logger:      logger,
 		authClient:  authClient,
+		idPManager:  idPManager,
 		userSaver:   userSaver,
 		subSaver:    subSaver,
 		subProvider: subProvider,
@@ -193,6 +194,7 @@ func (h *Handler) AuthWithIdentityProvider(w http.ResponseWriter, r *http.Reques
 func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	const handler = "http.Handler.AuthCallback"
 
+	// get user from identity provider
 	user, err := h.idPManager.HandleIdPCallback(r.FormValue("code"))
 	if err != nil {
 		h.logger.
@@ -203,7 +205,33 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("%+v\n", user)
+	// save user to database
+	_, err = h.userSaver.SaveUser(
+		user.Id,
+		user.GivenName,
+		user.FamilyName,
+		user.Email,
+	)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to save user to database", zap.Error(err))
+		http.Error(w, "failed to save user to database", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
 }
 
 func (h *Handler) LoginWithYandex(w http.ResponseWriter, r *http.Request) {

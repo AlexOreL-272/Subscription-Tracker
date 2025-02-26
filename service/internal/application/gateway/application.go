@@ -18,7 +18,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const (
+var (
 	// TODO: use prefix for all endpoints for versioning
 	// urlPrefix = "/api/v1"
 
@@ -44,7 +44,7 @@ func New(
 ) *Application {
 	const op = "gatewayapp.New"
 
-	keycloakAddr := fmt.Sprintf("%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port)
+	keycloakAddr := fmt.Sprintf("http://%s:%d", cfg.Keycloak.Host, cfg.Keycloak.Port)
 
 	keycloakClient := keycloak.New(
 		keycloakAddr,
@@ -53,10 +53,12 @@ func New(
 		cfg.Keycloak.ClientSecret,
 	)
 
+	keycloakRedirectURL := fmt.Sprintf("http://alexorel.ru:%d%s", cfg.Gateway.Port, authRedirectPath)
+
 	keycloakOauth2Config := oauth2.Config{
 		ClientID:     cfg.Keycloak.ClientID,
 		ClientSecret: cfg.Keycloak.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%s:%d%s", cfg.Gateway.Host, cfg.Gateway.Port, authRedirectPath),
+		RedirectURL:  keycloakRedirectURL,
 		Scopes:       []string{"openid", "profile", "email"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  fmt.Sprintf("%s/realms/%s/protocol/openid-connect/auth", keycloakAddr, cfg.Keycloak.Realm),
