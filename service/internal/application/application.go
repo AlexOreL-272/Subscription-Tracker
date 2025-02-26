@@ -15,10 +15,11 @@ func New(
 	logger *zap.Logger,
 ) *Application {
 	gatewayConfig := gatewayapp.GatewayConfig{
-		Gateway:  cfg.Gateway,
-		Keycloak: cfg.Keycloak,
-		Database: cfg.Database,
-		Yandex:   cfg.Yandex,
+		Gateway:      cfg.Gateway,
+		Keycloak:     cfg.Keycloak,
+		Database:     cfg.Database,
+		Yandex:       cfg.Yandex,
+		Notification: cfg.Notification,
 	}
 
 	apiGateway := gatewayapp.New(gatewayConfig, logger)

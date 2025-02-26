@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	Gateway  Gateway  `yaml:"gateway" env-required:"true"`
-	Database Database `yaml:"database" env-required:"true"`
-	Keycloak Keycloak `yaml:"keycloak" env-required:"true"`
-	Logger   Logger   `yaml:"logger" env-required:"true"`
-	Yandex   Yandex   `yaml:"yandex" env-required:"true"`
+	Gateway      Gateway      `yaml:"gateway" env-required:"true"`
+	Database     Database     `yaml:"database" env-required:"true"`
+	Keycloak     Keycloak     `yaml:"keycloak" env-required:"true"`
+	Notification Notification `yaml:"notification" env-required:"true"`
+	Logger       Logger       `yaml:"logger" env-required:"true"`
+	Yandex       Yandex       `yaml:"yandex" env-required:"true"`
 }
 
 type EnvType string
@@ -43,6 +44,19 @@ type Keycloak struct {
 	Realm        string `yaml:"realm" env:"KEYCLOAK_REALM" env-default:""`
 	ClientID     string `yaml:"clientId" env:"KEYCLOAK_CLIENT_ID" env-default:""`
 	ClientSecret string `yaml:"clientSecret" env:"KEYCLOAK_CLIENT_SECRET" env-default:""`
+}
+
+type Notification struct {
+	Email Email `yaml:"email" env-required:"true"`
+}
+
+type Email struct {
+	SenderEmail    string `yaml:"senderEmail" env:"EMAIL_SENDER_EMAIL" env-default:"noreply@wasubi.com"`
+	SenderNickname string `yaml:"senderNickname" env:"EMAIL_SENDER_NICKNAME" env-default:"Wasubi"`
+	SmtpServerHost string `yaml:"smtpServerHost" env:"EMAIL_SMTP_SERVER_HOST" env-default:"smtp.gmail.com"`
+	SmtpServerPort int    `yaml:"smtpServerPort" env:"EMAIL_SMTP_SERVER_PORT" env-default:"587"`
+	SmtpUsername   string `yaml:"smtpUsername" env:"EMAIL_SMTP_USERNAME" env-default:""`
+	SmtpPassword   string `yaml:"smtpPassword" env:"EMAIL_SMTP_PASSWORD" env-default:""`
 }
 
 type Yandex struct {

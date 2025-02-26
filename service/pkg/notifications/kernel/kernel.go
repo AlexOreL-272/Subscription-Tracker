@@ -1,6 +1,8 @@
 package kernel
 
 import (
+	"fmt"
+
 	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications"
 	email "github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications/senders/email"
 	"go.uber.org/zap"
@@ -14,7 +16,7 @@ type Sender struct {
 }
 
 type KernelConfig struct {
-	email *EmailConfig
+	Email *EmailConfig
 }
 
 type EmailConfig struct {
@@ -37,10 +39,10 @@ func New(
 	return &Sender{
 		logger: logger,
 		emailSender: email.New(
-			cfg.email.SmtpServerHost,
-			cfg.email.SmtpServerPort,
-			cfg.email.SmtpUsername,
-			cfg.email.SmtpPassword,
+			cfg.Email.SmtpServerHost,
+			cfg.Email.SmtpServerPort,
+			cfg.Email.SmtpUsername,
+			cfg.Email.SmtpPassword,
 		),
 		senderCredentials: creds,
 	}
@@ -69,7 +71,7 @@ func (s *Sender) sendEmail(
 
 	s.logger.
 		With(zap.String("op", op)).
-		Info("Sending email notification to", zap.Strings("to", to))
+		Debug("Sending email notification to", zap.Strings("to", to))
 
 	subject, ok := opts[notifications.Subject]
 	if !ok {
@@ -89,8 +91,14 @@ func (s *Sender) sendEmail(
 		contentType = "text/plain"
 	}
 
+	shownName := fmt.Sprintf(
+		"%s <%s>",
+		s.senderCredentials.SenderNickname,
+		s.senderCredentials.SenderEmail,
+	)
+
 	emailMessage := email.EmailMessage{
-		From:        s.senderCredentials.SenderEmail,
+		From:        shownName,
 		To:          to,
 		Subject:     subject.(string),
 		ContentType: contentType.(string),

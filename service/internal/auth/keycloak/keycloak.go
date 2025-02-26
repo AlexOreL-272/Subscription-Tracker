@@ -27,10 +27,8 @@ func New(
 	clientID string,
 	clientSecret string,
 ) *KeycloakClient {
-	baseURL := fmt.Sprintf("http://%s", address)
-
 	return &KeycloakClient{
-		client:       gocloak.NewClient(baseURL),
+		client:       gocloak.NewClient(address),
 		realm:        realm,
 		clientID:     clientID,
 		clientSecret: clientSecret,

@@ -11,6 +11,7 @@ import (
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
+	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
@@ -24,6 +25,7 @@ type Handler struct {
 	subProvider storage.SubscriptionProvider
 	subEditor   storage.SubscriptionEditor
 	subDeleter  storage.SubscriptionDeleter
+	notifSender notifications.NotificationSender
 
 	// TODO: use in keycloak
 	yandexAuth *yandexauth.YandexAuth
@@ -37,6 +39,7 @@ func New(
 	subProvider storage.SubscriptionProvider,
 	subEditor storage.SubscriptionEditor,
 	subDeleter storage.SubscriptionDeleter,
+	notifSender notifications.NotificationSender,
 	logger *zap.Logger,
 
 	yandexAuth *yandexauth.YandexAuth,
@@ -50,7 +53,9 @@ func New(
 		subProvider: subProvider,
 		subEditor:   subEditor,
 		subDeleter:  subDeleter,
-		yandexAuth:  yandexAuth,
+		notifSender: notifSender,
+
+		yandexAuth: yandexAuth,
 	}
 }
 
@@ -107,6 +112,25 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 			With(zap.String("operation", handler)).
 			Error("failed to save user to database", zap.Error(err))
 		http.Error(w, "failed to save user to database", http.StatusInternalServerError)
+
+		return
+	}
+
+	// send email notification
+	// TODO: add email verification
+	if err := h.notifSender.Send(
+		notifications.Email,
+		[]string{userCredentials.Email},
+		[]byte("test"),
+		notifications.ParameterTable{
+			notifications.Subject:     "test",
+			notifications.ContentType: "text/plain",
+		},
+	); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to send email notification", zap.Error(err))
+		http.Error(w, "failed to send email notification", http.StatusInternalServerError)
 
 		return
 	}

@@ -13,6 +13,7 @@ import (
 	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
 	httpmiddleware "github.com/AlexOreL-272/Subscription-Tracker/internal/http/middlewares"
 	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
+	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications/kernel"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -32,10 +33,11 @@ type Application struct {
 }
 
 type GatewayConfig struct {
-	Gateway  config.Gateway
-	Keycloak config.Keycloak
-	Database config.Database
-	Yandex   config.Yandex
+	Gateway      config.Gateway
+	Keycloak     config.Keycloak
+	Database     config.Database
+	Yandex       config.Yandex
+	Notification config.Notification
 }
 
 func New(
@@ -92,6 +94,22 @@ func New(
 		fmt.Sprintf("http://alexorel.ru%s", yandexAuthRedirectPath),
 	)
 
+	notifSender := kernel.New(
+		kernel.KernelConfig{
+			Email: &kernel.EmailConfig{
+				SmtpServerHost: cfg.Notification.Email.SmtpServerHost,
+				SmtpServerPort: cfg.Notification.Email.SmtpServerPort,
+				SmtpUsername:   cfg.Notification.Email.SmtpUsername,
+				SmtpPassword:   cfg.Notification.Email.SmtpPassword,
+			},
+		},
+		kernel.SenderCredentials{
+			SenderEmail:    cfg.Notification.Email.SenderEmail,
+			SenderNickname: cfg.Notification.Email.SenderNickname,
+		},
+		logger,
+	)
+
 	handler := handler.New(
 		keycloakClient,
 		keycloakIdPManager,
@@ -100,6 +118,7 @@ func New(
 		postgresDB,
 		postgresDB,
 		postgresDB,
+		notifSender,
 		logger,
 
 		yandexAuth,
