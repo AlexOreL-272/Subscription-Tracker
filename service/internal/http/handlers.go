@@ -7,23 +7,29 @@ import (
 	"strconv"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
+	emailverifier "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/email/verifier"
 	idprovider "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers"
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
+	htmlgenerator "github.com/AlexOreL-272/Subscription-Tracker/internal/html_generator"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
+	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
 
 type Handler struct {
-	logger      *zap.Logger
-	authClient  auth.Auth
-	idPManager  idprovider.IdentityProviderManager
-	userSaver   storage.UserSaver
-	subSaver    storage.SubscriptionSaver
-	subProvider storage.SubscriptionProvider
-	subEditor   storage.SubscriptionEditor
-	subDeleter  storage.SubscriptionDeleter
+	logger        *zap.Logger
+	authClient    auth.Auth
+	idPManager    idprovider.IdentityProviderManager
+	userSaver     storage.UserSaver
+	subSaver      storage.SubscriptionSaver
+	subProvider   storage.SubscriptionProvider
+	subEditor     storage.SubscriptionEditor
+	subDeleter    storage.SubscriptionDeleter
+	notifSender   notifications.NotificationSender
+	emailVerifier emailverifier.Verifier
+	htmlGenerator htmlgenerator.EmailHTMLGenerator
 
 	// TODO: use in keycloak
 	yandexAuth *yandexauth.YandexAuth
@@ -37,20 +43,27 @@ func New(
 	subProvider storage.SubscriptionProvider,
 	subEditor storage.SubscriptionEditor,
 	subDeleter storage.SubscriptionDeleter,
+	notifSender notifications.NotificationSender,
+	emailVerifier emailverifier.Verifier,
+	htmlGenerator htmlgenerator.EmailHTMLGenerator,
 	logger *zap.Logger,
 
 	yandexAuth *yandexauth.YandexAuth,
 ) *Handler {
 	return &Handler{
-		logger:      logger,
-		authClient:  authClient,
-		idPManager:  idPManager,
-		userSaver:   userSaver,
-		subSaver:    subSaver,
-		subProvider: subProvider,
-		subEditor:   subEditor,
-		subDeleter:  subDeleter,
-		yandexAuth:  yandexAuth,
+		logger:        logger,
+		authClient:    authClient,
+		idPManager:    idPManager,
+		userSaver:     userSaver,
+		subSaver:      subSaver,
+		subProvider:   subProvider,
+		subEditor:     subEditor,
+		subDeleter:    subDeleter,
+		notifSender:   notifSender,
+		emailVerifier: emailVerifier,
+		htmlGenerator: htmlGenerator,
+
+		yandexAuth: yandexAuth,
 	}
 }
 
@@ -107,6 +120,44 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 			With(zap.String("operation", handler)).
 			Error("failed to save user to database", zap.Error(err))
 		http.Error(w, "failed to save user to database", http.StatusInternalServerError)
+
+		return
+	}
+
+	token, err := h.emailVerifier.CreateVerificationTicket(userCredentials.Email)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to create verification ticket", zap.Error(err))
+		http.Error(w, "failed to create verification ticket", http.StatusInternalServerError)
+
+		return
+	}
+
+	html, err := h.htmlGenerator.CreateRegistrationEmailHTML(token)
+	if err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to create registration email HTML", zap.Error(err))
+		http.Error(w, "failed to create registration email HTML", http.StatusInternalServerError)
+
+		return
+	}
+
+	// send email notification
+	if err := h.notifSender.Send(
+		notifications.Email,
+		[]string{userCredentials.Email},
+		[]byte(html),
+		notifications.ParameterTable{
+			notifications.Subject:     RegistrationSubject,
+			notifications.ContentType: "text/html",
+		},
+	); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to send email notification", zap.Error(err))
+		http.Error(w, "failed to send email notification", http.StatusInternalServerError)
 
 		return
 	}
@@ -266,6 +317,32 @@ func (h *Handler) YandexCallback(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	// http.Post("/login", "application/json", bytes.NewBuffer())
+}
+
+func (h *Handler) VerifyEmail(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.VerifyEmail"
+
+	token := r.FormValue("token")
+
+	if token == "" {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("token not provided")
+		http.Error(w, "token not provided", http.StatusBadRequest)
+
+		return
+	}
+
+	if err := h.emailVerifier.Verify(token); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to verify email", zap.Error(err))
+		http.Error(w, "failed to verify email", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {

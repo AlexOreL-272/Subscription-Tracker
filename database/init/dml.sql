@@ -4,7 +4,7 @@
 CREATE SCHEMA IF NOT EXISTS "subscription_tracker";
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."users" (
-    id VARCHAR(36) NOT NULL,
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
     surname VARCHAR(50),
     full_name VARCHAR(100),     -- name and middle name separated by space
     email VARCHAR(64),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."users" (
 );
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
-    id VARCHAR(36) NOT NULL,
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
     caption VARCHAR(50) NOT NULL,
     link TEXT,
     tag VARCHAR(30),
@@ -33,9 +33,16 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
 );
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."user_subscription" (
-    user_id VARCHAR(36) NOT NULL,
-    subs_id VARCHAR(36) NOT NULL,
+    user_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    subs_id UUID NOT NULL DEFAULT gen_random_uuid(),
 
     FOREIGN KEY (user_id) REFERENCES "subscription_tracker"."users"(id),
     FOREIGN KEY (subs_id) REFERENCES "subscription_tracker"."subscriptions"(id)
+);
+
+CREATE TABLE IF NOT EXISTS "subscription_tracker"."email_verifications" (
+    email VARCHAR(64) NOT NULL,
+    token VARCHAR(16) NOT NULL,
+
+    PRIMARY KEY (email)
 );

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрационное письмо</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333333;
+            text-align: center;
+        }
+
+        p {
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #007BFF;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Добро пожаловать!</h1>
+        <p>Спасибо за регистрацию в нашем приложении. Мы рады видеть Вас среди наших клиентов.</p>
+        <p>Для завершения регистрации, пожалуйста, подтвердите Ваш email, нажав на кнопку ниже:</p>
+        <div class="button-container">
+            <button id="confirmButton" class="button">Подтвердить Email</button>
+        </div>
+        <div class="footer">
+            <p>С уважением,<br>Команда Wasubi</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('confirmButton').addEventListener('click', function () {
+            // extract token from URL
+            const url = new URL(window.location.href);
+            const token = url.searchParams.get('token');
+
+            fetch('http://alexorel.ru:8080/verify_email?token=' + token, {
+                method: 'GET',
+            })
+                .then(data => {
+                    // redirect to success page
+                    window.location.href = 'http://alexorel.ru:8080/success_verification';
+                })
+                .catch((error) => {
+                    console.error('Error: ', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
