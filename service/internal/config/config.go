@@ -57,6 +57,7 @@ type Email struct {
 	SmtpServerPort int    `yaml:"smtpServerPort" env:"EMAIL_SMTP_SERVER_PORT" env-default:"587"`
 	SmtpUsername   string `yaml:"smtpUsername" env:"EMAIL_SMTP_USERNAME" env-default:""`
 	SmtpPassword   string `yaml:"smtpPassword" env:"EMAIL_SMTP_PASSWORD" env-default:""`
+	TemplatesPath  string `yaml:"templatesPath" env:"EMAIL_TEMPLATES_PATH" env-default:"./templates/emails"`
 }
 
 type Yandex struct {

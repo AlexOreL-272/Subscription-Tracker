@@ -126,5 +126,64 @@ func (k *KeycloakClient) Logout(
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
+	if err := k.client.RevokeToken(
+		ctx,
+		k.realm,
+		k.clientID,
+		k.clientSecret,
+		refreshToken,
+	); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (k *KeycloakClient) SetVerifiedEmail(
+	ctx context.Context,
+	email string,
+) error {
+	const op = "keycloak.SetVerifiedEmail"
+
+	token, err := k.client.LoginClient(
+		ctx,
+		k.clientID,
+		k.clientSecret,
+		k.realm,
+	)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	users, err := k.client.GetUsers(
+		ctx,
+		token.AccessToken,
+		k.realm,
+		gocloak.GetUsersParams{
+			Email: gocloak.StringP(email),
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if len(users) == 0 {
+		return fmt.Errorf("%s: %w", op, ErrNoSuchUser)
+	}
+
+	updatedUser := gocloak.User{
+		ID:            users[0].ID,
+		EmailVerified: gocloak.BoolP(true),
+	}
+
+	if err := k.client.UpdateUser(
+		ctx,
+		token.AccessToken,
+		k.realm,
+		updatedUser,
+	); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
 	return nil
 }
