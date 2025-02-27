@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
+	emailverifier "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/email/verifier"
 	idpmanager "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/keycloak"
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
+	htmlgenerator "github.com/AlexOreL-272/Subscription-Tracker/internal/html_generator"
 	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
 	httpmiddleware "github.com/AlexOreL-272/Subscription-Tracker/internal/http/middlewares"
 	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
@@ -73,7 +75,7 @@ func New(
 		fmt.Sprintf("%s/realms/%s/protocol/openid-connect/userinfo", keycloakAddr, cfg.Keycloak.Realm),
 	)
 
-	postgresDB, err := pgstorage.New(fmt.Sprintf(
+	pgConnString := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Database.Host,
 		cfg.Database.Port,
@@ -81,7 +83,9 @@ func New(
 		cfg.Database.Password,
 		cfg.Database.DBName,
 		cfg.Database.SSLMode,
-	))
+	)
+
+	postgresDB, err := pgstorage.New(pgConnString)
 	if err != nil {
 		logger.
 			With(zap.String("operation", op)).
@@ -110,7 +114,21 @@ func New(
 		logger,
 	)
 
-	handler := handler.New(
+	emailVerifier, err := emailverifier.New(
+		pgConnString,
+		keycloakClient,
+	)
+	if err != nil {
+		logger.
+			With(zap.String("operation", op)).
+			Error("failed to create email verifier", zap.Error(err))
+
+		panic(err) // TODO: think about retries
+	}
+
+	emailGenerator := htmlgenerator.New(cfg.Notification.Email.TemplatesPath)
+
+	httpHandler := handler.New(
 		keycloakClient,
 		keycloakIdPManager,
 		postgresDB,
@@ -119,17 +137,22 @@ func New(
 		postgresDB,
 		postgresDB,
 		notifSender,
+		emailVerifier,
+		emailGenerator,
 		logger,
 
 		yandexAuth,
 	)
+
+	staticHandler := handler.NewStaticFileHandler(cfg.Notification.Email.TemplatesPath)
 
 	loggingMiddleware := httpmiddleware.NewLoggingInterceptor(logger)
 
 	router := chi.NewRouter()
 	setupRouter(
 		router,
-		handler,
+		httpHandler,
+		staticHandler,
 		loggingMiddleware.Intercept,
 	)
 
@@ -186,6 +209,7 @@ func (a *Application) Shutdown() {
 func setupRouter(
 	router *chi.Mux,
 	handler *handler.Handler,
+	static *handler.StaticFileHandler,
 	middlewares ...func(next http.Handler) http.Handler,
 ) {
 	// middlewares
@@ -203,6 +227,11 @@ func setupRouter(
 
 	router.Get("/yandex/login", handler.LoginWithYandex)
 	router.Get(yandexAuthRedirectPath, handler.YandexCallback)
+
+	// email endpoints
+	router.Get("/verify", static.ServeVerifyEmailPage)
+	router.Get("/verify_email", handler.VerifyEmail)
+	router.Get("/success_verification", static.ServeSuccessVerificationPage)
 
 	// subscription endpoints
 	router.Get("/subscriptions", handler.GetSubscriptions)

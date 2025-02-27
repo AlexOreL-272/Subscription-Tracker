@@ -64,13 +64,31 @@
         <p>Спасибо за регистрацию в нашем приложении. Мы рады видеть Вас среди наших клиентов.</p>
         <p>Для завершения регистрации, пожалуйста, подтвердите Ваш email, нажав на кнопку ниже:</p>
         <div class="button-container">
-            <a href="http://alexorel.ru:8080/verify?token={{.Token}}" class="button">Подтвердить Email</a>
+            <button id="confirmButton" class="button">Подтвердить Email</button>
         </div>
-        <p>Если вы не регистрировались в нашем приложении, пожалуйста, проигнорируйте это письмо.</p>
         <div class="footer">
             <p>С уважением,<br>Команда Wasubi</p>
         </div>
     </div>
+
+    <script>
+        document.getElementById('confirmButton').addEventListener('click', function () {
+            // extract token from URL
+            const url = new URL(window.location.href);
+            const token = url.searchParams.get('token');
+
+            fetch('http://alexorel.ru:8080/verify_email?token=' + token, {
+                method: 'GET',
+            })
+                .then(data => {
+                    // redirect to success page
+                    window.location.href = 'http://alexorel.ru:8080/success_verification';
+                })
+                .catch((error) => {
+                    console.error('Error: ', error);
+                });
+        });
+    </script>
 </body>
 
 </html>

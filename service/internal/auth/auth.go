@@ -33,3 +33,10 @@ type Auth interface {
 		creds domain.UserCredentials,
 	) (*RegisterResponse, error)
 }
+
+type EmailVerifier interface {
+	SetVerifiedEmail(
+		ctx context.Context,
+		email string,
+	) error
+}

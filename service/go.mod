@@ -30,6 +30,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
+	github.com/thanhpk/randstr v1.0.6
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/oauth2 v0.26.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
