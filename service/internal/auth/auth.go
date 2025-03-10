@@ -32,11 +32,28 @@ type Auth interface {
 		ctx context.Context,
 		creds domain.UserCredentials,
 	) (*RegisterResponse, error)
+
+	ResetPassword(
+		ctx context.Context,
+		email, newPassword string,
+	) error
 }
 
 type EmailVerifier interface {
 	SetVerifiedEmail(
 		ctx context.Context,
 		email string,
+	) error
+}
+
+type PasswordResetter interface {
+	RequestPasswordReset(
+		ctx context.Context,
+		email string,
+	) error
+
+	ResetPassword(
+		ctx context.Context,
+		token, newPassword string,
 	) error
 }
