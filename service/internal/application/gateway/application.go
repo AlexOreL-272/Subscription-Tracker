@@ -10,11 +10,13 @@ import (
 	idpmanager "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/keycloak"
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/pswreset"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/config"
 	htmlgenerator "github.com/AlexOreL-272/Subscription-Tracker/internal/html_generator"
 	handler "github.com/AlexOreL-272/Subscription-Tracker/internal/http"
 	httpmiddleware "github.com/AlexOreL-272/Subscription-Tracker/internal/http/middlewares"
 	pgstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/postgres"
+	redisstorage "github.com/AlexOreL-272/Subscription-Tracker/internal/storage/redis"
 	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications/kernel"
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
@@ -38,6 +40,7 @@ type GatewayConfig struct {
 	Gateway      config.Gateway
 	Keycloak     config.Keycloak
 	Database     config.Database
+	Redis        config.Redis
 	Yandex       config.Yandex
 	Notification config.Notification
 }
@@ -92,6 +95,19 @@ func New(
 			Error("failed to connect to database", zap.Error(err))
 	}
 
+	redisConnString := fmt.Sprintf(
+		"%s:%d",
+		cfg.Redis.Host,
+		cfg.Redis.Port,
+	)
+
+	redisStorage, err := redisstorage.New(redisConnString)
+	if err != nil {
+		logger.
+			With(zap.String("operation", op)).
+			Error("failed to connect to redis", zap.Error(err))
+	}
+
 	yandexAuth := yandexauth.New(
 		cfg.Yandex.ClientID,
 		cfg.Yandex.ClientSecret,
@@ -128,23 +144,31 @@ func New(
 
 	emailGenerator := htmlgenerator.New(cfg.Notification.Email.TemplatesPath)
 
-	httpHandler := handler.New(
+	passwordResetter := pswreset.New(
+		redisStorage,
 		keycloakClient,
-		keycloakIdPManager,
-		postgresDB,
-		postgresDB,
-		postgresDB,
-		postgresDB,
-		postgresDB,
-		notifSender,
-		emailVerifier,
 		emailGenerator,
-		logger,
-
-		yandexAuth,
+		notifSender,
 	)
 
-	staticHandler := handler.NewStaticFileHandler(cfg.Notification.Email.TemplatesPath)
+	httpHandler := handler.New(
+		keycloakClient,     // auth.Auth
+		keycloakIdPManager, // idpmanager.IdentityProviderManager
+		postgresDB,         // storage.UserSaver
+		postgresDB,         // storage.SubscriptionSaver
+		postgresDB,         // storage.SubscriptionProvider
+		postgresDB,         // storage.SubscriptionEditor
+		postgresDB,         // storage.SubscriptionDeleter
+		notifSender,        // notifications.NotificationSender
+		emailVerifier,      // emailverifier.Verifier
+		passwordResetter,   // auth.PasswordResetter
+		emailGenerator,     // htmlgenerator.EmailHTMLGenerator
+		logger,             // *zap.Logger
+
+		yandexAuth, // yandexauth.YandexAuth
+	)
+
+	staticHandler := handler.NewStaticFileHandler(cfg.Notification.Static.TemplatesPath)
 
 	loggingMiddleware := httpmiddleware.NewLoggingInterceptor(logger)
 
@@ -218,7 +242,7 @@ func setupRouter(
 	// TODO: use subrouter and assign middlewares to it
 	router.Get("/", handler.Echo)
 
-	// auth endpoints
+	// <=========== AUTH ENDPOINTS ===========>
 	router.Post("/register", handler.Register)
 	router.Post("/login", handler.Login)
 
@@ -228,12 +252,23 @@ func setupRouter(
 	router.Get("/yandex/login", handler.LoginWithYandex)
 	router.Get(yandexAuthRedirectPath, handler.YandexCallback)
 
-	// email endpoints
-	router.Get("/verify", static.ServeVerifyEmailPage)
+	// <=========== EMAIL ENDPOINTS ===========>
 	router.Get("/verify_email", handler.VerifyEmail)
+
+	router.Get("/verify", static.ServeVerifyEmailPage)
 	router.Get("/success_verification", static.ServeSuccessVerificationPage)
 
-	// subscription endpoints
+	// request password reset
+	router.Post("/request_password_reset", handler.RequestPasswordReset)
+	// make actual password reset
+	router.Post("/reset_password", handler.ResetPassword)
+
+	// serve the forgot password page
+	router.Get("/forgot_password", static.ServeForgotPasswordPage)
+	// serve the success reset page
+	router.Get("/success_reset", static.ServeSuccessResetPage)
+
+	// <=========== SUBSCRIPTION ENDPOINTS ===========>
 	router.Get("/subscriptions", handler.GetSubscriptions)
 	router.Get("/subscriptions/{sub_id}", handler.GetSubscriptionById)
 	router.Post("/subscriptions", handler.CreateSubscription)

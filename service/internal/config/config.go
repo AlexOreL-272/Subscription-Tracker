@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Gateway      Gateway      `yaml:"gateway" env-required:"true"`
 	Database     Database     `yaml:"database" env-required:"true"`
+	Redis        Redis        `yaml:"redis" env-required:"true"`
 	Keycloak     Keycloak     `yaml:"keycloak" env-required:"true"`
 	Notification Notification `yaml:"notification" env-required:"true"`
 	Logger       Logger       `yaml:"logger" env-required:"true"`
@@ -38,6 +39,11 @@ type Database struct {
 	SSLMode  string `yaml:"sslMode" env:"DB_SSL_MODE" env-default:"disable"`
 }
 
+type Redis struct {
+	Host string `yaml:"host" env:"REDIS_HOST" env-default:"localhost"`
+	Port int    `yaml:"port" env:"REDIS_PORT" env-default:"6379"`
+}
+
 type Keycloak struct {
 	Host         string `yaml:"host" env:"KEYCLOAK_HOST" env-default:"localhost"`
 	Port         int    `yaml:"port" env:"KEYCLOAK_PORT" env-default:"8180"`
@@ -47,7 +53,8 @@ type Keycloak struct {
 }
 
 type Notification struct {
-	Email Email `yaml:"email" env-required:"true"`
+	Email  Email  `yaml:"email" env-required:"true"`
+	Static Static `yaml:"static" env-required:"true"`
 }
 
 type Email struct {
@@ -58,6 +65,10 @@ type Email struct {
 	SmtpUsername   string `yaml:"smtpUsername" env:"EMAIL_SMTP_USERNAME" env-default:""`
 	SmtpPassword   string `yaml:"smtpPassword" env:"EMAIL_SMTP_PASSWORD" env-default:""`
 	TemplatesPath  string `yaml:"templatesPath" env:"EMAIL_TEMPLATES_PATH" env-default:"./templates/emails"`
+}
+
+type Static struct {
+	TemplatesPath string `yaml:"templatesPath" env:"STATIC_TEMPLATES_PATH" env-default:"./templates/static"`
 }
 
 type Yandex struct {

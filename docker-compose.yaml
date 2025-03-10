@@ -10,6 +10,19 @@ services:
     volumes:
       - ./database/init:/docker-entrypoint-initdb.d
 
+  redis:
+    image: redis:alpine
+    container_name: subscription-tracker-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - redis-network
+
   keycloak-db:
     image: postgres:latest
     container_name: keycloak-postgres
@@ -53,14 +66,19 @@ services:
       - /opt/wasubi:/opt/wasubi
     restart: always
     depends_on:
+      - database
+      - redis
       - keycloak
       # keycloak:
       #   condition: service_healthy
     networks:
       - keycloak-network
+      - redis-network
 
 networks:
   keycloak-network:
+    driver: bridge
+  redis-network:
     driver: bridge
 
 volumes:

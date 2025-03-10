@@ -19,17 +19,18 @@ import (
 )
 
 type Handler struct {
-	logger        *zap.Logger
-	authClient    auth.Auth
-	idPManager    idprovider.IdentityProviderManager
-	userSaver     storage.UserSaver
-	subSaver      storage.SubscriptionSaver
-	subProvider   storage.SubscriptionProvider
-	subEditor     storage.SubscriptionEditor
-	subDeleter    storage.SubscriptionDeleter
-	notifSender   notifications.NotificationSender
-	emailVerifier emailverifier.Verifier
-	htmlGenerator htmlgenerator.EmailHTMLGenerator
+	logger           *zap.Logger
+	authClient       auth.Auth
+	idPManager       idprovider.IdentityProviderManager
+	userSaver        storage.UserSaver
+	subSaver         storage.SubscriptionSaver
+	subProvider      storage.SubscriptionProvider
+	subEditor        storage.SubscriptionEditor
+	subDeleter       storage.SubscriptionDeleter
+	notifSender      notifications.NotificationSender
+	emailVerifier    emailverifier.Verifier
+	passwordResetter auth.PasswordResetter
+	htmlGenerator    htmlgenerator.EmailHTMLGenerator
 
 	// TODO: use in keycloak
 	yandexAuth *yandexauth.YandexAuth
@@ -45,30 +46,38 @@ func New(
 	subDeleter storage.SubscriptionDeleter,
 	notifSender notifications.NotificationSender,
 	emailVerifier emailverifier.Verifier,
+	passwordResetter auth.PasswordResetter,
 	htmlGenerator htmlgenerator.EmailHTMLGenerator,
 	logger *zap.Logger,
 
 	yandexAuth *yandexauth.YandexAuth,
 ) *Handler {
 	return &Handler{
-		logger:        logger,
-		authClient:    authClient,
-		idPManager:    idPManager,
-		userSaver:     userSaver,
-		subSaver:      subSaver,
-		subProvider:   subProvider,
-		subEditor:     subEditor,
-		subDeleter:    subDeleter,
-		notifSender:   notifSender,
-		emailVerifier: emailVerifier,
-		htmlGenerator: htmlGenerator,
+		logger:           logger,
+		authClient:       authClient,
+		idPManager:       idPManager,
+		userSaver:        userSaver,
+		subSaver:         subSaver,
+		subProvider:      subProvider,
+		subEditor:        subEditor,
+		subDeleter:       subDeleter,
+		notifSender:      notifSender,
+		emailVerifier:    emailVerifier,
+		passwordResetter: passwordResetter,
+		htmlGenerator:    htmlGenerator,
 
 		yandexAuth: yandexAuth,
 	}
 }
 
 func (h *Handler) Echo(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, world!"))
+	const handler = "http.Handler.Echo"
+
+	if _, err := w.Write([]byte("Hello, world!")); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to write response", zap.Error(err))
+	}
 }
 
 // TODO: make auth and storage saving in transaction
@@ -338,6 +347,92 @@ func (h *Handler) VerifyEmail(w http.ResponseWriter, r *http.Request) {
 			With(zap.String("operation", handler)).
 			Error("failed to verify email", zap.Error(err))
 		http.Error(w, "failed to verify email", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) RequestPasswordReset(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.RequestPasswordReset"
+
+	var requestPasswordResetRequest domain.RequestPasswordResetRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&requestPasswordResetRequest); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to decode request password reset request", zap.Error(err))
+		http.Error(w, "failed to decode request password reset request", http.StatusBadRequest)
+
+		return
+	}
+
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to close request body", zap.Error(err))
+		}
+	}()
+
+	if err := h.passwordResetter.RequestPasswordReset(
+		r.Context(),
+		requestPasswordResetRequest.Email,
+	); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to request password reset", zap.Error(err))
+		http.Error(w, "failed to request password reset", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.ResetPassword"
+
+	token := r.FormValue("token")
+
+	if token == "" {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("token not provided")
+		http.Error(w, "token not provided", http.StatusBadRequest)
+
+		return
+	}
+
+	var resetPasswordRequest domain.ResetPasswordRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&resetPasswordRequest); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to decode reset password request", zap.Error(err))
+		http.Error(w, "failed to decode reset password request", http.StatusBadRequest)
+
+		return
+	}
+
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to close request body", zap.Error(err))
+		}
+	}()
+
+	if err := h.passwordResetter.ResetPassword(
+		r.Context(),
+		token,
+		resetPasswordRequest.NewPassword,
+	); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to reset password", zap.Error(err))
+		http.Error(w, "failed to reset password", http.StatusInternalServerError)
 
 		return
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
+	ctxerror "github.com/AlexOreL-272/Subscription-Tracker/pkg/context_error"
 	"github.com/Nerzal/gocloak/v13"
 )
 
@@ -183,6 +184,52 @@ func (k *KeycloakClient) SetVerifiedEmail(
 		updatedUser,
 	); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (k *KeycloakClient) ResetPassword(
+	ctx context.Context,
+	email, newPassword string,
+) error {
+	const op = "keycloak.KeycloakClient.ResetPassword"
+
+	token, err := k.client.LoginClient(
+		ctx,
+		k.clientID,
+		k.clientSecret,
+		k.realm,
+	)
+	if err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	users, err := k.client.GetUsers(
+		ctx,
+		token.AccessToken,
+		k.realm,
+		gocloak.GetUsersParams{
+			Email: gocloak.StringP(email),
+		},
+	)
+	if err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	if len(users) == 0 {
+		return ctxerror.New(op, ErrNoSuchUser)
+	}
+
+	if err := k.client.SetPassword(
+		ctx,
+		token.AccessToken,
+		*users[0].ID,
+		k.realm,
+		newPassword,
+		false,
+	); err != nil {
+		return ctxerror.New(op, err)
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -81,4 +82,21 @@ type SubscriptionProvider interface {
 	GetSubscriptionById(
 		id string,
 	) (domain.Subscription, error)
+}
+
+type PasswordResetter interface {
+	CreatePasswordResetTicket(
+		ctx context.Context,
+		email string,
+	) (string, error)
+
+	ValidatePasswordResetTicket(
+		ctx context.Context,
+		token string,
+	) (string, error)
+
+	ClosePasswordResetTicket(
+		ctx context.Context,
+		token string,
+	) error
 }
