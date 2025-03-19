@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
     cost REAL NOT NULL,
     currency VARCHAR(3) NOT NULL,
     first_pay TIMESTAMP NOT NULL,
-    interval REAL NOT NULL,     -- in days
+    interval TIMESTAMP NOT NULL,     -- in days
     comment TEXT,
     color INT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
