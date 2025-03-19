@@ -80,7 +80,7 @@ func (p *PostgresStorage) SaveSubscription(
 	cost float64,
 	currency string,
 	firstPay time.Time,
-	interval time.Time,
+	interval uint32,
 	comment string,
 	color uint32,
 ) (string, error) {
@@ -286,7 +286,7 @@ func (p *PostgresStorage) EditSubscription(
 	cost float64,
 	currency string,
 	firstPay time.Time,
-	interval time.Time,
+	interval uint32,
 	comment string,
 	color uint32,
 ) error {
@@ -326,7 +326,7 @@ func (p *PostgresStorage) EditSubscription(
 		updateSubscriptionRequest = updateSubscriptionRequest.Set("first_pay", firstPay)
 	}
 
-	if !interval.IsZero() {
+	if interval != 0 {
 		updateSubscriptionRequest = updateSubscriptionRequest.Set("interval", interval)
 	}
 
