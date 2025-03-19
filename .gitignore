@@ -24,6 +24,8 @@ go.work.sum
 # env file
 *.env
 
+go.sum
+
 config.yaml
 
 #logs
