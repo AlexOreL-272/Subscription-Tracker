@@ -17,9 +17,9 @@ type EditableSubscription struct {
 	Cost     float64   `json:"cost,omitempty"`
 	Currency string    `json:"currency,omitempty"`
 	FirstPay time.Time `json:"first_pay,omitempty"`
-	Interval float64   `json:"interval,omitempty"`
+	Interval time.Time `json:"interval,omitempty"`
 	Comment  string    `json:"comment,omitempty"`
-	Color    uint8     `json:"color,omitempty"`
+	Color    uint32    `json:"color,omitempty"`
 }
 
 type Subscription struct {
@@ -31,8 +31,8 @@ type Subscription struct {
 	Cost      float64   `json:"cost,omitempty" db:"cost"`
 	Currency  string    `json:"currency,omitempty" db:"currency"`
 	FirstPay  time.Time `json:"first_pay,omitempty" db:"first_pay"`
-	Interval  float64   `json:"interval,omitempty" db:"interval"`
+	Interval  time.Time `json:"interval,omitempty" db:"interval"`
 	Comment   string    `json:"comment,omitempty" db:"comment"`
-	Color     uint8     `json:"color,omitempty" db:"color"`
+	Color     uint32    `json:"color,omitempty" db:"color"`
 	CreatedAt time.Time `json:"created_at,omitempty" db:"created_at"`
 }

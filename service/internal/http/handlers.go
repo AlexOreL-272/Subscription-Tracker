@@ -471,6 +471,10 @@ func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	if resultType == "" {
+		resultType = "full"
+	}
+
 	subs, err := h.subProvider.GetSubscriptions(
 		userId,
 		storage.GetSubscriptionResultType(resultType),

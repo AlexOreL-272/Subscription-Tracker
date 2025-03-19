@@ -26,9 +26,9 @@ type SubscriptionSaver interface {
 		cost float64,
 		currency string,
 		firstPay time.Time,
-		interval float64,
+		interval time.Time,
 		comment string,
-		color uint8,
+		color uint32,
 	) (string, error)
 
 	AssignSubscriptionToUser(
@@ -47,9 +47,9 @@ type SubscriptionEditor interface {
 		cost float64,
 		currency string,
 		firstPay time.Time,
-		interval float64,
+		interval time.Time,
 		comment string,
-		color uint8,
+		color uint32,
 	) error
 }
 
