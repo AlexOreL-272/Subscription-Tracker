@@ -40,3 +40,16 @@ func (s *StaticFileHandler) ServeSuccessResetPage(w http.ResponseWriter, r *http
 
 	http.ServeFile(w, r, successResetPswFilePath)
 }
+
+func (s *StaticFileHandler) ServeRandomFile(w http.ResponseWriter, r *http.Request) {
+	filename := r.URL.Query().Get("filename")
+
+	if filename == "" {
+		http.Error(w, "filename not provided", http.StatusBadRequest)
+		return
+	}
+
+	randomFilePath := filepath.Join(s.templatesPath, "random", filename)
+
+	http.ServeFile(w, r, randomFilePath)
+}

@@ -274,4 +274,7 @@ func setupRouter(
 	router.Post("/subscriptions", handler.CreateSubscription)
 	router.Put("/subscriptions/{sub_id}", handler.EditSubscription)
 	router.Delete("/subscriptions/{sub_id}", handler.DeleteSubscription)
+
+	// <=========== TEST ENDPOINTS ===========>
+	router.Get("/random", static.ServeRandomFile)
 }
