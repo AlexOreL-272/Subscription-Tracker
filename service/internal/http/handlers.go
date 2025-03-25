@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -484,6 +485,11 @@ func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
 		limit,
 	)
 	if err != nil {
+		if errors.Is(err, storage.ErrNotFound) {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+
 		h.logger.
 			With(zap.String("operation", handler)).
 			Error("failed to get subscriptions", zap.Error(err))
@@ -512,6 +518,11 @@ func (h *Handler) GetSubscriptionById(w http.ResponseWriter, r *http.Request) {
 
 	sub, err := h.subProvider.GetSubscriptionById(subId)
 	if err != nil {
+		if errors.Is(err, storage.ErrNotFound) {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+
 		h.logger.
 			With(zap.String("operation", handler)).
 			Error("failed to get subscription by id", zap.Error(err))

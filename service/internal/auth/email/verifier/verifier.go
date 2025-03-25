@@ -10,6 +10,8 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/thanhpk/randstr"
+
+	ctxerror "github.com/AlexOreL-272/Subscription-Tracker/pkg/context_error"
 )
 
 type Verifier interface {
@@ -41,7 +43,7 @@ func New(
 
 	db, err := sqlx.Connect("postgres", connString)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	return &EmailVerifier{
@@ -71,11 +73,11 @@ func (v *EmailVerifier) CreateVerificationTicket(
 
 	sqlCreateTicketRequest, args, err := createVerificationTicketRequest.ToSql()
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", ctxerror.New(op, err)
 	}
 
 	if _, err := v.db.Exec(sqlCreateTicketRequest, args...); err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", ctxerror.New(op, err)
 	}
 
 	return token, nil
@@ -104,21 +106,21 @@ func (v *EmailVerifier) Verify(token string) error {
 	// Update verification ticket
 	sqlVerifyRequest, args, err := verifyRequest.ToSql()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	var verifiedEmail string
 
 	if err := v.db.QueryRow(sqlVerifyRequest, args...).Scan(&verifiedEmail); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return ErrNotFound
+			return ctxerror.New(op, ErrNotFound)
 		}
 
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if err := v.verifier.SetVerifiedEmail(context.Background(), verifiedEmail); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil
