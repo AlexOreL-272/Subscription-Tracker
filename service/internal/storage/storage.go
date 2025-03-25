@@ -75,6 +75,7 @@ type SubscriptionProvider interface {
 	GetSubscriptions(
 		id string,
 		resultType GetSubscriptionResultType,
+		category string,
 		offset uint32,
 		limit uint32,
 	) ([]domain.Subscription, error)

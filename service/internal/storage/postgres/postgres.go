@@ -163,6 +163,7 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 func (p *PostgresStorage) GetSubscriptions(
 	id string,
 	resultType storage.GetSubscriptionResultType,
+	category string,
 	offset uint32,
 	limit uint32,
 ) ([]domain.Subscription, error) {
@@ -195,6 +196,11 @@ func (p *PostgresStorage) GetSubscriptions(
 			Where(squirrel.Eq{"user_subs.user_id": id}).
 			OrderBy("subs.created_at DESC")
 
+		// Add category filter if present
+		if category != "" {
+			getSubscriptionsRequest = getSubscriptionsRequest.Where(squirrel.Eq{"subs.category": category})
+		}
+
 	case storage.ShortType:
 		// Build request in case of short result type
 		getSubscriptionsRequest = psql.Select(
@@ -202,6 +208,11 @@ func (p *PostgresStorage) GetSubscriptions(
 		).
 			From(userSubTableName).
 			Where(squirrel.Eq{"user_id": id})
+
+		// Add category filter if present
+		if category != "" {
+			getSubscriptionsRequest = getSubscriptionsRequest.Where(squirrel.Eq{"category": category})
+		}
 
 	default:
 		return nil, storage.ErrInvalidResultType
