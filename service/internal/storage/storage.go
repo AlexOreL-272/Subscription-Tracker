@@ -82,7 +82,7 @@ type SubscriptionProvider interface {
 
 	GetSubscriptionById(
 		id string,
-	) (domain.Subscription, error)
+	) (*domain.Subscription, error)
 }
 
 type PasswordResetter interface {

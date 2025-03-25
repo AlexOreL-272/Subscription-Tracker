@@ -3,7 +3,6 @@ package keycloak
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
@@ -49,7 +48,7 @@ func (k *KeycloakClient) Register(
 		k.realm,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	user := gocloak.User{
@@ -68,7 +67,7 @@ func (k *KeycloakClient) Register(
 
 	id, err := k.client.CreateUser(ctx, token.AccessToken, k.realm, user)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	return &auth.RegisterResponse{
@@ -92,7 +91,7 @@ func (k *KeycloakClient) Login(
 		password,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	user, err := k.client.GetUserInfo(
@@ -101,7 +100,7 @@ func (k *KeycloakClient) Login(
 		k.realm,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	return &auth.LoginResponse{
@@ -124,7 +123,7 @@ func (k *KeycloakClient) Logout(
 		k.realm,
 		refreshToken,
 	); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if err := k.client.RevokeToken(
@@ -134,7 +133,7 @@ func (k *KeycloakClient) Logout(
 		k.clientSecret,
 		refreshToken,
 	); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil
@@ -153,7 +152,7 @@ func (k *KeycloakClient) SetVerifiedEmail(
 		k.realm,
 	)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	users, err := k.client.GetUsers(
@@ -165,11 +164,11 @@ func (k *KeycloakClient) SetVerifiedEmail(
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if len(users) == 0 {
-		return fmt.Errorf("%s: %w", op, ErrNoSuchUser)
+		return ctxerror.New(op, ErrNoSuchUser)
 	}
 
 	updatedUser := gocloak.User{
@@ -183,7 +182,7 @@ func (k *KeycloakClient) SetVerifiedEmail(
 		k.realm,
 		updatedUser,
 	); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil

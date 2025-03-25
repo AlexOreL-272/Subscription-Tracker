@@ -2,11 +2,14 @@ package pgstorage
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
+	ctxerror "github.com/AlexOreL-272/Subscription-Tracker/pkg/context_error"
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -28,7 +31,7 @@ func New(connString string) (*PostgresStorage, error) {
 
 	db, err := sqlx.Connect("postgres", connString)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	return &PostgresStorage{
@@ -62,11 +65,11 @@ func (p *PostgresStorage) SaveUser(
 	// Insert user into database
 	sqlSaveUserRequest, args, err := saveUserRequest.ToSql()
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", ctxerror.New(op, err)
 	}
 
 	if _, err := p.db.Exec(sqlSaveUserRequest, args...); err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", ctxerror.New(op, err)
 	}
 
 	return id, nil
@@ -120,11 +123,11 @@ func (p *PostgresStorage) SaveSubscription(
 	// Insert subscription into database
 	sqlSaveSubscriptionRequest, args, err := saveSubscriptionRequest.ToSql()
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", ctxerror.New(op, err)
 	}
 
 	if _, err := p.db.Exec(sqlSaveSubscriptionRequest, args...); err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", ctxerror.New(op, err)
 	}
 
 	return subID, nil
@@ -150,11 +153,11 @@ func (p *PostgresStorage) AssignSubscriptionToUser(
 	// Assign subscription to user
 	sqlAssignSubscriptionToUserRequest, args, err := assignSubscriptionToUserRequest.ToSql()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if _, err := p.db.Exec(sqlAssignSubscriptionToUserRequest, args...); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil
@@ -231,13 +234,17 @@ func (p *PostgresStorage) GetSubscriptions(
 	// Select subscriptions
 	sqlGetSubscriptionsRequest, args, err := getSubscriptionsRequest.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	var subscriptions []domain.Subscription
 
 	if err := p.db.Select(&subscriptions, sqlGetSubscriptionsRequest, args...); err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ctxerror.New(op, storage.ErrNotFound)
+		}
+
+		return nil, ctxerror.New(op, err)
 	}
 
 	return subscriptions, nil
@@ -245,7 +252,7 @@ func (p *PostgresStorage) GetSubscriptions(
 
 func (p *PostgresStorage) GetSubscriptionById(
 	id string,
-) (domain.Subscription, error) {
+) (*domain.Subscription, error) {
 	const op = "pgstorage.PostgresStorage.GetSubscriptionById"
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
@@ -271,21 +278,25 @@ func (p *PostgresStorage) GetSubscriptionById(
 	// Select subscription by ID
 	sqlGetSubscriptionByIDRequest, args, err := getSubscriptionByIDRequest.ToSql()
 	if err != nil {
-		return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	var subscription []domain.Subscription
 
 	if err := p.db.Select(&subscription, sqlGetSubscriptionByIDRequest, args...); err != nil {
-		return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ctxerror.New(op, storage.ErrNotFound)
+		}
+
+		return nil, ctxerror.New(op, err)
 	}
 
 	// If subscription is not found
 	if len(subscription) == 0 {
-		return domain.Subscription{}, storage.ErrNotFound
+		return nil, ctxerror.New(op, storage.ErrNotFound)
 	}
 
-	return subscription[0], nil
+	return &subscription[0], nil
 }
 
 func (p *PostgresStorage) EditSubscription(
@@ -355,11 +366,11 @@ func (p *PostgresStorage) EditSubscription(
 	// Update subscription
 	sqlUpdateSubscriptionRequest, args, err := updateSubscriptionRequest.ToSql()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if _, err := p.db.Exec(sqlUpdateSubscriptionRequest, args...); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil
@@ -381,7 +392,7 @@ func (p *PostgresStorage) DeleteSubscription(
 	// Begin transaction
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	// Defer rollback in case anything fails
@@ -390,26 +401,26 @@ func (p *PostgresStorage) DeleteSubscription(
 	// Delete user subscription
 	sqlDeleteUserSubscriptionRequest, args, err := deleteUserSubscriptionRequest.ToSql()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if _, err := tx.Exec(sqlDeleteUserSubscriptionRequest, args...); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	// Delete subscription
 	sqlDeleteSubscriptionRequest, args, err := deleteSubscriptionRequest.ToSql()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	if _, err := tx.Exec(sqlDeleteSubscriptionRequest, args...); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil

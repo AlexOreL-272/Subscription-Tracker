@@ -21,6 +21,8 @@ import (
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
+
+	ctxerror "github.com/AlexOreL-272/Subscription-Tracker/pkg/context_error"
 )
 
 var (
@@ -209,7 +211,7 @@ func (a *Application) start() error {
 			return nil
 		}
 
-		return fmt.Errorf("%s: %w", op, err)
+		return ctxerror.New(op, err)
 	}
 
 	return nil

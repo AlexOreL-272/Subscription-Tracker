@@ -3,10 +3,10 @@ package idpmanager
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	idprovider "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
+	ctxerror "github.com/AlexOreL-272/Subscription-Tracker/pkg/context_error"
 	"golang.org/x/oauth2"
 )
 
@@ -56,19 +56,19 @@ func (k *KeycloakOauthConfig) HandleIdPCallback(
 
 	token, err := k.oauthCfg.Exchange(context.Background(), code)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	client := k.oauthCfg.Client(context.Background(), token)
 
 	userInfo, err := client.Get(k.userInfoEndpoint)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	var user domain.UserInfo
 	if err := json.NewDecoder(userInfo.Body).Decode(&user); err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, ctxerror.New(op, err)
 	}
 
 	return &user, nil
