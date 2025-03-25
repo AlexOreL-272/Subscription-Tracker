@@ -247,6 +247,10 @@ func (p *PostgresStorage) GetSubscriptions(
 		return nil, ctxerror.New(op, err)
 	}
 
+	if len(subscriptions) == 0 {
+		return nil, ctxerror.New(op, storage.ErrNotFound)
+	}
+
 	return subscriptions, nil
 }
 
