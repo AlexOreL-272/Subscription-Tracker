@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/category_selector.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/infinite_stream_list.dart';
-import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class SubscriptionsScreen extends StatelessWidget {
   const SubscriptionsScreen({super.key});

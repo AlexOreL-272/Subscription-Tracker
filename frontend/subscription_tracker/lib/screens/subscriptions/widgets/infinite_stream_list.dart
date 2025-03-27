@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
+import 'package:subscription_tracker/screens/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/subscription_info.dart';
 import 'package:subscription_tracker/services/subs_api_service.dart';
 
@@ -102,13 +103,28 @@ class _InfiniteStreamListState extends State<InfiniteStreamList> {
                       },
                     );
                   },
-                  child: SubscriptionPreview(
-                    caption: currentSubs.caption,
-                    cost: currentSubs.cost,
-                    currency: currentSubs.currency,
-                    firstPay: formatDate(currentSubs.firstPay),
-                    interval: currentSubs.interval,
-                    color: Color(currentSubs.color),
+                  child: SlideableWidget(
+                    rightIcon: Icon(Icons.delete_outlined, color: Colors.red),
+                    onRightActionPressed: () {
+                      print('Right Action triggered!');
+                    },
+
+                    leftIcon: Icon(
+                      Icons.pause_circle_outline_rounded,
+                      color: Colors.blue,
+                    ),
+                    onLeftActionPressed: () {
+                      print('Left Action triggered!');
+                    },
+
+                    child: SubscriptionPreview(
+                      caption: currentSubs.caption,
+                      cost: currentSubs.cost,
+                      currency: currentSubs.currency,
+                      firstPay: formatDate(currentSubs.firstPay),
+                      interval: currentSubs.interval,
+                      color: Color(currentSubs.color),
+                    ),
                   ),
                 ),
               );

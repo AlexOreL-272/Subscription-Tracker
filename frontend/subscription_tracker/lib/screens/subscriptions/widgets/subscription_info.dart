@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
 
-class SubscriptionPreview extends StatefulWidget {
+class SubscriptionPreview extends StatelessWidget {
   final String caption;
   final double cost;
   final String currency;
@@ -22,86 +22,75 @@ class SubscriptionPreview extends StatefulWidget {
   });
 
   @override
-  State<SubscriptionPreview> createState() => _SubscriptionPreviewState();
-}
-
-class _SubscriptionPreviewState extends State<SubscriptionPreview> {
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        print(details.primaryDelta);
-      },
-
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: widget.color,
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(20),
-              blurRadius: 2.0,
-              spreadRadius: 1.0,
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 8.0,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 12.0,
-                  children: [
-                    Text(
-                      widget.caption,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w500,
-                      ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(20),
+            blurRadius: 2.0,
+            spreadRadius: 1.0,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8.0,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 12.0,
+                children: [
+                  Text(
+                    caption,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w500,
                     ),
+                  ),
 
-                    Text(
-                      formatCost(widget.cost, widget.currency, widget.interval),
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w300,
-                      ),
+                  Text(
+                    formatCost(cost, currency, interval),
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w300,
                     ),
+                  ),
 
-                    Text(
-                      'Следующий платёж: ${widget.firstPay}',
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w300,
-                      ),
+                  Text(
+                    'Следующий платёж: $firstPay',
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w300,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
 
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: SizedBox(
-                  width: 48.0,
-                  height: 48.0,
-                  child: Center(
-                    child: Text(
-                      getInitials(widget.caption),
-                      style: TextStyle(fontSize: 24.0, fontFamily: 'Inter'),
-                    ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: SizedBox(
+                width: 48.0,
+                height: 48.0,
+                child: Center(
+                  child: Text(
+                    getInitials(caption),
+                    style: TextStyle(fontSize: 24.0, fontFamily: 'Inter'),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
