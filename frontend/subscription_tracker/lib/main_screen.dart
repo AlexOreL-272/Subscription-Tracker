@@ -16,7 +16,7 @@ class _AppState extends State<App> {
   final _pageController = PageController();
 
   final _screens = <Widget>[
-    const SubscriptionsScreen(),
+    SubscriptionsScreen(),
     const StatisticsScreen(),
     const ProfileScreen(),
   ];
@@ -37,6 +37,7 @@ class _AppState extends State<App> {
 
       home: Scaffold(
         backgroundColor: Colors.white,
+
         body: SafeArea(
           child: PageView(
             controller: _pageController,
@@ -46,20 +47,23 @@ class _AppState extends State<App> {
         ),
 
         bottomNavigationBar: SafeArea(
-          child: NavBar(
-            onTapped: (index) {
-              if (_currentIndex == index) return;
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: NavBar(
+              onTapped: (index) {
+                if (_currentIndex == index) return;
 
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
 
-              setState(() {
-                _currentIndex = index;
-              });
-            },
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
           ),
         ),
       ),
