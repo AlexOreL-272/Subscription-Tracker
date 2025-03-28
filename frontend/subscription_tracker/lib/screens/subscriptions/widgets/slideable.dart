@@ -26,10 +26,12 @@ class _SlideableWidgetState extends State<SlideableWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
-  static const double _buttonVisibleThreshold = 0.15;
+  static const double _buttonVisibleThreshold = 0.12;
   static const double _minimalSwipeThreshold = 0.07;
   static const double _actionTriggerThreshold = 0.7;
   static const double _buttonJumpThreshold = 0.7;
+
+  static const double _iconSize = 28.0;
 
   bool _buttonNeedJump = false;
   bool _wasSwipedPastThreshold = false;
@@ -136,23 +138,31 @@ class _SlideableWidgetState extends State<SlideableWidget>
       }
 
       _animationController.animateTo(0.0);
-      _buttonNeedJump = false;
-      _wasSwipedPastThreshold = false;
-      _swipeDirection = 0;
+      setState(() {
+        _buttonNeedJump = false;
+        _wasSwipedPastThreshold = false;
+        _swipeDirection = 0;
+      });
     } else if (_animationController.value >= _buttonVisibleThreshold) {
       // If we swiped partially, animate to the button visible position
       _animationController.animateTo(_buttonVisibleThreshold);
-      _buttonNeedJump = false;
+      setState(() {
+        _buttonNeedJump = false;
+      });
     } else if (_animationController.value >= _minimalSwipeThreshold) {
       // If we swiped just a little bit past the minimal threshold,
       // still animate to the button visible position
       _animationController.animateTo(_buttonVisibleThreshold);
-      _buttonNeedJump = false;
+      setState(() {
+        _buttonNeedJump = false;
+      });
     } else {
       // Otherwise animate back to the start
       _animationController.animateTo(0.0);
-      _buttonNeedJump = false;
-      _swipeDirection = 0;
+      setState(() {
+        _buttonNeedJump = false;
+        _swipeDirection = 0;
+      });
     }
   }
 
@@ -176,7 +186,7 @@ class _SlideableWidgetState extends State<SlideableWidget>
                         right:
                             _buttonNeedJump
                                 ? _buttonJumpThreshold * constraints.maxWidth -
-                                    36.0
+                                    _iconSize
                                 : 0,
                       ),
 
@@ -192,8 +202,7 @@ class _SlideableWidgetState extends State<SlideableWidget>
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
 
-                        iconSize: 24.0 * (1 + _animationController.value * 0.5),
-
+                        iconSize: _iconSize,
                         icon: widget.rightIcon!,
                       ),
                     ),
@@ -212,7 +221,7 @@ class _SlideableWidgetState extends State<SlideableWidget>
                         left:
                             _buttonNeedJump
                                 ? _buttonJumpThreshold * constraints.maxWidth -
-                                    36.0
+                                    _iconSize
                                 : 0,
                       ),
 
@@ -228,7 +237,7 @@ class _SlideableWidgetState extends State<SlideableWidget>
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
 
-                        iconSize: 24.0 * (1 + _animationController.value * 0.5),
+                        iconSize: _iconSize,
 
                         icon: widget.leftIcon!,
                       ),
