@@ -25,11 +25,11 @@ String getInitials(String caption) {
 // and is either a predefined value like N day(s), N week(s), N month(s) or N year(s)
 // or a custom value in days
 String formatCost(double cost, String currency, int interval) {
-  final formattedInterval = formatPeriod(interval);
+  final formattedInterval = formatPreviewPeriod(interval);
   return '${cost.toStringAsFixed(2)} $currency / $formattedInterval';
 }
 
-String formatPeriod(int interval) {
+String formatPreviewPeriod(int interval, [bool conjugate = true]) {
   String formattedInterval;
 
   // looks terrific...
@@ -37,9 +37,9 @@ String formatPeriod(int interval) {
     if (interval % 10 == 1 && interval % 100 != 11) {
       formattedInterval = '$interval День';
     } else if (interval == 7) {
-      formattedInterval = '1 Неделю';
+      formattedInterval = conjugate ? '1 Неделю' : '1 Неделя';
     } else if (interval % 7 == 0 && interval < 30) {
-      formattedInterval = '${interval / 7} Недели';
+      formattedInterval = '${interval ~/ 7} Недели';
     } else if (interval % 10 >= 2 &&
         interval % 10 <= 4 &&
         interval % 100 != 12 &&

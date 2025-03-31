@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'subscription_model.freezed.dart';
 part 'subscription_model.g.dart';
 
-@Freezed(equal: false, copyWith: false, toJson: false, fromJson: false)
+@Freezed(toJson: false, fromJson: false)
 @JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
 class SubscriptionModel with _$SubscriptionModel {
   // not final version of model, but it is not important for the task

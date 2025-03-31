@@ -27,6 +27,222 @@ mixin _$SubscriptionModel {
   int get interval => throw _privateConstructorUsedError;
   String? get comment => throw _privateConstructorUsedError;
   int get color => throw _privateConstructorUsedError;
+
+  /// Create a copy of SubscriptionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SubscriptionModelCopyWith<SubscriptionModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SubscriptionModelCopyWith<$Res> {
+  factory $SubscriptionModelCopyWith(
+    SubscriptionModel value,
+    $Res Function(SubscriptionModel) then,
+  ) = _$SubscriptionModelCopyWithImpl<$Res, SubscriptionModel>;
+  @useResult
+  $Res call({
+    String id,
+    String caption,
+    String? supportLink,
+    String? category,
+    double cost,
+    String currency,
+    DateTime firstPay,
+    int interval,
+    String? comment,
+    int color,
+  });
+}
+
+/// @nodoc
+class _$SubscriptionModelCopyWithImpl<$Res, $Val extends SubscriptionModel>
+    implements $SubscriptionModelCopyWith<$Res> {
+  _$SubscriptionModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SubscriptionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? caption = null,
+    Object? supportLink = freezed,
+    Object? category = freezed,
+    Object? cost = null,
+    Object? currency = null,
+    Object? firstPay = null,
+    Object? interval = null,
+    Object? comment = freezed,
+    Object? color = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            caption:
+                null == caption
+                    ? _value.caption
+                    : caption // ignore: cast_nullable_to_non_nullable
+                        as String,
+            supportLink:
+                freezed == supportLink
+                    ? _value.supportLink
+                    : supportLink // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            category:
+                freezed == category
+                    ? _value.category
+                    : category // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            cost:
+                null == cost
+                    ? _value.cost
+                    : cost // ignore: cast_nullable_to_non_nullable
+                        as double,
+            currency:
+                null == currency
+                    ? _value.currency
+                    : currency // ignore: cast_nullable_to_non_nullable
+                        as String,
+            firstPay:
+                null == firstPay
+                    ? _value.firstPay
+                    : firstPay // ignore: cast_nullable_to_non_nullable
+                        as DateTime,
+            interval:
+                null == interval
+                    ? _value.interval
+                    : interval // ignore: cast_nullable_to_non_nullable
+                        as int,
+            comment:
+                freezed == comment
+                    ? _value.comment
+                    : comment // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            color:
+                null == color
+                    ? _value.color
+                    : color // ignore: cast_nullable_to_non_nullable
+                        as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$SubscriptionModelImplCopyWith<$Res>
+    implements $SubscriptionModelCopyWith<$Res> {
+  factory _$$SubscriptionModelImplCopyWith(
+    _$SubscriptionModelImpl value,
+    $Res Function(_$SubscriptionModelImpl) then,
+  ) = __$$SubscriptionModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String id,
+    String caption,
+    String? supportLink,
+    String? category,
+    double cost,
+    String currency,
+    DateTime firstPay,
+    int interval,
+    String? comment,
+    int color,
+  });
+}
+
+/// @nodoc
+class __$$SubscriptionModelImplCopyWithImpl<$Res>
+    extends _$SubscriptionModelCopyWithImpl<$Res, _$SubscriptionModelImpl>
+    implements _$$SubscriptionModelImplCopyWith<$Res> {
+  __$$SubscriptionModelImplCopyWithImpl(
+    _$SubscriptionModelImpl _value,
+    $Res Function(_$SubscriptionModelImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of SubscriptionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? caption = null,
+    Object? supportLink = freezed,
+    Object? category = freezed,
+    Object? cost = null,
+    Object? currency = null,
+    Object? firstPay = null,
+    Object? interval = null,
+    Object? comment = freezed,
+    Object? color = null,
+  }) {
+    return _then(
+      _$SubscriptionModelImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        caption:
+            null == caption
+                ? _value.caption
+                : caption // ignore: cast_nullable_to_non_nullable
+                    as String,
+        supportLink:
+            freezed == supportLink
+                ? _value.supportLink
+                : supportLink // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        category:
+            freezed == category
+                ? _value.category
+                : category // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        cost:
+            null == cost
+                ? _value.cost
+                : cost // ignore: cast_nullable_to_non_nullable
+                    as double,
+        currency:
+            null == currency
+                ? _value.currency
+                : currency // ignore: cast_nullable_to_non_nullable
+                    as String,
+        firstPay:
+            null == firstPay
+                ? _value.firstPay
+                : firstPay // ignore: cast_nullable_to_non_nullable
+                    as DateTime,
+        interval:
+            null == interval
+                ? _value.interval
+                : interval // ignore: cast_nullable_to_non_nullable
+                    as int,
+        comment:
+            freezed == comment
+                ? _value.comment
+                : comment // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        color:
+            null == color
+                ? _value.color
+                : color // ignore: cast_nullable_to_non_nullable
+                    as int,
+      ),
+    );
+  }
 }
 
 /// @nodoc
@@ -70,6 +286,54 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
   String toString() {
     return 'SubscriptionModel(id: $id, caption: $caption, supportLink: $supportLink, category: $category, cost: $cost, currency: $currency, firstPay: $firstPay, interval: $interval, comment: $comment, color: $color)';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SubscriptionModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.caption, caption) || other.caption == caption) &&
+            (identical(other.supportLink, supportLink) ||
+                other.supportLink == supportLink) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.cost, cost) || other.cost == cost) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency) &&
+            (identical(other.firstPay, firstPay) ||
+                other.firstPay == firstPay) &&
+            (identical(other.interval, interval) ||
+                other.interval == interval) &&
+            (identical(other.comment, comment) || other.comment == comment) &&
+            (identical(other.color, color) || other.color == color));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    caption,
+    supportLink,
+    category,
+    cost,
+    currency,
+    firstPay,
+    interval,
+    comment,
+    color,
+  );
+
+  /// Create a copy of SubscriptionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SubscriptionModelImplCopyWith<_$SubscriptionModelImpl> get copyWith =>
+      __$$SubscriptionModelImplCopyWithImpl<_$SubscriptionModelImpl>(
+        this,
+        _$identity,
+      );
 }
 
 abstract class _SubscriptionModel implements SubscriptionModel {
@@ -106,4 +370,11 @@ abstract class _SubscriptionModel implements SubscriptionModel {
   String? get comment;
   @override
   int get color;
+
+  /// Create a copy of SubscriptionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SubscriptionModelImplCopyWith<_$SubscriptionModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

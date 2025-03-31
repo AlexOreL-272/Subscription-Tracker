@@ -5,6 +5,7 @@ import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/subscription_info.dart';
+import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/services/subs_api_service.dart';
 
 class InfiniteStreamList extends StatefulWidget {
@@ -63,6 +64,7 @@ class _InfiniteStreamListState extends State<InfiniteStreamList> {
 
     if (response.statusCode == 200) {
       _items.addAll(response.body!);
+      SharedData.instance.subscriptions.addAll(response.body!);
       _currentPage++;
       _streamController.add(_items);
     } else if (response.statusCode == 404) {
@@ -76,73 +78,62 @@ class _InfiniteStreamListState extends State<InfiniteStreamList> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<SubscriptionModel>>(
-      stream: _streamController.stream,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.builder(
-            controller: _scrollController,
-            itemCount: snapshot.data!.length,
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: SharedData.instance.subscriptions.length,
 
-            physics: const BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
 
-            // clipBehavior: Clip.none,
-            itemBuilder: (context, index) {
-              final currentSubs = snapshot.data![index];
+      // clipBehavior: Clip.none,
+      itemBuilder: (context, index) {
+        final currentSubs = SharedData.instance.subscriptions[index];
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      useSafeArea: true,
-                      isScrollControlled: true,
-                      builder: (bottomSheetCtx) {
-                        return SubscriptionDetails(subscription: currentSubs);
-                      },
-                    );
-                  },
-                  child: SlideableWidget(
-                    rightIcon: Icon(Icons.delete_outlined, color: Colors.red),
-                    onRightActionPressed: () {
-                      print('Right Action triggered!');
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                useSafeArea: true,
+                isScrollControlled: true,
+                builder: (bottomSheetCtx) {
+                  return SubscriptionDetails(
+                    subscription: currentSubs,
+                    onChanged: (newSubs) {
+                      setState(() {
+                        SharedData.instance.subscriptions[index] = newSubs;
+                      });
                     },
-
-                    leftIcon: Icon(
-                      Icons.pause_circle_outline_rounded,
-                      color: Colors.blue,
-                    ),
-                    onLeftActionPressed: () {
-                      print('Left Action triggered!');
-                    },
-
-                    child: SubscriptionPreview(
-                      caption: currentSubs.caption,
-                      cost: currentSubs.cost,
-                      currency: currentSubs.currency,
-                      firstPay: formatDate(currentSubs.firstPay),
-                      interval: currentSubs.interval,
-                      color: Color(currentSubs.color),
-                    ),
-                  ),
-                ),
+                  );
+                },
               );
             },
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Вышла ошибочка: ${snapshot.error.toString()}'),
-          );
-        } else if (!snapshot.hasData && _notFound) {
-          return const Center(
-            child: Text('Ничего не найдено', style: TextStyle(fontSize: 24.0)),
-          );
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.blueAccent),
-          );
-        }
+
+            child: SlideableWidget(
+              rightIcon: Icon(Icons.delete_outlined, color: Colors.red),
+              onRightActionPressed: () {
+                print('Right Action triggered!');
+              },
+
+              leftIcon: Icon(
+                Icons.pause_circle_outline_rounded,
+                color: Colors.blue,
+              ),
+              onLeftActionPressed: () {
+                print('Left Action triggered!');
+              },
+
+              child: SubscriptionPreview(
+                caption: currentSubs.caption,
+                cost: currentSubs.cost,
+                currency: currentSubs.currency,
+                firstPay: formatDate(currentSubs.firstPay),
+                interval: currentSubs.interval,
+                color: Color(currentSubs.color),
+              ),
+            ),
+          ),
+        );
       },
     );
   }

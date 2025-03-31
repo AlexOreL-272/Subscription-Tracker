@@ -2,6 +2,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
+import 'package:subscription_tracker/services/shared_data.dart';
+import 'package:subscription_tracker/widgets/dropdown_button.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class SubscriptionPreview extends StatelessWidget {
   final String caption;
@@ -35,8 +38,10 @@ class SubscriptionPreview extends StatelessWidget {
           ),
         ],
       ),
+
       child: Padding(
         padding: const EdgeInsets.all(12.0),
+
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8.0,
@@ -99,48 +104,98 @@ class SubscriptionPreview extends StatelessWidget {
 
 class SubscriptionDetails extends StatefulWidget {
   final SubscriptionModel subscription;
+  final ValueChanged<SubscriptionModel> onChanged;
 
-  const SubscriptionDetails({required this.subscription, super.key});
+  const SubscriptionDetails({
+    required this.subscription,
+    required this.onChanged,
+    super.key,
+  });
 
   @override
   State<SubscriptionDetails> createState() => _SubscriptionDetailsState();
 }
 
 class _SubscriptionDetailsState extends State<SubscriptionDetails> {
+  bool _hasChanged = false;
+  late var _newSubscription = widget.subscription;
+  late final String formattedInitialPeriod = formatPreviewPeriod(
+    widget.subscription.interval,
+    false,
+  );
+
   @override
   Widget build(BuildContext context) {
-    final formattedDate = formatDate(widget.subscription.firstPay);
-    final formattedCost = widget.subscription.cost.toStringAsFixed(2);
-    final formattedInterval = formatPeriod(widget.subscription.interval);
+    final formattedDate = formatDate(_newSubscription.firstPay);
+    final formattedCost = _newSubscription.cost.toStringAsFixed(2);
+    final formattedInterval = formatPreviewPeriod(
+      _newSubscription.interval,
+      false,
+    );
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16.0),
+
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
+
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
+
           leading: IconButton(
             icon: const Icon(Icons.keyboard_arrow_down),
             onPressed: () => Navigator.pop(context),
           ),
+
           centerTitle: true,
+
           title: Text(
-            widget.subscription.caption,
+            _newSubscription.caption,
             style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
           ),
+
+          actions: [
+            TextButton(
+              onPressed: () {
+                widget.onChanged(_newSubscription);
+
+                Navigator.pop(context);
+              },
+
+              style: ButtonStyle(
+                overlayColor: WidgetStatePropertyAll<Color>(Colors.transparent),
+
+                splashFactory: NoSplash.splashFactory,
+              ),
+
+              child: Text(
+                'Сохранить',
+                style: TextStyle(
+                  color:
+                      _hasChanged
+                          ? WasubiColors.wasubiPurple
+                          : WasubiColors.wasubiNeutral[450],
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
+          ],
         ),
+
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
                 // header
                 _SubscriptionDetailsHeader(
-                  caption: widget.subscription.caption,
-                  comment: widget.subscription.comment,
+                  caption: _newSubscription.caption,
+                  comment: _newSubscription.comment,
                 ),
 
                 const SizedBox(height: 16.0),
@@ -160,11 +215,15 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     // cost
                     _NamedEntry(
                       name: 'Цена',
-                      child: Text(
-                        '$formattedCost ${widget.subscription.currency}',
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+
+                        child: Text(
+                          '$formattedCost ${_newSubscription.currency}',
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
@@ -172,11 +231,40 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     // currency
                     _NamedEntry(
                       name: 'Валюта',
-                      child: Text(
-                        widget.subscription.currency,
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+
+                      child: Dropdown<String>(
+                        value: _newSubscription.currency,
+
+                        items: SharedData.currencies,
+
+                        onChanged: (value) {
+                          setState(() {
+                            _newSubscription = _newSubscription.copyWith(
+                              currency: value!,
+                            );
+
+                            if (value != widget.subscription.currency) {
+                              _hasChanged = true;
+                            } else if (_newSubscription ==
+                                widget.subscription) {
+                              _hasChanged = false;
+                            }
+                          });
+                        },
+
+                        icon: Icon(Icons.keyboard_arrow_down),
+
+                        buttonDecoration: BoxDecoration(
+                          color: Color(_newSubscription.color),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+
+                        dropdownDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: WasubiColors.wasubiNeutral[400]!,
+                          ),
                         ),
                       ),
                     ),
@@ -184,11 +272,16 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     // next payment
                     _NamedEntry(
                       name: 'Следующая оплата',
-                      child: Text(
-                        formattedDate,
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+
+                      child: Align(
+                        alignment: Alignment.centerRight,
+
+                        child: Text(
+                          formattedDate,
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
@@ -196,19 +289,72 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     //period
                     _NamedEntry(
                       name: 'Период',
-                      child: Text(
-                        formattedInterval,
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+
+                      child: Dropdown<String>(
+                        value: formattedInterval,
+
+                        items: [
+                          if (!SharedData.intervals.keys.contains(
+                            formattedInitialPeriod,
+                          )) ...{
+                            formattedInitialPeriod,
+                          },
+
+                          ...SharedData.intervals.keys,
+                        ],
+
+                        onChanged: (value) {
+                          setState(() {
+                            _newSubscription = _newSubscription.copyWith(
+                              interval: SharedData.intervals[value]!,
+                            );
+
+                            if (SharedData.intervals[value]! !=
+                                widget.subscription.interval) {
+                              _hasChanged = true;
+                            } else if (_newSubscription ==
+                                widget.subscription) {
+                              _hasChanged = false;
+                            }
+                          });
+                        },
+
+                        icon: Icon(Icons.keyboard_arrow_down),
+
+                        buttonDecoration: BoxDecoration(
+                          color: Color(_newSubscription.color),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+
+                        dropdownDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: WasubiColors.wasubiNeutral[400]!,
+                          ),
                         ),
                       ),
                     ),
+
+                    // subscription end date
+                    // _NamedEntry(
+                    //   name: 'Подписка истекает',
+
+                    //   child: const SizedBox(),
+                    // ),
+
+                    // Notify me
+                    // _NamedEntry(
+                    //   name: 'Уведомить меня',
+
+                    //   child: const SizedBox(),
+                    // ),
                   ],
                 ),
 
                 const SizedBox(height: 16.0),
 
+                // additional info
                 const Text(
                   'Дополнительная информация',
                   style: TextStyle(
@@ -224,24 +370,32 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     // card color
                     _NamedEntry(
                       name: 'Цвет карточки',
-                      child: SizedBox(
-                        width: 24.0,
-                        height: 24.0,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            border: Border.all(
-                              color: darkenColor(
-                                Color(widget.subscription.color),
-                                0.2,
+
+                      child: GestureDetector(
+                        onTap: () {
+                          print('Color picker');
+                        },
+
+                        child: SizedBox(
+                          width: 24.0,
+                          height: 24.0,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(
+                                color: darkenColor(
+                                  Color(_newSubscription.color),
+                                  0.2,
+                                ),
                               ),
+                              shape: BoxShape.circle,
                             ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: CircleAvatar(
-                              backgroundColor: Color(widget.subscription.color),
-                              radius: 10.0,
+
+                            child: Center(
+                              child: CircleAvatar(
+                                backgroundColor: Color(_newSubscription.color),
+                                radius: 10.0,
+                              ),
                             ),
                           ),
                         ),
@@ -251,11 +405,40 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     // category
                     _NamedEntry(
                       name: 'Категория',
-                      child: Text(
-                        widget.subscription.category ?? 'Все',
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+
+                      child: Dropdown<String>(
+                        value: _newSubscription.category ?? 'Все',
+
+                        items: SharedData.instance.categories,
+
+                        onChanged: (value) {
+                          setState(() {
+                            _newSubscription = _newSubscription.copyWith(
+                              category: value!,
+                            );
+
+                            if (value != widget.subscription.category) {
+                              _hasChanged = true;
+                            } else if (_newSubscription ==
+                                widget.subscription) {
+                              _hasChanged = false;
+                            }
+                          });
+                        },
+
+                        icon: Icon(Icons.keyboard_arrow_down),
+
+                        buttonDecoration: BoxDecoration(
+                          color: Color(_newSubscription.color),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+
+                        dropdownDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: WasubiColors.wasubiNeutral[400]!,
+                          ),
                         ),
                       ),
                     ),
@@ -280,8 +463,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     _NamedEntry(
                       name: 'Ссылка',
                       child: Text(
-                        widget.subscription.supportLink ??
-                            'https://example.com',
+                        _newSubscription.supportLink ?? 'https://example.com',
                         style: TextStyle(
                           color: Colors.blue[400]!,
                           fontSize: 16.0,
@@ -294,7 +476,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     _NamedEntry(
                       name: 'Телефон',
                       child: Text(
-                        widget.subscription.supportLink ?? '+7 (XXX) XXX-XX-XX',
+                        _newSubscription.supportLink ?? '+7 (XXX) XXX-XX-XX',
                         style: TextStyle(
                           color: Colors.blue[400]!,
                           fontSize: 16.0,
@@ -492,7 +674,7 @@ class _NamedEntry extends StatelessWidget {
               ),
             ),
 
-            child,
+            SizedBox(height: 28.0, child: child),
           ],
         ),
       ),
