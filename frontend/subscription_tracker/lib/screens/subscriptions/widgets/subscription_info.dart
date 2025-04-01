@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/color_picker.dart';
+import 'package:subscription_tracker/screens/subscriptions/widgets/divided_list.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
@@ -214,7 +215,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                   const SizedBox(height: 16.0),
 
-                  const Text(
+                  Text(
                     'Основная информация',
                     style: TextStyle(
                       color: Colors.grey,
@@ -224,11 +225,12 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                   ),
 
                   // main info
-                  _DividedNamedList(
+                  DividedNamedList(
                     children: [
                       // cost
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Цена',
+
                         child: Align(
                           alignment: Alignment.centerRight,
 
@@ -243,7 +245,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       ),
 
                       // currency
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Валюта',
 
                         child: Dropdown<String>(
@@ -299,7 +301,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       ),
 
                       // next payment
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Следующая оплата',
 
                         child: Align(
@@ -315,8 +317,8 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         ),
                       ),
 
-                      //period
-                      _NamedEntry(
+                      // period
+                      NamedEntry(
                         name: 'Период',
 
                         child: Dropdown<String>(
@@ -379,6 +381,44 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                           ),
                         ),
                       ),
+
+                      // end of subscription
+                      NamedEntry(
+                        name: 'Подписка истекает',
+
+                        child: Align(
+                          alignment: Alignment.centerRight,
+
+                          child: Text(
+                            'Никогда',
+
+                            style: TextStyle(
+                              color: Colors.grey[900],
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // notify me
+                      NamedEntry(
+                        name: 'Уведомить меня',
+
+                        child: Align(
+                          alignment: Alignment.centerRight,
+
+                          child: Text(
+                            'Никогда',
+
+                            style: TextStyle(
+                              color: Colors.grey[900],
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
 
@@ -395,10 +435,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                   ),
 
                   // additional info
-                  _DividedNamedList(
+                  DividedNamedList(
                     children: [
                       // card color
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Цвет карточки',
 
                         child: ColorPicker(
@@ -431,7 +471,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       ),
 
                       // category
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Категория',
 
                         child: Dropdown<String>(
@@ -491,9 +531,66 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                   const SizedBox(height: 16.0),
 
                   // trial period
-                  _ExpandableDividedNamedList(
+                  ExpandableDividedNamedList(
                     label: 'Пробный период',
-                    children: [],
+                    children: [
+                      // period
+                      NamedEntry(
+                        name: 'Период',
+
+                        child: Text(
+                          'Пробный период',
+                          style: TextStyle(
+                            color: Colors.grey[900],
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      // cost
+                      NamedEntry(
+                        name: 'Цена',
+
+                        child: Text(
+                          'Пробный name',
+                          style: TextStyle(
+                            color: Colors.grey[900],
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      // end of trial period
+                      NamedEntry(
+                        name: 'Конец периода',
+
+                        child: Text(
+                          'Пробный 2',
+                          style: TextStyle(
+                            color: Colors.grey[900],
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      // notify me
+                      NamedEntry(
+                        name: 'Уведомить меня',
+
+                        child: Text(
+                          'Пробный 3',
+
+                          style: TextStyle(
+                            color: Colors.grey[900],
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 16.0),
@@ -508,35 +605,49 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                   ),
 
                   // contact info
-                  _DividedNamedList(
+                  DividedNamedList(
                     children: [
                       // support link
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Ссылка',
-                        child: Text(
-                          _newSubscription.supportLink ?? 'https://example.com',
-                          style: TextStyle(
-                            color: Colors.blue[400]!,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w400,
+
+                        child: Align(
+                          alignment: Alignment.centerRight,
+
+                          child: Text(
+                            _newSubscription.supportLink ??
+                                'https://example.com',
+                            style: TextStyle(
+                              color: Colors.blue[400]!,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ),
 
                       // phone
-                      _NamedEntry(
+                      NamedEntry(
                         name: 'Телефон',
-                        child: Text(
-                          _newSubscription.supportLink ?? '+7 (XXX) XXX-XX-XX',
-                          style: TextStyle(
-                            color: Colors.blue[400]!,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w400,
+
+                        child: Align(
+                          alignment: Alignment.centerRight,
+
+                          child: Text(
+                            _newSubscription.supportLink ??
+                                '+7 (XXX) XXX-XX-XX',
+                            style: TextStyle(
+                              color: Colors.blue[400]!,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
+
+                  const SizedBox(height: 160.0),
                 ],
               ),
             ),
@@ -569,10 +680,13 @@ class _SubscriptionDetailsHeader extends StatelessWidget {
           ),
         ],
       ),
+
       child: SizedBox(
         width: double.infinity,
+
         child: Padding(
           padding: const EdgeInsets.all(16.0),
+
           child: Column(
             spacing: 8.0,
             children: [
@@ -587,9 +701,11 @@ class _SubscriptionDetailsHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10.0),
                       border: Border.all(color: Colors.grey[300]!),
                     ),
+
                     child: SizedBox(
                       width: 84.0,
                       height: 84.0,
+
                       child: Center(
                         child: Text(
                           getInitials(caption),
@@ -619,6 +735,7 @@ class _SubscriptionDetailsHeader extends StatelessWidget {
 
                         Row(
                           spacing: 6.0,
+
                           children: [
                             Icon(
                               Icons.circle,
@@ -659,156 +776,6 @@ class _SubscriptionDetailsHeader extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DividedNamedList extends StatelessWidget {
-  final List<_NamedEntry> children;
-
-  const _DividedNamedList({required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
-        borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        // I tried using a ListView.separated, but it ruined the layout
-        child: Column(
-          children: [
-            for (int i = 0; i < children.length; i++) ...[
-              children[i],
-              if (i != children.length - 1) const Divider(height: 1.0),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NamedEntry extends StatelessWidget {
-  final String name;
-  final Widget child;
-
-  const _NamedEntry({required this.name, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 32.0,
-
-      child: Center(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-
-          children: [
-            Expanded(
-              child: Text(
-                name,
-                style: TextStyle(
-                  color: Colors.grey[900],
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 28.0, child: child),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ExpandableDividedNamedList extends StatefulWidget {
-  final String label;
-  final List<_NamedEntry> children;
-
-  static const _divider = Divider(height: 1.0);
-
-  const _ExpandableDividedNamedList({
-    required this.label,
-    required this.children,
-  });
-
-  @override
-  State<_ExpandableDividedNamedList> createState() =>
-      _ExpandableDividedNamedListState();
-}
-
-class _ExpandableDividedNamedListState
-    extends State<_ExpandableDividedNamedList> {
-  bool _isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
-        borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
-        ],
-      ),
-
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-
-        child: Column(
-          children: [
-            _NamedEntry(
-              name: widget.label,
-
-              child: Transform.scale(
-                scale: 24.0 / 32.0,
-                alignment: Alignment.centerRight,
-
-                child: Switch(
-                  value: _isExpanded,
-
-                  onChanged: (_) {
-                    setState(() {
-                      _isExpanded = !_isExpanded;
-                    });
-                  },
-
-                  trackColor: WidgetStatePropertyAll(
-                    Theme.of(context).colorScheme.primaryContainer,
-                  ),
-                  thumbColor: WidgetStatePropertyAll(Colors.white),
-                  trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
-
-                  padding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-
-            for (int i = 0; i < widget.children.length; i++) ...[
-              _ExpandableDividedNamedList._divider,
-              widget.children[i],
-            ],
-          ],
         ),
       ),
     );
