@@ -15,6 +15,8 @@ class Dropdown<T> extends StatefulWidget {
   final Widget? icon;
 
   final double dropdownWidth;
+  final TextStyle? buttonTextStyle;
+  final TextStyle? dropdownTextStyle;
   final BoxDecoration? buttonDecoration;
   final BoxDecoration? dropdownDecoration;
 
@@ -30,6 +32,8 @@ class Dropdown<T> extends StatefulWidget {
     this.hint,
     this.icon,
     this.dropdownWidth = 0,
+    this.buttonTextStyle,
+    this.dropdownTextStyle,
     this.buttonDecoration,
     this.dropdownDecoration,
     this.padding,
@@ -41,9 +45,17 @@ class Dropdown<T> extends StatefulWidget {
 }
 
 class DropdownState<T> extends State<Dropdown<T>> {
-  final GlobalKey _buttonKey = GlobalKey();
+  final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
   bool _isDropdownOpen = false;
+
+  late final double dropdownWidth =
+      widget.dropdownWidth == 0
+          ? SharedData.intervals.keys
+                  .map((elem) => getTextWidth(elem, widget.dropdownTextStyle))
+                  .reduce((a, b) => max(a, b)) +
+              24.0
+          : widget.dropdownWidth;
 
   @override
   void dispose() {
@@ -71,10 +83,14 @@ class DropdownState<T> extends State<Dropdown<T>> {
     return Container(
       decoration:
           isSelected
-              ? BoxDecoration(color: WasubiColors.wasubiPurple[150]!)
+              ? BoxDecoration(
+                color:
+                    widget.buttonDecoration?.color ??
+                    WasubiColors.wasubiPurple[150]!,
+              )
               : null,
 
-      height: 36.0,
+      height: 32.0,
 
       alignment: Alignment.centerLeft,
 
@@ -82,26 +98,14 @@ class DropdownState<T> extends State<Dropdown<T>> {
 
       child: Text(
         item.toString(),
-        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
+        style:
+            widget.dropdownTextStyle ??
+            TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
       ),
     );
   }
 
   void _showDropdown() {
-    final RenderBox renderBox =
-        _buttonKey.currentContext!.findRenderObject() as RenderBox;
-
-    final Size size = renderBox.size;
-    final Offset offset = renderBox.localToGlobal(Offset.zero);
-
-    final double dropdownWidth =
-        widget.dropdownWidth == 0
-            ? SharedData.intervals.keys
-                    .map((elem) => getTextWidth(elem))
-                    .reduce((a, b) => max(a, b)) +
-                32.0
-            : widget.dropdownWidth;
-
     _overlayEntry = OverlayEntry(
       builder: (context) {
         return GestureDetector(
@@ -111,39 +115,44 @@ class DropdownState<T> extends State<Dropdown<T>> {
           child: Stack(
             children: [
               Positioned(
-                left: offset.dx - dropdownWidth + size.width,
-                top: offset.dy + size.height + 4.0,
                 width: dropdownWidth,
 
-                child: Material(
-                  child: Container(
-                    decoration: widget.dropdownDecoration,
-                    clipBehavior: Clip.hardEdge,
-                    constraints: BoxConstraints(maxHeight: 300.0),
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  targetAnchor: Alignment.bottomRight,
+                  followerAnchor: Alignment.topRight,
+                  showWhenUnlinked: false,
 
-                    child: ListView.separated(
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          behavior: HitTestBehavior.opaque,
+                  child: Material(
+                    child: Container(
+                      decoration: widget.dropdownDecoration,
+                      clipBehavior: Clip.hardEdge,
+                      constraints: BoxConstraints(maxHeight: 300.0),
 
-                          onTap: () {
-                            widget.onChanged?.call(widget.items[index]);
-                            _removeOverlay();
-                          },
+                      child: ListView.separated(
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            behavior: HitTestBehavior.opaque,
 
-                          child: _buildDropdownItem(widget.items[index]),
-                        );
-                      },
+                            onTap: () {
+                              widget.onChanged?.call(widget.items[index]);
+                              _removeOverlay();
+                            },
 
-                      separatorBuilder: (context, index) {
-                        return const Divider(height: 1.0);
-                      },
+                            child: _buildDropdownItem(widget.items[index]),
+                          );
+                        },
 
-                      itemCount: widget.items.length,
+                        separatorBuilder: (context, index) {
+                          return const Divider(height: 1.0);
+                        },
 
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
+                        itemCount: widget.items.length,
+
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                      ),
                     ),
                   ),
                 ),
@@ -165,29 +174,34 @@ class DropdownState<T> extends State<Dropdown<T>> {
       orElse: () => widget.items.first,
     );
 
-    return GestureDetector(
-      key: _buttonKey,
-      onTap: _toggleDropdown,
+    return CompositedTransformTarget(
+      link: _layerLink,
 
-      child: Container(
-        padding: widget.padding ?? EdgeInsets.only(left: 8.0),
+      child: GestureDetector(
+        onTap: _toggleDropdown,
 
-        decoration: widget.buttonDecoration,
+        child: Container(
+          padding: widget.padding ?? EdgeInsets.only(left: 8.0),
 
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          decoration: widget.buttonDecoration,
 
-          children: [
-            Flexible(
-              child: Text(
-                selectedItem.toString(),
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+
+            children: [
+              Flexible(
+                child: Text(
+                  selectedItem.toString(),
+                  style:
+                      widget.buttonTextStyle ??
+                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
+                ),
               ),
-            ),
 
-            if (widget.icon != null) widget.icon!,
-          ],
+              if (widget.icon != null) widget.icon!,
+            ],
+          ),
         ),
       ),
     );

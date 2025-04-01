@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
+import 'package:subscription_tracker/screens/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
@@ -26,9 +27,11 @@ class SubscriptionPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(seedColor: color);
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: color,
+        color: colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(8.0),
         boxShadow: [
           BoxShadow(
@@ -53,7 +56,8 @@ class SubscriptionPreview extends StatelessWidget {
                 children: [
                   Text(
                     caption,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: colorScheme.onPrimaryContainer,
                       fontSize: 14.0,
                       fontWeight: FontWeight.w500,
                     ),
@@ -61,17 +65,19 @@ class SubscriptionPreview extends StatelessWidget {
 
                   Text(
                     formatCost(cost, currency, interval),
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: colorScheme.onPrimaryContainer,
                       fontSize: 12.0,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
 
                   Text(
                     'Следующий платёж: $firstPay',
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: colorScheme.onPrimaryContainer,
                       fontSize: 12.0,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
@@ -90,6 +96,7 @@ class SubscriptionPreview extends StatelessWidget {
                 child: Center(
                   child: Text(
                     getInitials(caption),
+
                     style: TextStyle(fontSize: 24.0, fontFamily: 'Inter'),
                   ),
                 ),
@@ -131,6 +138,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
     final formattedInterval = formatPreviewPeriod(
       _newSubscription.interval,
       false,
+    );
+
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: Color(_newSubscription.color),
     );
 
     return ClipRRect(
@@ -252,10 +263,25 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                           });
                         },
 
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+
+                        buttonTextStyle: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                        ),
+
+                        dropdownTextStyle: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                        ),
 
                         buttonDecoration: BoxDecoration(
-                          color: Color(_newSubscription.color),
+                          color: colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(4.0),
                         ),
 
@@ -319,10 +345,25 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                           });
                         },
 
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+
+                        buttonTextStyle: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                        ),
+
+                        dropdownTextStyle: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                        ),
 
                         buttonDecoration: BoxDecoration(
-                          color: Color(_newSubscription.color),
+                          color: colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(4.0),
                         ),
 
@@ -371,32 +412,30 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     _NamedEntry(
                       name: 'Цвет карточки',
 
-                      child: GestureDetector(
-                        onTap: () {
-                          print('Color picker');
+                      child: ColorPicker(
+                        color: Color(_newSubscription.color),
+                        onChanged: (color) {
+                          setState(() {
+                            final int colorValue = color.toARGB32();
+
+                            _newSubscription = _newSubscription.copyWith(
+                              color: colorValue,
+                            );
+
+                            if (colorValue != widget.subscription.color) {
+                              _hasChanged = true;
+                            } else if (_newSubscription ==
+                                widget.subscription) {
+                              _hasChanged = false;
+                            }
+                          });
                         },
 
-                        child: SizedBox(
-                          width: 24.0,
-                          height: 24.0,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border.all(
-                                color: darkenColor(
-                                  Color(_newSubscription.color),
-                                  0.2,
-                                ),
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-
-                            child: Center(
-                              child: CircleAvatar(
-                                backgroundColor: Color(_newSubscription.color),
-                                radius: 10.0,
-                              ),
-                            ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: WasubiColors.wasubiNeutral[400]!,
                           ),
                         ),
                       ),
@@ -426,10 +465,25 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                           });
                         },
 
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+
+                        buttonTextStyle: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                        ),
+
+                        dropdownTextStyle: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                        ),
 
                         buttonDecoration: BoxDecoration(
-                          color: Color(_newSubscription.color),
+                          color: colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(4.0),
                         ),
 

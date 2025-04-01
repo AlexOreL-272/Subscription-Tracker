@@ -27,7 +27,7 @@ class SharedData {
       currency: 'RUB',
       firstPay: DateTime.now(),
       interval: 30,
-      color: 0xFFBE8FB8,
+      color: 0xFFFF0000,
     ),
   ];
 
