@@ -195,352 +195,350 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
           ],
         ),
 
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        body: Theme(
+          data: ThemeData(colorScheme: colorScheme),
 
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
 
-              children: [
-                // header
-                _SubscriptionDetailsHeader(
-                  caption: _newSubscription.caption,
-                  comment: _newSubscription.comment,
-                ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-                const SizedBox(height: 16.0),
-
-                const Text(
-                  'Основная информация',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
+                children: [
+                  // header
+                  _SubscriptionDetailsHeader(
+                    caption: _newSubscription.caption,
+                    comment: _newSubscription.comment,
                   ),
-                ),
 
-                // main info
-                _DividedNamedList(
-                  children: [
-                    // cost
-                    _NamedEntry(
-                      name: 'Цена',
-                      child: Align(
-                        alignment: Alignment.centerRight,
+                  const SizedBox(height: 16.0),
 
-                        child: Text(
-                          '$formattedCost ${_newSubscription.currency}',
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w400,
+                  const Text(
+                    'Основная информация',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  // main info
+                  _DividedNamedList(
+                    children: [
+                      // cost
+                      _NamedEntry(
+                        name: 'Цена',
+                        child: Align(
+                          alignment: Alignment.centerRight,
+
+                          child: Text(
+                            '$formattedCost ${_newSubscription.currency}',
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // currency
-                    _NamedEntry(
-                      name: 'Валюта',
+                      // currency
+                      _NamedEntry(
+                        name: 'Валюта',
 
-                      child: Dropdown<String>(
-                        value: _newSubscription.currency,
+                        child: Dropdown<String>(
+                          value: _newSubscription.currency,
 
-                        items: SharedData.currencies,
+                          items: SharedData.currencies,
 
-                        onChanged: (value) {
-                          setState(() {
-                            _newSubscription = _newSubscription.copyWith(
-                              currency: value!,
-                            );
+                          onChanged: (value) {
+                            setState(() {
+                              _newSubscription = _newSubscription.copyWith(
+                                currency: value!,
+                              );
 
-                            if (value != widget.subscription.currency) {
-                              _hasChanged = true;
-                            } else if (_newSubscription ==
-                                widget.subscription) {
-                              _hasChanged = false;
-                            }
-                          });
-                        },
-
-                        icon: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-
-                        buttonTextStyle: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        dropdownTextStyle: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        buttonDecoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-
-                        dropdownDecoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            color: WasubiColors.wasubiNeutral[400]!,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // next payment
-                    _NamedEntry(
-                      name: 'Следующая оплата',
-
-                      child: Align(
-                        alignment: Alignment.centerRight,
-
-                        child: Text(
-                          formattedDate,
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    //period
-                    _NamedEntry(
-                      name: 'Период',
-
-                      child: Dropdown<String>(
-                        value: formattedInterval,
-
-                        items: [
-                          if (!SharedData.intervals.keys.contains(
-                            formattedInitialPeriod,
-                          )) ...{
-                            formattedInitialPeriod,
+                              if (value != widget.subscription.currency) {
+                                _hasChanged = true;
+                              } else if (_newSubscription ==
+                                  widget.subscription) {
+                                _hasChanged = false;
+                              }
+                            });
                           },
 
-                          ...SharedData.intervals.keys,
-                        ],
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
 
-                        onChanged: (value) {
-                          setState(() {
-                            _newSubscription = _newSubscription.copyWith(
-                              interval: SharedData.intervals[value]!,
-                            );
+                          buttonTextStyle: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
 
-                            if (SharedData.intervals[value]! !=
-                                widget.subscription.interval) {
-                              _hasChanged = true;
-                            } else if (_newSubscription ==
-                                widget.subscription) {
-                              _hasChanged = false;
-                            }
-                          });
-                        },
+                          dropdownTextStyle: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
 
-                        icon: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: colorScheme.onPrimaryContainer,
-                        ),
+                          buttonDecoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
 
-                        buttonTextStyle: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        dropdownTextStyle: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        buttonDecoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-
-                        dropdownDecoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            color: WasubiColors.wasubiNeutral[400]!,
+                          dropdownDecoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: WasubiColors.wasubiNeutral[400]!,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // subscription end date
-                    // _NamedEntry(
-                    //   name: 'Подписка истекает',
+                      // next payment
+                      _NamedEntry(
+                        name: 'Следующая оплата',
 
-                    //   child: const SizedBox(),
-                    // ),
+                        child: Align(
+                          alignment: Alignment.centerRight,
 
-                    // Notify me
-                    // _NamedEntry(
-                    //   name: 'Уведомить меня',
+                          child: Text(
+                            formattedDate,
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
 
-                    //   child: const SizedBox(),
-                    // ),
-                  ],
-                ),
+                      //period
+                      _NamedEntry(
+                        name: 'Период',
 
-                const SizedBox(height: 16.0),
+                        child: Dropdown<String>(
+                          value: formattedInterval,
 
-                // additional info
-                const Text(
-                  'Дополнительная информация',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
+                          items: [
+                            if (!SharedData.intervals.keys.contains(
+                              formattedInitialPeriod,
+                            )) ...{
+                              formattedInitialPeriod,
+                            },
+
+                            ...SharedData.intervals.keys,
+                          ],
+
+                          onChanged: (value) {
+                            setState(() {
+                              _newSubscription = _newSubscription.copyWith(
+                                interval: SharedData.intervals[value]!,
+                              );
+
+                              if (SharedData.intervals[value]! !=
+                                  widget.subscription.interval) {
+                                _hasChanged = true;
+                              } else if (_newSubscription ==
+                                  widget.subscription) {
+                                _hasChanged = false;
+                              }
+                            });
+                          },
+
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+
+                          buttonTextStyle: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+
+                          dropdownTextStyle: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+
+                          buttonDecoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+
+                          dropdownDecoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: WasubiColors.wasubiNeutral[400]!,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
 
-                // additional info
-                _DividedNamedList(
-                  children: [
-                    // card color
-                    _NamedEntry(
-                      name: 'Цвет карточки',
+                  const SizedBox(height: 16.0),
 
-                      child: ColorPicker(
-                        color: Color(_newSubscription.color),
-                        onChanged: (color) {
-                          setState(() {
-                            final int colorValue = color.toARGB32();
-
-                            _newSubscription = _newSubscription.copyWith(
-                              color: colorValue,
-                            );
-
-                            if (colorValue != widget.subscription.color) {
-                              _hasChanged = true;
-                            } else if (_newSubscription ==
-                                widget.subscription) {
-                              _hasChanged = false;
-                            }
-                          });
-                        },
-
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            color: WasubiColors.wasubiNeutral[400]!,
-                          ),
-                        ),
-                      ),
+                  // additional info
+                  const Text(
+                    'Дополнительная информация',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
                     ),
-
-                    // category
-                    _NamedEntry(
-                      name: 'Категория',
-
-                      child: Dropdown<String>(
-                        value: _newSubscription.category ?? 'Все',
-
-                        items: SharedData.instance.categories,
-
-                        onChanged: (value) {
-                          setState(() {
-                            _newSubscription = _newSubscription.copyWith(
-                              category: value!,
-                            );
-
-                            if (value != widget.subscription.category) {
-                              _hasChanged = true;
-                            } else if (_newSubscription ==
-                                widget.subscription) {
-                              _hasChanged = false;
-                            }
-                          });
-                        },
-
-                        icon: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-
-                        buttonTextStyle: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        dropdownTextStyle: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        buttonDecoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-
-                        dropdownDecoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            color: WasubiColors.wasubiNeutral[400]!,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16.0),
-
-                const Text(
-                  'Контактная информация',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
                   ),
-                ),
 
-                // contact info
-                _DividedNamedList(
-                  children: [
-                    // support link
-                    _NamedEntry(
-                      name: 'Ссылка',
-                      child: Text(
-                        _newSubscription.supportLink ?? 'https://example.com',
-                        style: TextStyle(
-                          color: Colors.blue[400]!,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+                  // additional info
+                  _DividedNamedList(
+                    children: [
+                      // card color
+                      _NamedEntry(
+                        name: 'Цвет карточки',
+
+                        child: ColorPicker(
+                          color: Color(_newSubscription.color),
+                          onChanged: (color) {
+                            setState(() {
+                              final int colorValue = color.toARGB32();
+
+                              _newSubscription = _newSubscription.copyWith(
+                                color: colorValue,
+                              );
+
+                              if (colorValue != widget.subscription.color) {
+                                _hasChanged = true;
+                              } else if (_newSubscription ==
+                                  widget.subscription) {
+                                _hasChanged = false;
+                              }
+                            });
+                          },
+
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: WasubiColors.wasubiNeutral[400]!,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
 
-                    // phone
-                    _NamedEntry(
-                      name: 'Телефон',
-                      child: Text(
-                        _newSubscription.supportLink ?? '+7 (XXX) XXX-XX-XX',
-                        style: TextStyle(
-                          color: Colors.blue[400]!,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
+                      // category
+                      _NamedEntry(
+                        name: 'Категория',
+
+                        child: Dropdown<String>(
+                          value: _newSubscription.category ?? 'Все',
+
+                          items: SharedData.instance.categories,
+
+                          onChanged: (value) {
+                            setState(() {
+                              _newSubscription = _newSubscription.copyWith(
+                                category: value!,
+                              );
+
+                              if (value != widget.subscription.category) {
+                                _hasChanged = true;
+                              } else if (_newSubscription ==
+                                  widget.subscription) {
+                                _hasChanged = false;
+                              }
+                            });
+                          },
+
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+
+                          buttonTextStyle: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+
+                          dropdownTextStyle: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+
+                          buttonDecoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+
+                          dropdownDecoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: WasubiColors.wasubiNeutral[400]!,
+                            ),
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16.0),
+
+                  // trial period
+                  _ExpandableDividedNamedList(
+                    label: 'Пробный период',
+                    children: [],
+                  ),
+
+                  const SizedBox(height: 16.0),
+
+                  const Text(
+                    'Контактная информация',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+
+                  // contact info
+                  _DividedNamedList(
+                    children: [
+                      // support link
+                      _NamedEntry(
+                        name: 'Ссылка',
+                        child: Text(
+                          _newSubscription.supportLink ?? 'https://example.com',
+                          style: TextStyle(
+                            color: Colors.blue[400]!,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+
+                      // phone
+                      _NamedEntry(
+                        name: 'Телефон',
+                        child: Text(
+                          _newSubscription.supportLink ?? '+7 (XXX) XXX-XX-XX',
+                          style: TextStyle(
+                            color: Colors.blue[400]!,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -713,9 +711,11 @@ class _NamedEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 32.0,
+
       child: Center(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+
           children: [
             Expanded(
               child: Text(
@@ -729,6 +729,85 @@ class _NamedEntry extends StatelessWidget {
             ),
 
             SizedBox(height: 28.0, child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ExpandableDividedNamedList extends StatefulWidget {
+  final String label;
+  final List<_NamedEntry> children;
+
+  static const _divider = Divider(height: 1.0);
+
+  const _ExpandableDividedNamedList({
+    required this.label,
+    required this.children,
+  });
+
+  @override
+  State<_ExpandableDividedNamedList> createState() =>
+      _ExpandableDividedNamedListState();
+}
+
+class _ExpandableDividedNamedListState
+    extends State<_ExpandableDividedNamedList> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 248, 249, 250),
+        borderRadius: BorderRadius.circular(6.0),
+        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 2.0,
+            spreadRadius: 1.0,
+          ),
+        ],
+      ),
+
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+
+        child: Column(
+          children: [
+            _NamedEntry(
+              name: widget.label,
+
+              child: Transform.scale(
+                scale: 24.0 / 32.0,
+                alignment: Alignment.centerRight,
+
+                child: Switch(
+                  value: _isExpanded,
+
+                  onChanged: (_) {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+
+                  trackColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  thumbColor: WidgetStatePropertyAll(Colors.white),
+                  trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
+
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+            ),
+
+            for (int i = 0; i < widget.children.length; i++) ...[
+              _ExpandableDividedNamedList._divider,
+              widget.children[i],
+            ],
           ],
         ),
       ),
