@@ -70,6 +70,8 @@ class DatePicker extends StatelessWidget {
             ),
           ),
 
+          actionsPadding: EdgeInsets.zero,
+
           actions: [
             additionalAction ?? const SizedBox(width: 0.0),
 

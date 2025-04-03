@@ -34,7 +34,7 @@ class SharedData {
       endDate: DateTime(2026, 01, 20),
       notification: 30,
 
-      color: 0xFFFF0000,
+      color: 0xFF2196F3,
       category: 'Music',
 
       isActive: true,
