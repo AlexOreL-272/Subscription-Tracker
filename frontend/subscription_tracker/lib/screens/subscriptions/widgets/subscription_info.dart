@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -599,9 +600,16 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                           child: Dropdown<String>(
                             value: _newSubscription.category ?? 'Все',
 
-                            items: SharedData.instance.categories,
+                            items:
+                                SharedData.instance.categories + ['Добавить'],
 
                             onChanged: (value) {
+                              if (value == 'Добавить') {
+                                final newCategory = _addCategory(context);
+                                setState(() {});
+                                value = newCategory;
+                              }
+
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
                                   category: value!,
@@ -923,6 +931,155 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
         ),
       ),
     );
+  }
+
+  String _addCategory(BuildContext context) {
+    final textController = TextEditingController();
+    String newCategory = '';
+
+    showAdaptiveDialog<String>(
+      context: context,
+
+      builder: (dialogCtx) {
+        return Center(
+          child: AnimatedPadding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(dialogCtx).viewInsets.bottom,
+            ),
+
+            duration: const Duration(milliseconds: 300),
+
+            child: Material(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+
+              clipBehavior: Clip.hardEdge,
+
+              child: Container(
+                width: 300,
+                height: 175,
+
+                decoration: BoxDecoration(color: Colors.white),
+
+                padding: const EdgeInsets.all(16.0),
+
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+
+                  children: [
+                    const Text(
+                      'Добавить категорию',
+
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const Text(
+                      'Введите название категории',
+
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+
+                    const SizedBox(height: 16.0),
+
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          isCollapsed: true,
+
+                          hintText: 'Музыка',
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                        ),
+
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w400,
+                        ),
+
+                        autofocus: true,
+                      ),
+                    ),
+
+                    const SizedBox(height: 16.0),
+
+                    SizedBox(
+                      height: 36.0,
+
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.pop(dialogCtx);
+                              },
+
+                              child: Text(
+                                'Отмена',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                newCategory = textController.text.trim();
+
+                                if (newCategory.isNotEmpty) {
+                                  SharedData.instance.categories.add(
+                                    (textController.text).trim(),
+                                  );
+                                }
+
+                                Navigator.pop(dialogCtx);
+                              },
+
+                              child: Text(
+                                'Добавить',
+
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    textController.dispose();
+    return newCategory;
   }
 }
 
