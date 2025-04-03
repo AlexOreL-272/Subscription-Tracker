@@ -1,12 +1,14 @@
 import 'dart:ui' as ui;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/decimal_input.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/divided_list.dart';
+import 'package:subscription_tracker/services/phone_formatter.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
@@ -229,6 +231,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     _SubscriptionDetailsHeader(
                       caption: _newSubscription.caption,
                       comment: _newSubscription.comment,
+                      isActive: _newSubscription.isActive,
 
                       onCaptionChanged: (caption) {
                         setState(() {
@@ -858,18 +861,26 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Ссылка',
 
-                          child: Align(
-                            alignment: Alignment.centerRight,
+                          child: _DefaultTextInput(
+                            label: _newSubscription.supportLink,
+                            hint: 'https://example.com',
 
-                            child: Text(
-                              _newSubscription.supportLink ??
-                                  'https://example.com',
-                              style: TextStyle(
-                                color: Colors.blue[400]!,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
+                            keyboardType: TextInputType.url,
+
+                            onChanged: (value) {
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  supportLink: value,
+                                );
+
+                                if (value != widget.subscription.supportLink) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
                           ),
                         ),
 
@@ -877,18 +888,27 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Телефон',
 
-                          child: Align(
-                            alignment: Alignment.centerRight,
+                          child: _DefaultTextInput(
+                            label: _newSubscription.supportPhone,
+                            hint: '+7 (XXX) XXX-XX-XX',
 
-                            child: Text(
-                              _newSubscription.supportPhone ??
-                                  '+7 (XXX) XXX-XX-XX',
-                              style: TextStyle(
-                                color: Colors.blue[400]!,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
+                            keyboardType: TextInputType.phone,
+                            formatters: [PhoneInputFormatter()],
+
+                            onChanged: (value) {
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  supportPhone: value,
+                                );
+
+                                if (value != widget.subscription.supportPhone) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
                           ),
                         ),
                       ],
@@ -1168,5 +1188,77 @@ class _SubscriptionDetailsHeaderState
       setState(() => _isEditing = false);
       widget.onCaptionChanged(_captionController.text);
     }
+  }
+}
+
+class _DefaultTextInput extends StatefulWidget {
+  final String? label;
+  final String? hint;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? formatters;
+  final ValueChanged<String> onChanged;
+
+  const _DefaultTextInput({
+    this.label,
+    this.hint,
+    this.keyboardType,
+    this.formatters,
+    required this.onChanged,
+  });
+
+  @override
+  State<_DefaultTextInput> createState() => _DefaultTextInputState();
+}
+
+class _DefaultTextInputState extends State<_DefaultTextInput> {
+  late final _controller = TextEditingController(text: widget.label);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 250.0,
+
+      child: TextFormField(
+        controller: _controller,
+
+        textAlign: TextAlign.right,
+        textAlignVertical: TextAlignVertical.center,
+
+        keyboardType: widget.keyboardType ?? TextInputType.text,
+
+        inputFormatters: widget.formatters,
+
+        maxLines: 1,
+
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          hintStyle: TextStyle(color: Colors.grey),
+
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.only(top: 2.0),
+          isDense: true,
+        ),
+
+        style: TextStyle(
+          color: Colors.blue[400],
+          fontSize: 16.0,
+          fontWeight: FontWeight.w400,
+        ),
+
+        onFieldSubmitted: (value) {
+          widget.onChanged(value);
+        },
+
+        onTapOutside: (event) {
+          widget.onChanged(_controller.text);
+        },
+      ),
+    );
   }
 }
