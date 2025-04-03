@@ -22,12 +22,31 @@ class SharedData {
   List<SubscriptionModel> subscriptions = [
     SubscriptionModel(
       id: "asd",
+
       caption: "My Test Subscription",
+      comment: "Test comment",
+
       cost: 123.45,
       currency: 'RUB',
+
       firstPay: DateTime.now(),
       interval: 30,
+      endDate: DateTime(2026, 01, 20),
+      notification: 30,
+
       color: 0xFFFF0000,
+      category: 'Music',
+
+      isActive: true,
+
+      trialActive: true,
+      trialInterval: 30,
+      trialCost: 0.10,
+      trialEndDate: DateTime(2026, 01, 20),
+      trialNotification: 30,
+
+      supportLink: 'youtube.com',
+      supportPhone: '+7 (999) 999-99-99',
     ),
   ];
 

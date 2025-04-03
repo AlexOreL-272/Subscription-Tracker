@@ -6,18 +6,32 @@ part 'subscription_model.g.dart';
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
 class SubscriptionModel with _$SubscriptionModel {
-  // not final version of model, but it is not important for the task
   const factory SubscriptionModel({
     required String id,
+
     required String caption,
-    String? supportLink,
-    String? category,
+    String? comment,
+
     required double cost,
     required String currency,
     required DateTime firstPay,
     required int interval,
-    String? comment,
+    DateTime? endDate,
+    int? notification,
+
     required int color,
+    String? category,
+
+    required bool isActive,
+
+    required bool trialActive,
+    int? trialInterval,
+    double? trialCost,
+    DateTime? trialEndDate,
+    int? trialNotification,
+
+    String? supportLink,
+    String? supportPhone,
   }) = _SubscriptionModel;
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>

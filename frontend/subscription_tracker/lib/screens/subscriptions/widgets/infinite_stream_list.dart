@@ -54,6 +54,8 @@ class _InfiniteStreamListState extends State<InfiniteStreamList> {
   }
 
   Future<void> _fetchNextPage({required String category}) async {
+    return;
+
     final response = await _service.getSubscriptions(
       userId: 'deae4c8c-474c-4587-b40b-5bd100154f5f',
       resultType: 'full',

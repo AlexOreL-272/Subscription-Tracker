@@ -19,14 +19,23 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$SubscriptionModel {
   String get id => throw _privateConstructorUsedError;
   String get caption => throw _privateConstructorUsedError;
-  String? get supportLink => throw _privateConstructorUsedError;
-  String? get category => throw _privateConstructorUsedError;
+  String? get comment => throw _privateConstructorUsedError;
   double get cost => throw _privateConstructorUsedError;
   String get currency => throw _privateConstructorUsedError;
   DateTime get firstPay => throw _privateConstructorUsedError;
   int get interval => throw _privateConstructorUsedError;
-  String? get comment => throw _privateConstructorUsedError;
+  DateTime? get endDate => throw _privateConstructorUsedError;
+  int? get notification => throw _privateConstructorUsedError;
   int get color => throw _privateConstructorUsedError;
+  String? get category => throw _privateConstructorUsedError;
+  bool get isActive => throw _privateConstructorUsedError;
+  bool get trialActive => throw _privateConstructorUsedError;
+  int? get trialInterval => throw _privateConstructorUsedError;
+  double? get trialCost => throw _privateConstructorUsedError;
+  DateTime? get trialEndDate => throw _privateConstructorUsedError;
+  int? get trialNotification => throw _privateConstructorUsedError;
+  String? get supportLink => throw _privateConstructorUsedError;
+  String? get supportPhone => throw _privateConstructorUsedError;
 
   /// Create a copy of SubscriptionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -45,14 +54,23 @@ abstract class $SubscriptionModelCopyWith<$Res> {
   $Res call({
     String id,
     String caption,
-    String? supportLink,
-    String? category,
+    String? comment,
     double cost,
     String currency,
     DateTime firstPay,
     int interval,
-    String? comment,
+    DateTime? endDate,
+    int? notification,
     int color,
+    String? category,
+    bool isActive,
+    bool trialActive,
+    int? trialInterval,
+    double? trialCost,
+    DateTime? trialEndDate,
+    int? trialNotification,
+    String? supportLink,
+    String? supportPhone,
   });
 }
 
@@ -73,14 +91,23 @@ class _$SubscriptionModelCopyWithImpl<$Res, $Val extends SubscriptionModel>
   $Res call({
     Object? id = null,
     Object? caption = null,
-    Object? supportLink = freezed,
-    Object? category = freezed,
+    Object? comment = freezed,
     Object? cost = null,
     Object? currency = null,
     Object? firstPay = null,
     Object? interval = null,
-    Object? comment = freezed,
+    Object? endDate = freezed,
+    Object? notification = freezed,
     Object? color = null,
+    Object? category = freezed,
+    Object? isActive = null,
+    Object? trialActive = null,
+    Object? trialInterval = freezed,
+    Object? trialCost = freezed,
+    Object? trialEndDate = freezed,
+    Object? trialNotification = freezed,
+    Object? supportLink = freezed,
+    Object? supportPhone = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -94,15 +121,10 @@ class _$SubscriptionModelCopyWithImpl<$Res, $Val extends SubscriptionModel>
                     ? _value.caption
                     : caption // ignore: cast_nullable_to_non_nullable
                         as String,
-            supportLink:
-                freezed == supportLink
-                    ? _value.supportLink
-                    : supportLink // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            category:
-                freezed == category
-                    ? _value.category
-                    : category // ignore: cast_nullable_to_non_nullable
+            comment:
+                freezed == comment
+                    ? _value.comment
+                    : comment // ignore: cast_nullable_to_non_nullable
                         as String?,
             cost:
                 null == cost
@@ -124,16 +146,66 @@ class _$SubscriptionModelCopyWithImpl<$Res, $Val extends SubscriptionModel>
                     ? _value.interval
                     : interval // ignore: cast_nullable_to_non_nullable
                         as int,
-            comment:
-                freezed == comment
-                    ? _value.comment
-                    : comment // ignore: cast_nullable_to_non_nullable
-                        as String?,
+            endDate:
+                freezed == endDate
+                    ? _value.endDate
+                    : endDate // ignore: cast_nullable_to_non_nullable
+                        as DateTime?,
+            notification:
+                freezed == notification
+                    ? _value.notification
+                    : notification // ignore: cast_nullable_to_non_nullable
+                        as int?,
             color:
                 null == color
                     ? _value.color
                     : color // ignore: cast_nullable_to_non_nullable
                         as int,
+            category:
+                freezed == category
+                    ? _value.category
+                    : category // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            isActive:
+                null == isActive
+                    ? _value.isActive
+                    : isActive // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            trialActive:
+                null == trialActive
+                    ? _value.trialActive
+                    : trialActive // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            trialInterval:
+                freezed == trialInterval
+                    ? _value.trialInterval
+                    : trialInterval // ignore: cast_nullable_to_non_nullable
+                        as int?,
+            trialCost:
+                freezed == trialCost
+                    ? _value.trialCost
+                    : trialCost // ignore: cast_nullable_to_non_nullable
+                        as double?,
+            trialEndDate:
+                freezed == trialEndDate
+                    ? _value.trialEndDate
+                    : trialEndDate // ignore: cast_nullable_to_non_nullable
+                        as DateTime?,
+            trialNotification:
+                freezed == trialNotification
+                    ? _value.trialNotification
+                    : trialNotification // ignore: cast_nullable_to_non_nullable
+                        as int?,
+            supportLink:
+                freezed == supportLink
+                    ? _value.supportLink
+                    : supportLink // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            supportPhone:
+                freezed == supportPhone
+                    ? _value.supportPhone
+                    : supportPhone // ignore: cast_nullable_to_non_nullable
+                        as String?,
           )
           as $Val,
     );
@@ -152,14 +224,23 @@ abstract class _$$SubscriptionModelImplCopyWith<$Res>
   $Res call({
     String id,
     String caption,
-    String? supportLink,
-    String? category,
+    String? comment,
     double cost,
     String currency,
     DateTime firstPay,
     int interval,
-    String? comment,
+    DateTime? endDate,
+    int? notification,
     int color,
+    String? category,
+    bool isActive,
+    bool trialActive,
+    int? trialInterval,
+    double? trialCost,
+    DateTime? trialEndDate,
+    int? trialNotification,
+    String? supportLink,
+    String? supportPhone,
   });
 }
 
@@ -179,14 +260,23 @@ class __$$SubscriptionModelImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? caption = null,
-    Object? supportLink = freezed,
-    Object? category = freezed,
+    Object? comment = freezed,
     Object? cost = null,
     Object? currency = null,
     Object? firstPay = null,
     Object? interval = null,
-    Object? comment = freezed,
+    Object? endDate = freezed,
+    Object? notification = freezed,
     Object? color = null,
+    Object? category = freezed,
+    Object? isActive = null,
+    Object? trialActive = null,
+    Object? trialInterval = freezed,
+    Object? trialCost = freezed,
+    Object? trialEndDate = freezed,
+    Object? trialNotification = freezed,
+    Object? supportLink = freezed,
+    Object? supportPhone = freezed,
   }) {
     return _then(
       _$SubscriptionModelImpl(
@@ -200,15 +290,10 @@ class __$$SubscriptionModelImplCopyWithImpl<$Res>
                 ? _value.caption
                 : caption // ignore: cast_nullable_to_non_nullable
                     as String,
-        supportLink:
-            freezed == supportLink
-                ? _value.supportLink
-                : supportLink // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        category:
-            freezed == category
-                ? _value.category
-                : category // ignore: cast_nullable_to_non_nullable
+        comment:
+            freezed == comment
+                ? _value.comment
+                : comment // ignore: cast_nullable_to_non_nullable
                     as String?,
         cost:
             null == cost
@@ -230,16 +315,66 @@ class __$$SubscriptionModelImplCopyWithImpl<$Res>
                 ? _value.interval
                 : interval // ignore: cast_nullable_to_non_nullable
                     as int,
-        comment:
-            freezed == comment
-                ? _value.comment
-                : comment // ignore: cast_nullable_to_non_nullable
-                    as String?,
+        endDate:
+            freezed == endDate
+                ? _value.endDate
+                : endDate // ignore: cast_nullable_to_non_nullable
+                    as DateTime?,
+        notification:
+            freezed == notification
+                ? _value.notification
+                : notification // ignore: cast_nullable_to_non_nullable
+                    as int?,
         color:
             null == color
                 ? _value.color
                 : color // ignore: cast_nullable_to_non_nullable
                     as int,
+        category:
+            freezed == category
+                ? _value.category
+                : category // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        isActive:
+            null == isActive
+                ? _value.isActive
+                : isActive // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        trialActive:
+            null == trialActive
+                ? _value.trialActive
+                : trialActive // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        trialInterval:
+            freezed == trialInterval
+                ? _value.trialInterval
+                : trialInterval // ignore: cast_nullable_to_non_nullable
+                    as int?,
+        trialCost:
+            freezed == trialCost
+                ? _value.trialCost
+                : trialCost // ignore: cast_nullable_to_non_nullable
+                    as double?,
+        trialEndDate:
+            freezed == trialEndDate
+                ? _value.trialEndDate
+                : trialEndDate // ignore: cast_nullable_to_non_nullable
+                    as DateTime?,
+        trialNotification:
+            freezed == trialNotification
+                ? _value.trialNotification
+                : trialNotification // ignore: cast_nullable_to_non_nullable
+                    as int?,
+        supportLink:
+            freezed == supportLink
+                ? _value.supportLink
+                : supportLink // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        supportPhone:
+            freezed == supportPhone
+                ? _value.supportPhone
+                : supportPhone // ignore: cast_nullable_to_non_nullable
+                    as String?,
       ),
     );
   }
@@ -251,14 +386,23 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
   const _$SubscriptionModelImpl({
     required this.id,
     required this.caption,
-    this.supportLink,
-    this.category,
+    this.comment,
     required this.cost,
     required this.currency,
     required this.firstPay,
     required this.interval,
-    this.comment,
+    this.endDate,
+    this.notification,
     required this.color,
+    this.category,
+    required this.isActive,
+    required this.trialActive,
+    this.trialInterval,
+    this.trialCost,
+    this.trialEndDate,
+    this.trialNotification,
+    this.supportLink,
+    this.supportPhone,
   });
 
   @override
@@ -266,9 +410,7 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
   @override
   final String caption;
   @override
-  final String? supportLink;
-  @override
-  final String? category;
+  final String? comment;
   @override
   final double cost;
   @override
@@ -278,13 +420,33 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
   @override
   final int interval;
   @override
-  final String? comment;
+  final DateTime? endDate;
+  @override
+  final int? notification;
   @override
   final int color;
+  @override
+  final String? category;
+  @override
+  final bool isActive;
+  @override
+  final bool trialActive;
+  @override
+  final int? trialInterval;
+  @override
+  final double? trialCost;
+  @override
+  final DateTime? trialEndDate;
+  @override
+  final int? trialNotification;
+  @override
+  final String? supportLink;
+  @override
+  final String? supportPhone;
 
   @override
   String toString() {
-    return 'SubscriptionModel(id: $id, caption: $caption, supportLink: $supportLink, category: $category, cost: $cost, currency: $currency, firstPay: $firstPay, interval: $interval, comment: $comment, color: $color)';
+    return 'SubscriptionModel(id: $id, caption: $caption, comment: $comment, cost: $cost, currency: $currency, firstPay: $firstPay, interval: $interval, endDate: $endDate, notification: $notification, color: $color, category: $category, isActive: $isActive, trialActive: $trialActive, trialInterval: $trialInterval, trialCost: $trialCost, trialEndDate: $trialEndDate, trialNotification: $trialNotification, supportLink: $supportLink, supportPhone: $supportPhone)';
   }
 
   @override
@@ -294,10 +456,7 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
             other is _$SubscriptionModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.caption, caption) || other.caption == caption) &&
-            (identical(other.supportLink, supportLink) ||
-                other.supportLink == supportLink) &&
-            (identical(other.category, category) ||
-                other.category == category) &&
+            (identical(other.comment, comment) || other.comment == comment) &&
             (identical(other.cost, cost) || other.cost == cost) &&
             (identical(other.currency, currency) ||
                 other.currency == currency) &&
@@ -305,24 +464,53 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
                 other.firstPay == firstPay) &&
             (identical(other.interval, interval) ||
                 other.interval == interval) &&
-            (identical(other.comment, comment) || other.comment == comment) &&
-            (identical(other.color, color) || other.color == color));
+            (identical(other.endDate, endDate) || other.endDate == endDate) &&
+            (identical(other.notification, notification) ||
+                other.notification == notification) &&
+            (identical(other.color, color) || other.color == color) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.trialActive, trialActive) ||
+                other.trialActive == trialActive) &&
+            (identical(other.trialInterval, trialInterval) ||
+                other.trialInterval == trialInterval) &&
+            (identical(other.trialCost, trialCost) ||
+                other.trialCost == trialCost) &&
+            (identical(other.trialEndDate, trialEndDate) ||
+                other.trialEndDate == trialEndDate) &&
+            (identical(other.trialNotification, trialNotification) ||
+                other.trialNotification == trialNotification) &&
+            (identical(other.supportLink, supportLink) ||
+                other.supportLink == supportLink) &&
+            (identical(other.supportPhone, supportPhone) ||
+                other.supportPhone == supportPhone));
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     caption,
-    supportLink,
-    category,
+    comment,
     cost,
     currency,
     firstPay,
     interval,
-    comment,
+    endDate,
+    notification,
     color,
-  );
+    category,
+    isActive,
+    trialActive,
+    trialInterval,
+    trialCost,
+    trialEndDate,
+    trialNotification,
+    supportLink,
+    supportPhone,
+  ]);
 
   /// Create a copy of SubscriptionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -340,14 +528,23 @@ abstract class _SubscriptionModel implements SubscriptionModel {
   const factory _SubscriptionModel({
     required final String id,
     required final String caption,
-    final String? supportLink,
-    final String? category,
+    final String? comment,
     required final double cost,
     required final String currency,
     required final DateTime firstPay,
     required final int interval,
-    final String? comment,
+    final DateTime? endDate,
+    final int? notification,
     required final int color,
+    final String? category,
+    required final bool isActive,
+    required final bool trialActive,
+    final int? trialInterval,
+    final double? trialCost,
+    final DateTime? trialEndDate,
+    final int? trialNotification,
+    final String? supportLink,
+    final String? supportPhone,
   }) = _$SubscriptionModelImpl;
 
   @override
@@ -355,9 +552,7 @@ abstract class _SubscriptionModel implements SubscriptionModel {
   @override
   String get caption;
   @override
-  String? get supportLink;
-  @override
-  String? get category;
+  String? get comment;
   @override
   double get cost;
   @override
@@ -367,9 +562,29 @@ abstract class _SubscriptionModel implements SubscriptionModel {
   @override
   int get interval;
   @override
-  String? get comment;
+  DateTime? get endDate;
+  @override
+  int? get notification;
   @override
   int get color;
+  @override
+  String? get category;
+  @override
+  bool get isActive;
+  @override
+  bool get trialActive;
+  @override
+  int? get trialInterval;
+  @override
+  double? get trialCost;
+  @override
+  DateTime? get trialEndDate;
+  @override
+  int? get trialNotification;
+  @override
+  String? get supportLink;
+  @override
+  String? get supportPhone;
 
   /// Create a copy of SubscriptionModel
   /// with the given fields replaced by the non-null parameter values.

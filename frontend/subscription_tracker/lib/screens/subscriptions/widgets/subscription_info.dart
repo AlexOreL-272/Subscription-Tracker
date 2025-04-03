@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/color_picker.dart';
+import 'package:subscription_tracker/screens/subscriptions/widgets/date_picker.dart';
+import 'package:subscription_tracker/screens/subscriptions/widgets/decimal_input.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/divided_list.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
@@ -133,12 +135,20 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
     false,
   );
 
+  late final String formattedInitialTrialPeriod = formatPreviewPeriod(
+    widget.subscription.trialInterval ?? 1,
+    false,
+  );
+
   @override
   Widget build(BuildContext context) {
-    final formattedDate = formatDate(_newSubscription.firstPay);
-    final formattedCost = _newSubscription.cost.toStringAsFixed(2);
     final formattedInterval = formatPreviewPeriod(
       _newSubscription.interval,
+      false,
+    );
+
+    final formattedTrialInterval = formatPreviewPeriod(
+      _newSubscription.trialInterval ?? 1,
       false,
     );
 
@@ -267,16 +277,32 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Цена',
 
-                          child: Align(
-                            alignment: Alignment.centerRight,
+                          child: DecimalInput(
+                            value: _newSubscription.cost,
+                            currency: _newSubscription.currency,
 
-                            child: Text(
-                              '$formattedCost ${_newSubscription.currency}',
-                              style: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w400,
-                              ),
+                            textStyle: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w400,
                             ),
+
+                            onChanged: (value) {
+                              final newCost =
+                                  value.isEmpty ? .0 : double.parse(value);
+
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  cost: newCost,
+                                );
+
+                                if (newCost != widget.subscription.cost) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
                           ),
                         ),
 
@@ -340,15 +366,36 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Следующая оплата',
 
-                          child: Align(
-                            alignment: Alignment.centerRight,
+                          child: DatePicker(
+                            value: _newSubscription.firstPay,
 
-                            child: Text(
-                              formattedDate,
-                              style: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w400,
-                              ),
+                            onChanged: (value) {
+                              if (value == null) {
+                                return;
+                              }
+
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  firstPay: value,
+                                );
+
+                                if (value != widget.subscription.firstPay) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
+
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+
+                            textStyle: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
+                              fontSize: 16.0,
                             ),
                           ),
                         ),
@@ -422,39 +469,75 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Подписка истекает',
 
-                          child: Align(
-                            alignment: Alignment.centerRight,
+                          child: DatePicker(
+                            value: _newSubscription.endDate,
 
-                            child: Text(
-                              'Никогда',
+                            onChanged: (value) {
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  endDate: value,
+                                );
 
-                              style: TextStyle(
-                                color: Colors.grey[900],
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                if (value != widget.subscription.endDate) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
+
+                            additionalAction: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _newSubscription = _newSubscription.copyWith(
+                                    endDate: null,
+                                  );
+
+                                  if (null != widget.subscription.endDate) {
+                                    _hasChanged = true;
+                                  } else if (_newSubscription ==
+                                      widget.subscription) {
+                                    _hasChanged = false;
+                                  }
+                                });
+
+                                Navigator.of(context).pop();
+                              },
+
+                              child: const Text('Никогда'),
+                            ),
+
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+
+                            textStyle: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
+                              fontSize: 16.0,
                             ),
                           ),
                         ),
 
                         // notify me
-                        NamedEntry(
-                          name: 'Уведомить меня',
+                        // NamedEntry(
+                        //   name: 'Уведомить меня',
 
-                          child: Align(
-                            alignment: Alignment.centerRight,
+                        //   child: Align(
+                        //     alignment: Alignment.centerRight,
 
-                            child: Text(
-                              'Никогда',
+                        //     child: Text(
+                        //       'Никогда',
 
-                              style: TextStyle(
-                                color: Colors.grey[900],
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                        //       style: TextStyle(
+                        //         color: Colors.grey[900],
+                        //         fontSize: 16.0,
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
@@ -568,18 +651,85 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                     // trial period
                     ExpandableDividedNamedList(
+                      isActive: _newSubscription.trialActive,
                       label: 'Пробный период',
+
+                      onSwitch: (value) {
+                        setState(() {
+                          _newSubscription = _newSubscription.copyWith(
+                            trialActive: value,
+                          );
+
+                          if (value != widget.subscription.trialActive) {
+                            _hasChanged = true;
+                          } else if (_newSubscription == widget.subscription) {
+                            _hasChanged = false;
+                          }
+                        });
+                      },
+
                       children: [
                         // period
                         NamedEntry(
                           name: 'Период',
 
-                          child: Text(
-                            'Пробный период',
-                            style: TextStyle(
-                              color: Colors.grey[900],
+                          child: Dropdown<String>(
+                            value: formattedTrialInterval,
+
+                            items: [
+                              if (!SharedData.intervals.keys.contains(
+                                formattedInitialTrialPeriod,
+                              )) ...{
+                                formattedInitialTrialPeriod,
+                              },
+
+                              ...SharedData.intervals.keys,
+                            ],
+
+                            onChanged: (value) {
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  trialInterval: SharedData.intervals[value]!,
+                                );
+
+                                if (SharedData.intervals[value]! !=
+                                    widget.subscription.trialInterval) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
+
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: colorScheme.onPrimaryContainer,
+                            ),
+
+                            buttonTextStyle: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w400,
+                            ),
+
+                            dropdownTextStyle: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w400,
+                            ),
+
+                            buttonDecoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+
+                            dropdownDecoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: Border.all(
+                                color: WasubiColors.wasubiNeutral[400]!,
+                              ),
                             ),
                           ),
                         ),
@@ -588,13 +738,32 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Цена',
 
-                          child: Text(
-                            'Пробный name',
-                            style: TextStyle(
-                              color: Colors.grey[900],
+                          child: DecimalInput(
+                            value: _newSubscription.trialCost,
+                            currency: _newSubscription.currency,
+
+                            textStyle: const TextStyle(
                               fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w400,
                             ),
+
+                            onChanged: (value) {
+                              final newCost =
+                                  value.isEmpty ? .0 : double.parse(value);
+
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  trialCost: newCost,
+                                );
+
+                                if (newCost != widget.subscription.trialCost) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
                           ),
                         ),
 
@@ -602,30 +771,72 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Конец периода',
 
-                          child: Text(
-                            'Пробный 2',
-                            style: TextStyle(
-                              color: Colors.grey[900],
+                          child: DatePicker(
+                            value: _newSubscription.trialEndDate,
+
+                            onChanged: (value) {
+                              setState(() {
+                                _newSubscription = _newSubscription.copyWith(
+                                  trialEndDate: value,
+                                );
+
+                                if (value != widget.subscription.trialEndDate) {
+                                  _hasChanged = true;
+                                } else if (_newSubscription ==
+                                    widget.subscription) {
+                                  _hasChanged = false;
+                                }
+                              });
+                            },
+
+                            additionalAction: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _newSubscription = _newSubscription.copyWith(
+                                    trialEndDate: null,
+                                  );
+
+                                  if (null !=
+                                      widget.subscription.trialEndDate) {
+                                    _hasChanged = true;
+                                  } else if (_newSubscription ==
+                                      widget.subscription) {
+                                    _hasChanged = false;
+                                  }
+                                });
+
+                                Navigator.of(context).pop();
+                              },
+
+                              child: const Text('Никогда'),
+                            ),
+
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+
+                            textStyle: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
 
                         // notify me
-                        NamedEntry(
-                          name: 'Уведомить меня',
+                        // NamedEntry(
+                        //   name: 'Уведомить меня',
 
-                          child: Text(
-                            'Пробный 3',
+                        //   child: Text(
+                        //     'Пробный 3',
 
-                            style: TextStyle(
-                              color: Colors.grey[900],
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                        //     style: TextStyle(
+                        //       color: Colors.grey[900],
+                        //       fontSize: 16.0,
+                        //       fontWeight: FontWeight.bold,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
@@ -670,7 +881,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             alignment: Alignment.centerRight,
 
                             child: Text(
-                              _newSubscription.supportLink ??
+                              _newSubscription.supportPhone ??
                                   '+7 (XXX) XXX-XX-XX',
                               style: TextStyle(
                                 color: Colors.blue[400]!,

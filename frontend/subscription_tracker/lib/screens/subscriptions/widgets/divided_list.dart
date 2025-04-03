@@ -83,6 +83,8 @@ class NamedEntry extends StatelessWidget {
 
 class ExpandableDividedNamedList extends StatefulWidget {
   final String label;
+  final bool isActive;
+  final ValueChanged<bool>? onSwitch;
   final List<NamedEntry> children;
 
   static final _divider = Divider(
@@ -92,6 +94,8 @@ class ExpandableDividedNamedList extends StatefulWidget {
 
   const ExpandableDividedNamedList({
     required this.label,
+    this.isActive = false,
+    this.onSwitch,
     required this.children,
     super.key,
   });
@@ -104,7 +108,7 @@ class ExpandableDividedNamedList extends StatefulWidget {
 class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  bool _isExpanded = false;
+  late bool _isExpanded = widget.isActive;
 
   @override
   void initState() {
@@ -113,6 +117,10 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+
+    if (_isExpanded) {
+      _controller.forward();
+    }
   }
 
   @override
@@ -131,6 +139,8 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
         _controller.reverse();
       }
     });
+
+    widget.onSwitch?.call(_isExpanded);
   }
 
   @override
