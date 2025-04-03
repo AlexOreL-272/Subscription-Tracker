@@ -28,6 +28,8 @@ class DatePicker extends StatelessWidget {
     DateTime? finalChoice = value;
     DateTime? selectedDate = value;
 
+    FocusScope.of(context).unfocus();
+
     await showDialog(
       context: context,
 
@@ -74,7 +76,7 @@ class DatePicker extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.pop(context),
 
-              child: const Text('Отставить'),
+              child: const Text('Отмена'),
             ),
 
             TextButton(

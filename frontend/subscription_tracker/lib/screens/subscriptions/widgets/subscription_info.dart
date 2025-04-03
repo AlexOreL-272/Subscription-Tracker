@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:subscription_tracker/screens/subscriptions/widgets/color_picker.
 import 'package:subscription_tracker/screens/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/decimal_input.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/divided_list.dart';
-import 'package:subscription_tracker/services/phone_formatter.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
@@ -867,7 +865,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       children: [
                         // support link
                         NamedEntry(
-                          name: 'Ссылка',
+                          name: 'URL',
 
                           child: _DefaultTextInput(
                             label: _newSubscription.supportLink,
@@ -882,34 +880,6 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                                 );
 
                                 if (value != widget.subscription.supportLink) {
-                                  _hasChanged = true;
-                                } else if (_newSubscription ==
-                                    widget.subscription) {
-                                  _hasChanged = false;
-                                }
-                              });
-                            },
-                          ),
-                        ),
-
-                        // phone
-                        NamedEntry(
-                          name: 'Телефон',
-
-                          child: _DefaultTextInput(
-                            label: _newSubscription.supportPhone,
-                            hint: '+7 (XXX) XXX-XX-XX',
-
-                            keyboardType: TextInputType.phone,
-                            formatters: [PhoneInputFormatter()],
-
-                            onChanged: (value) {
-                              setState(() {
-                                _newSubscription = _newSubscription.copyWith(
-                                  supportPhone: value,
-                                );
-
-                                if (value != widget.subscription.supportPhone) {
                                   _hasChanged = true;
                                 } else if (_newSubscription ==
                                     widget.subscription) {
@@ -1012,6 +982,8 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                           fontWeight: FontWeight.w400,
                         ),
 
+                        cursorHeight: 18.0,
+
                         autofocus: true,
                       ),
                     ),
@@ -1110,7 +1082,8 @@ class _SubscriptionDetailsHeaderState
   late final _commentController = TextEditingController(text: widget.comment);
 
   bool _isEditing = false;
-  final _focusNode = FocusNode();
+  final _captionFocusNode = FocusNode();
+  final _commentFocusNode = FocusNode();
 
   @override
   void didUpdateWidget(covariant _SubscriptionDetailsHeader oldWidget) {
@@ -1129,13 +1102,13 @@ class _SubscriptionDetailsHeaderState
   void initState() {
     super.initState();
 
-    _focusNode.addListener(_handleFocusChange);
+    _captionFocusNode.addListener(_handleFocusChange);
   }
 
   @override
   void dispose() {
-    _focusNode.removeListener(_handleFocusChange);
-    _focusNode.dispose();
+    _captionFocusNode.removeListener(_handleFocusChange);
+    _captionFocusNode.dispose();
     _captionController.dispose();
     _commentController.dispose();
     super.dispose();
@@ -1208,7 +1181,7 @@ class _SubscriptionDetailsHeaderState
                               _isEditing = true;
                             });
 
-                            _focusNode.requestFocus();
+                            _captionFocusNode.requestFocus();
                           },
 
                           child: FocusScope(
@@ -1227,7 +1200,7 @@ class _SubscriptionDetailsHeaderState
                                       ? IntrinsicWidth(
                                         child: TextField(
                                           controller: _captionController,
-                                          focusNode: _focusNode,
+                                          focusNode: _captionFocusNode,
 
                                           style: const TextStyle(
                                             fontSize: 24.0,
@@ -1294,13 +1267,15 @@ class _SubscriptionDetailsHeaderState
 
                 child: TextField(
                   controller: _commentController,
+                  focusNode: _commentFocusNode,
 
                   onSubmitted: (value) {
                     widget.onCommentChanged(value);
                   },
 
                   onTapOutside: (_) {
-                    FocusScope.of(context).unfocus();
+                    _commentFocusNode.unfocus();
+                    widget.onCommentChanged(_commentController.text);
                   },
 
                   decoration: InputDecoration(
@@ -1341,7 +1316,7 @@ class _SubscriptionDetailsHeaderState
   }
 
   void _handleFocusChange() {
-    if (!_focusNode.hasFocus && _isEditing) {
+    if (!_captionFocusNode.hasFocus && _isEditing) {
       setState(() => _isEditing = false);
       widget.onCaptionChanged(_captionController.text);
     }
@@ -1379,7 +1354,7 @@ class _DefaultTextInputState extends State<_DefaultTextInput> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 250.0,
+      width: MediaQuery.of(context).size.width * 0.7,
 
       child: TextFormField(
         controller: _controller,

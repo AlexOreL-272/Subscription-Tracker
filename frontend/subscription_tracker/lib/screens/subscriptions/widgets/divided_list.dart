@@ -130,6 +130,8 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
   }
 
   void _toggleExpansion(_) {
+    FocusScope.of(context).unfocus();
+
     setState(() {
       _isExpanded = !_isExpanded;
 

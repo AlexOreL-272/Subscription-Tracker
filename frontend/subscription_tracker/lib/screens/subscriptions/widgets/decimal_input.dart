@@ -21,7 +21,6 @@ class DecimalInput extends StatefulWidget {
 
 class _DecimalInputState extends State<DecimalInput> {
   late final TextEditingController _textController;
-  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -30,15 +29,11 @@ class _DecimalInputState extends State<DecimalInput> {
     _textController = TextEditingController(
       text: widget.value?.toStringAsFixed(2),
     );
-
-    _focusNode.addListener(_handleFocusChange);
   }
 
   @override
   void dispose() {
     _textController.dispose();
-    _focusNode.removeListener(_handleFocusChange);
-    _focusNode.dispose();
 
     super.dispose();
   }
@@ -56,7 +51,6 @@ class _DecimalInputState extends State<DecimalInput> {
 
           child: TextFormField(
             controller: _textController,
-            focusNode: _focusNode,
 
             textAlign: TextAlign.right,
             textAlignVertical: TextAlignVertical.center,
@@ -80,6 +74,13 @@ class _DecimalInputState extends State<DecimalInput> {
               _textController.text = value;
               widget.onChanged?.call(value);
             },
+
+            onTapOutside: (_) {
+              final value = _formatValue(_textController.text);
+
+              _textController.text = value;
+              widget.onChanged?.call(value);
+            },
           ),
         ),
 
@@ -88,13 +89,6 @@ class _DecimalInputState extends State<DecimalInput> {
         Text(widget.currency, style: widget.textStyle),
       ],
     );
-  }
-
-  void _handleFocusChange() {
-    if (!_focusNode.hasFocus) {
-      _textController.text = _formatValue(_textController.text);
-      widget.onChanged?.call(_textController.text);
-    }
   }
 
   String _formatValue(String value) {
@@ -117,6 +111,10 @@ class _DecimalInputState extends State<DecimalInput> {
       formattedSuffix = '00';
     } else if (parts[1].length == 1) {
       formattedSuffix = '${parts[1]}0';
+    }
+
+    if (formattedPrefix.length > 1 && formattedPrefix[0] == '0') {
+      formattedPrefix = formattedPrefix.replaceFirst('0', '');
     }
 
     return '$formattedPrefix.$formattedSuffix';
