@@ -1,5 +1,3 @@
-import 'package:subscription_tracker/models/subscription_model.dart';
-
 class SharedData {
   static final SharedData _instance = SharedData._();
 
@@ -18,37 +16,4 @@ class SharedData {
     '1 Год': 365,
     'Выбрать': 0,
   };
-
-  List<SubscriptionModel> subscriptions = [
-    SubscriptionModel(
-      id: "asd",
-
-      caption: "My Test Subscription",
-      comment: "Test comment",
-
-      cost: 123.45,
-      currency: 'RUB',
-
-      firstPay: DateTime.now(),
-      interval: 30,
-      endDate: DateTime(2026, 01, 20),
-      notification: 30,
-
-      color: 0xFF2196F3,
-      category: 'Music',
-
-      isActive: true,
-
-      trialActive: true,
-      trialInterval: 30,
-      trialCost: 0.10,
-      trialEndDate: DateTime(2026, 01, 20),
-      trialNotification: 30,
-
-      supportLink: 'youtube.com',
-      supportPhone: '+7 (999) 999-99-99',
-    ),
-  ];
-
-  List<String> categories = ['Все'];
 }

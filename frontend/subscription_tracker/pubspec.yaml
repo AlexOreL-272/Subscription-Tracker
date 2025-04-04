@@ -19,6 +19,8 @@ dependencies:
   rxdart: ^0.28.0
   auto_size_text: ^3.0.0
   syncfusion_flutter_datepicker: ^29.1.35
+  flutter_bloc: ^8.1.6
+  uuid: ^4.4.2
 
 dev_dependencies:
   flutter_test:

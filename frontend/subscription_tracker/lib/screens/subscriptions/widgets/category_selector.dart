@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/models/category_bloc/category_state.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class CategorySelector extends StatefulWidget {
@@ -7,12 +10,10 @@ class CategorySelector extends StatefulWidget {
   final TabController tabController;
 
   final void Function(String) onChanged;
-  final List<String> categories;
 
   const CategorySelector({
     required this.tabController,
     required this.onChanged,
-    required this.categories,
     this.selectedIndex = 0,
     super.key,
   });
@@ -24,36 +25,43 @@ class CategorySelector extends StatefulWidget {
 class _CategorySelectorState extends State<CategorySelector> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 30.0,
+    return BlocBuilder<CategoryBloc, CategoryState>(
+      builder: (blocCtx, state) {
+        return SizedBox(
+          height: 30.0,
 
-      child: TabBar(
-        controller: widget.tabController,
-        tabs: widget.categories.map((category) => Tab(text: category)).toList(),
+          child: TabBar(
+            controller: widget.tabController,
+            tabs:
+                state.categories
+                    .map((category) => Tab(text: category))
+                    .toList(),
 
-        labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
 
-        onTap: (index) {
-          widget.onChanged(widget.categories[widget.tabController.index]);
-        },
+            onTap: (index) {
+              widget.onChanged(state.categories[widget.tabController.index]);
+            },
 
-        tabAlignment: TabAlignment.start,
+            tabAlignment: TabAlignment.start,
 
-        labelColor: WasubiColors.wasubiPurple,
-        unselectedLabelColor: WasubiColors.wasubiNeutral[500],
-        dividerColor: Colors.transparent,
+            labelColor: WasubiColors.wasubiPurple,
+            unselectedLabelColor: WasubiColors.wasubiNeutral[500],
+            dividerColor: Colors.transparent,
 
-        indicator: OverlineTabIndicator(color: WasubiColors.wasubiPurple),
-        indicatorSize: TabBarIndicatorSize.tab,
+            indicator: OverlineTabIndicator(color: WasubiColors.wasubiPurple),
+            indicatorSize: TabBarIndicatorSize.tab,
 
-        labelStyle: TextStyle(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
 
-        isScrollable: true,
+            isScrollable: true,
 
-        splashFactory: NoSplash.splashFactory,
-        splashBorderRadius: BorderRadius.circular(8.0),
-      ),
+            splashFactory: NoSplash.splashFactory,
+            splashBorderRadius: BorderRadius.circular(8.0),
+          ),
+        );
+      },
     );
   }
 }

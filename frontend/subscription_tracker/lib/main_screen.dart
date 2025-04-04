@@ -17,6 +17,7 @@ class _AppState extends State<App> {
 
   final _screens = <Widget>[
     SubscriptionsScreen(),
+
     const StatisticsScreen(),
     const ProfileScreen(),
   ];

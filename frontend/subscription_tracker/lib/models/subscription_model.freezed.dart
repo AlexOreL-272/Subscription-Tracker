@@ -382,7 +382,7 @@ class __$$SubscriptionModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$SubscriptionModelImpl implements _SubscriptionModel {
+class _$SubscriptionModelImpl extends _SubscriptionModel {
   const _$SubscriptionModelImpl({
     required this.id,
     required this.caption,
@@ -403,7 +403,7 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
     this.trialNotification,
     this.supportLink,
     this.supportPhone,
-  });
+  }) : super._();
 
   @override
   final String id;
@@ -449,69 +449,6 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
     return 'SubscriptionModel(id: $id, caption: $caption, comment: $comment, cost: $cost, currency: $currency, firstPay: $firstPay, interval: $interval, endDate: $endDate, notification: $notification, color: $color, category: $category, isActive: $isActive, trialActive: $trialActive, trialInterval: $trialInterval, trialCost: $trialCost, trialEndDate: $trialEndDate, trialNotification: $trialNotification, supportLink: $supportLink, supportPhone: $supportPhone)';
   }
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$SubscriptionModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.caption, caption) || other.caption == caption) &&
-            (identical(other.comment, comment) || other.comment == comment) &&
-            (identical(other.cost, cost) || other.cost == cost) &&
-            (identical(other.currency, currency) ||
-                other.currency == currency) &&
-            (identical(other.firstPay, firstPay) ||
-                other.firstPay == firstPay) &&
-            (identical(other.interval, interval) ||
-                other.interval == interval) &&
-            (identical(other.endDate, endDate) || other.endDate == endDate) &&
-            (identical(other.notification, notification) ||
-                other.notification == notification) &&
-            (identical(other.color, color) || other.color == color) &&
-            (identical(other.category, category) ||
-                other.category == category) &&
-            (identical(other.isActive, isActive) ||
-                other.isActive == isActive) &&
-            (identical(other.trialActive, trialActive) ||
-                other.trialActive == trialActive) &&
-            (identical(other.trialInterval, trialInterval) ||
-                other.trialInterval == trialInterval) &&
-            (identical(other.trialCost, trialCost) ||
-                other.trialCost == trialCost) &&
-            (identical(other.trialEndDate, trialEndDate) ||
-                other.trialEndDate == trialEndDate) &&
-            (identical(other.trialNotification, trialNotification) ||
-                other.trialNotification == trialNotification) &&
-            (identical(other.supportLink, supportLink) ||
-                other.supportLink == supportLink) &&
-            (identical(other.supportPhone, supportPhone) ||
-                other.supportPhone == supportPhone));
-  }
-
-  @override
-  int get hashCode => Object.hashAll([
-    runtimeType,
-    id,
-    caption,
-    comment,
-    cost,
-    currency,
-    firstPay,
-    interval,
-    endDate,
-    notification,
-    color,
-    category,
-    isActive,
-    trialActive,
-    trialInterval,
-    trialCost,
-    trialEndDate,
-    trialNotification,
-    supportLink,
-    supportPhone,
-  ]);
-
   /// Create a copy of SubscriptionModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -524,7 +461,7 @@ class _$SubscriptionModelImpl implements _SubscriptionModel {
       );
 }
 
-abstract class _SubscriptionModel implements SubscriptionModel {
+abstract class _SubscriptionModel extends SubscriptionModel {
   const factory _SubscriptionModel({
     required final String id,
     required final String caption,
@@ -546,6 +483,7 @@ abstract class _SubscriptionModel implements SubscriptionModel {
     final String? supportLink,
     final String? supportPhone,
   }) = _$SubscriptionModelImpl;
+  const _SubscriptionModel._() : super._();
 
   @override
   String get id;

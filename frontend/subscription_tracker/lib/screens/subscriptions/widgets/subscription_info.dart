@@ -2,112 +2,169 @@ import 'dart:ui' as ui;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/models/category_bloc/category_event.dart';
+import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/decimal_input.dart';
 import 'package:subscription_tracker/screens/subscriptions/widgets/divided_list.dart';
+import 'package:subscription_tracker/screens/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
-class SubscriptionPreview extends StatelessWidget {
-  final String caption;
-  final double cost;
-  final String currency;
-  final String firstPay;
-  final int interval;
-  final Color color;
+class SubscriptionListItem extends StatelessWidget {
+  final SubscriptionModel subscription;
 
-  const SubscriptionPreview({
-    super.key,
-    required this.caption,
-    required this.cost,
-    required this.currency,
-    required this.firstPay,
-    required this.interval,
-    required this.color,
-  });
+  const SubscriptionListItem({required this.subscription, super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(seedColor: color);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(20),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
-        ],
+      child: SlideableWidget(
+        rightIcon: Icon(Icons.delete_outlined, color: Colors.red),
+        onRightActionPressed: () {
+          print('Right Action triggered!');
+        },
+
+        leftIcon: Icon(Icons.pause_circle_outline_rounded, color: Colors.blue),
+        onLeftActionPressed: () {
+          print('Left Action triggered!');
+        },
+
+        child: SubscriptionPreview(subscription: subscription),
       ),
+    );
+  }
+}
 
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+class SubscriptionPreview extends StatelessWidget {
+  final SubscriptionModel subscription;
 
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 8.0,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 12.0,
-                children: [
-                  Text(
-                    caption,
-                    style: TextStyle(
-                      color: colorScheme.onPrimaryContainer,
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+  const SubscriptionPreview({required this.subscription, super.key});
 
-                  Text(
-                    formatCost(cost, currency, interval),
-                    style: TextStyle(
-                      color: colorScheme.onPrimaryContainer,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: Color(subscription.color),
+    );
 
-                  Text(
-                    'Следующий платёж: $firstPay',
-                    style: TextStyle(
-                      color: colorScheme.onPrimaryContainer,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          useSafeArea: true,
+          isScrollControlled: true,
+
+          builder: (bottomSheetCtx) {
+            final categoryBloc = BlocProvider.of<CategoryBloc>(context);
+
+            return BlocProvider.value(
+              value: categoryBloc,
+
+              child: SubscriptionDetails(
+                subscription: subscription,
+
+                onChanged: (newSubs) {
+                  BlocProvider.of<SubscriptionBloc>(
+                    context,
+                  ).add(UpdateSubscriptionEvent(newSubs));
+                },
               ),
+            );
+          },
+        );
+      },
+
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(20),
+              blurRadius: 2.0,
+              spreadRadius: 1.0,
             ),
+          ],
+        ),
 
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10.0),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8.0,
+
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 12.0,
+
+                  children: [
+                    Text(
+                      subscription.caption,
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    Text(
+                      formatCost(
+                        subscription.cost,
+                        subscription.currency,
+                        subscription.interval,
+                      ),
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+
+                    Text(
+                      'Следующий платёж: ${formatDate(subscription.firstPay)}',
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: SizedBox(
-                width: 48.0,
-                height: 48.0,
-                child: Center(
-                  child: Text(
-                    getInitials(caption),
 
-                    style: TextStyle(fontSize: 24.0, fontFamily: 'Inter'),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+
+                child: SizedBox(
+                  width: 48.0,
+                  height: 48.0,
+                  child: Center(
+                    child: Text(
+                      getInitials(subscription.caption),
+
+                      style: TextStyle(fontSize: 24.0, fontFamily: 'Inter'),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -115,10 +172,12 @@ class SubscriptionPreview extends StatelessWidget {
 }
 
 class SubscriptionDetails extends StatefulWidget {
+  final bool isNew;
   final SubscriptionModel subscription;
   final ValueChanged<SubscriptionModel> onChanged;
 
   const SubscriptionDetails({
+    this.isNew = false,
     required this.subscription,
     required this.onChanged,
     super.key,
@@ -129,7 +188,7 @@ class SubscriptionDetails extends StatefulWidget {
 }
 
 class _SubscriptionDetailsState extends State<SubscriptionDetails> {
-  bool _hasChanged = false;
+  late bool _hasChanged = widget.isNew;
   late var _newSubscription = widget.subscription;
   late final String formattedInitialPeriod = formatPreviewPeriod(
     widget.subscription.interval,
@@ -203,6 +262,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                 child: Text(
                   'Сохранить',
+
                   style: TextStyle(
                     color:
                         _hasChanged
@@ -599,13 +659,28 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             value: _newSubscription.category ?? 'Все',
 
                             items:
-                                SharedData.instance.categories + ['Добавить'],
+                                BlocProvider.of<CategoryBloc>(
+                                  context,
+                                ).state.categories +
+                                ['Добавить'],
 
-                            onChanged: (value) {
+                            onChanged: (value) async {
                               if (value == 'Добавить') {
-                                final newCategory = _addCategory(context);
-                                setState(() {});
+                                final newCategory = await _addCategory(context);
+
+                                if (newCategory == null ||
+                                    newCategory.isEmpty ||
+                                    BlocProvider.of<CategoryBloc>(
+                                      context,
+                                    ).state.categories.contains(newCategory)) {
+                                  return;
+                                }
+
                                 value = newCategory;
+
+                                BlocProvider.of<CategoryBloc>(
+                                  context,
+                                ).add(AddCategoryEvent(newCategory));
                               }
 
                               setState(() {
@@ -903,154 +978,15 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
     );
   }
 
-  String _addCategory(BuildContext context) {
-    final textController = TextEditingController();
-    String newCategory = '';
-
-    showAdaptiveDialog<String>(
+  Future<String?> _addCategory(BuildContext context) async {
+    String? newCategory = await showAdaptiveDialog<String>(
       context: context,
 
       builder: (dialogCtx) {
-        return Center(
-          child: AnimatedPadding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(dialogCtx).viewInsets.bottom,
-            ),
-
-            duration: const Duration(milliseconds: 300),
-
-            child: Material(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-
-              clipBehavior: Clip.hardEdge,
-
-              child: Container(
-                width: 300,
-                height: 175,
-
-                decoration: BoxDecoration(color: Colors.white),
-
-                padding: const EdgeInsets.all(16.0),
-
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-
-                  children: [
-                    const Text(
-                      'Добавить категорию',
-
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-
-                    const Text(
-                      'Введите название категории',
-
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-
-                    const SizedBox(height: 16.0),
-
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          isCollapsed: true,
-
-                          hintText: 'Музыка',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w400,
-                          ),
-
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                        ),
-
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-
-                        cursorHeight: 18.0,
-
-                        autofocus: true,
-                      ),
-                    ),
-
-                    const SizedBox(height: 16.0),
-
-                    SizedBox(
-                      height: 36.0,
-
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.pop(dialogCtx);
-                              },
-
-                              child: Text(
-                                'Отмена',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {
-                                newCategory = textController.text.trim();
-
-                                if (newCategory.isNotEmpty) {
-                                  SharedData.instance.categories.add(
-                                    (textController.text).trim(),
-                                  );
-                                }
-
-                                Navigator.pop(dialogCtx);
-                              },
-
-                              child: Text(
-                                'Добавить',
-
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
+        return _AddCategoryDialog();
       },
     );
 
-    textController.dispose();
     return newCategory;
   }
 }
@@ -1390,6 +1326,149 @@ class _DefaultTextInputState extends State<_DefaultTextInput> {
         onTapOutside: (event) {
           widget.onChanged(_controller.text);
         },
+      ),
+    );
+  }
+}
+
+class _AddCategoryDialog extends StatefulWidget {
+  @override
+  State<_AddCategoryDialog> createState() => _AddCategoryDialogState();
+}
+
+class _AddCategoryDialogState extends State<_AddCategoryDialog> {
+  final textController = TextEditingController();
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AnimatedPadding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+
+        duration: const Duration(milliseconds: 300),
+
+        child: Material(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+
+          clipBehavior: Clip.hardEdge,
+
+          child: Container(
+            width: 300,
+            height: 175,
+
+            decoration: BoxDecoration(color: Colors.white),
+
+            padding: const EdgeInsets.all(16.0),
+
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+
+              children: [
+                const Text(
+                  'Добавить категорию',
+
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+                ),
+
+                const Text(
+                  'Введите название категории',
+
+                  style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400),
+                ),
+
+                const SizedBox(height: 16.0),
+
+                Expanded(
+                  child: TextField(
+                    controller: textController,
+
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      isCollapsed: true,
+
+                      hintText: 'Музыка',
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w400,
+                      ),
+
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                    ),
+
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w400,
+                    ),
+
+                    cursorHeight: 18.0,
+
+                    autofocus: true,
+                  ),
+                ),
+
+                const SizedBox(height: 16.0),
+
+                SizedBox(
+                  height: 36.0,
+
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+
+                          child: Text(
+                            'Отмена',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, textController.text.trim());
+                          },
+
+                          child: Text(
+                            'Добавить',
+
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

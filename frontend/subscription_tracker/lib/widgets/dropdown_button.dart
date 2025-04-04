@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
-import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class Dropdown<T> extends StatefulWidget {
@@ -51,8 +50,11 @@ class DropdownState<T> extends State<Dropdown<T>> {
 
   late final double dropdownWidth =
       widget.dropdownWidth == 0
-          ? SharedData.intervals.keys
-                  .map((elem) => getTextWidth(elem, widget.dropdownTextStyle))
+          ? widget.items
+                  .map(
+                    (elem) =>
+                        getTextWidth(elem.toString(), widget.dropdownTextStyle),
+                  )
                   .reduce((a, b) => max(a, b)) +
               24.0
           : widget.dropdownWidth;
