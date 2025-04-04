@@ -1,8 +1,10 @@
 import 'dart:ui' as ui;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_dialogs/dialogs.dart';
+import 'package:material_dialogs/shared/types.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
 import 'package:subscription_tracker/models/category_bloc/category_event.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
@@ -30,17 +32,76 @@ class SubscriptionListItem extends StatelessWidget {
 
       child: SlideableWidget(
         rightIcon: Icon(Icons.delete_outlined, color: Colors.red),
-        onRightActionPressed: () {
-          print('Right Action triggered!');
+        onRightActionPressed: () async {
+          _showDeleteDialog(
+            context,
+            onDeleted: () {
+              BlocProvider.of<SubscriptionBloc>(
+                context,
+              ).add(DeleteSubscriptionEvent(subscription));
+            },
+          );
         },
 
-        leftIcon: Icon(Icons.pause_circle_outline_rounded, color: Colors.blue),
+        leftIcon: Icon(
+          subscription.isActive
+              ? Icons.pause_circle_outline_rounded
+              : Icons.play_circle_outline_rounded,
+          color: subscription.isActive ? Colors.blue : Colors.green,
+        ),
         onLeftActionPressed: () {
-          print('Left Action triggered!');
+          BlocProvider.of<SubscriptionBloc>(context).add(
+            UpdateSubscriptionEvent(
+              subscription.copyWith(isActive: !subscription.isActive),
+            ),
+          );
         },
 
         child: SubscriptionPreview(subscription: subscription),
       ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, {VoidCallback? onDeleted}) {
+    Dialogs.bottomMaterialDialog(
+      context: context,
+
+      title: 'Удалить подписку',
+      msg: 'Действительно удалить подписку?',
+
+      customView: SizedBox(height: 36.0),
+      customViewPosition: CustomViewPosition.AFTER_ACTION,
+
+      actionsBuilder: (context) {
+        return [
+          IconsButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+
+            text: 'Отмена',
+            iconData: Icons.cancel_outlined,
+
+            textStyle: TextStyle(color: Colors.grey),
+            iconColor: Colors.grey,
+          ),
+
+          IconsButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+
+              onDeleted?.call();
+            },
+
+            text: 'Удалить',
+            iconData: Icons.delete,
+            color: Colors.red,
+
+            textStyle: TextStyle(color: Colors.white),
+            iconColor: Colors.white,
+          ),
+        ];
+      },
     );
   }
 }
@@ -83,9 +144,15 @@ class SubscriptionPreview extends StatelessWidget {
         );
       },
 
-      child: DecoratedBox(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+
         decoration: BoxDecoration(
-          color: colorScheme.primaryContainer,
+          color:
+              subscription.isActive
+                  ? colorScheme.primaryContainer
+                  : colorScheme.surface,
+
           borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
@@ -1263,14 +1330,12 @@ class _DefaultTextInput extends StatefulWidget {
   final String? label;
   final String? hint;
   final TextInputType? keyboardType;
-  final List<TextInputFormatter>? formatters;
   final ValueChanged<String> onChanged;
 
   const _DefaultTextInput({
     this.label,
     this.hint,
     this.keyboardType,
-    this.formatters,
     required this.onChanged,
   });
 
@@ -1299,8 +1364,6 @@ class _DefaultTextInputState extends State<_DefaultTextInput> {
         textAlignVertical: TextAlignVertical.center,
 
         keyboardType: widget.keyboardType ?? TextInputType.text,
-
-        inputFormatters: widget.formatters,
 
         maxLines: 1,
 

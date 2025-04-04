@@ -21,6 +21,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^29.1.35
   flutter_bloc: ^8.1.6
   uuid: ^4.4.2
+  material_dialogs: ^1.1.5
 
 dev_dependencies:
   flutter_test:

@@ -133,14 +133,16 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen>
             (previous, current) => previous.categories != current.categories,
 
         listener: (context, state) {
-          setState(() {
-            _categories
-              ..clear()
-              ..addAll(state.categories);
+          if (mounted) {
+            setState(() {
+              _categories
+                ..clear()
+                ..addAll(state.categories);
 
-            _tabController.dispose();
-            _updateTabController();
-          });
+              _tabController.dispose();
+              _updateTabController();
+            });
+          }
         },
 
         child: TabBarView(

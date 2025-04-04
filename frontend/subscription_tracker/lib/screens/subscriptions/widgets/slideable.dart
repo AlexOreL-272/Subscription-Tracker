@@ -128,16 +128,17 @@ class _SlideableWidgetState extends State<SlideableWidget>
     }
   }
 
-  void _handleDragEnd(DragEndDetails details) {
+  void _handleDragEnd(DragEndDetails details) async {
     if (_wasSwipedPastThreshold &&
         _animationController.value >= _actionTriggerThreshold) {
+      await _animationController.reverse();
+
       if (_swipeDirection > 0) {
         widget.onRightActionPressed?.call();
       } else {
         widget.onLeftActionPressed?.call();
       }
 
-      _animationController.animateTo(0.0);
       setState(() {
         _buttonNeedJump = false;
         _wasSwipedPastThreshold = false;
@@ -176,7 +177,7 @@ class _SlideableWidgetState extends State<SlideableWidget>
           child: Stack(
             children: [
               // Right action button (appears when swiping right-to-left)
-              if (widget.rightIcon != null && _swipeDirection >= 0) ...{
+              if (widget.rightIcon != null && _swipeDirection > 0) ...{
                 Positioned.fill(
                   child: Align(
                     alignment: Alignment.centerRight,
@@ -191,9 +192,10 @@ class _SlideableWidgetState extends State<SlideableWidget>
                       ),
 
                       child: IconButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          await _animationController.reverse();
                           widget.onRightActionPressed?.call();
-                          _animationController.animateTo(0.0);
+
                           _buttonNeedJump = false;
                           _wasSwipedPastThreshold = false;
                           _swipeDirection = 0;
@@ -211,7 +213,7 @@ class _SlideableWidgetState extends State<SlideableWidget>
               },
 
               // Left action button (appears when swiping left-to-right)
-              if (widget.leftIcon != null && _swipeDirection <= 0) ...{
+              if (widget.leftIcon != null && _swipeDirection < 0) ...{
                 Positioned.fill(
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -226,9 +228,10 @@ class _SlideableWidgetState extends State<SlideableWidget>
                       ),
 
                       child: IconButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          await _animationController.animateTo(0.0);
                           widget.onLeftActionPressed?.call();
-                          _animationController.animateTo(0.0);
+
                           _buttonNeedJump = false;
                           _wasSwipedPastThreshold = false;
                           _swipeDirection = 0;
