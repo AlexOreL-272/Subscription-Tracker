@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 
 const textTheme = TextTheme(
-  bodySmall: TextStyle(
-    fontFamily: "Graphik LCG",
-    color: Colors.grey,
-    fontWeight: FontWeight.w100,
+  headlineLarge: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.bold,
+    fontSize: 32.0,
+  ),
+
+  titleMedium: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w500,
     fontSize: 16.0,
-    height: 19.2 / 16.0,
+  ),
+
+  labelMedium: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w500,
+    fontSize: 12.0,
   ),
 
   bodyMedium: TextStyle(
-    fontFamily: "Graphik LCG",
-    color: Colors.black,
-    fontWeight: FontWeight.bold,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w400,
     fontSize: 14.0,
-  ),
-
-  bodyLarge: TextStyle(
-    fontFamily: "Graphik LCG",
-    color: Colors.black,
-    fontWeight: FontWeight.bold,
-    fontSize: 32.0,
-    height: 38.4 / 32.0,
   ),
 );
 

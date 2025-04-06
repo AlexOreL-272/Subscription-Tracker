@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
+import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 
 class DatePicker extends StatelessWidget {
   final DateTime? value;
