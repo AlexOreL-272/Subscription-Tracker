@@ -19,6 +19,19 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       emit(SubscriptionState(newSubs));
     });
 
+    on<ResetCategoriesEvent>((event, emit) {
+      final newSubs = Map<String, SubscriptionModel>.from(state.subscriptions)
+        ..updateAll((key, value) {
+          if (value.category != event.oldCategory) {
+            return value;
+          }
+
+          return value.copyWith(category: event.newCategory);
+        });
+
+      emit(SubscriptionState(newSubs));
+    });
+
     on<DeleteSubscriptionEvent>((event, emit) {
       final newSubs = Map<String, SubscriptionModel>.from(state.subscriptions)
         ..removeWhere((key, value) => key == event.subscription.id);

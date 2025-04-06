@@ -21,6 +21,7 @@ class DecimalInput extends StatefulWidget {
 
 class _DecimalInputState extends State<DecimalInput> {
   late final TextEditingController _textController;
+  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _DecimalInputState extends State<DecimalInput> {
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _textController.dispose();
 
     super.dispose();
@@ -51,6 +53,7 @@ class _DecimalInputState extends State<DecimalInput> {
 
           child: TextFormField(
             controller: _textController,
+            focusNode: _focusNode,
 
             textAlign: TextAlign.right,
             textAlignVertical: TextAlignVertical.center,
@@ -80,6 +83,8 @@ class _DecimalInputState extends State<DecimalInput> {
 
               _textController.text = value;
               widget.onChanged?.call(value);
+
+              _focusNode.unfocus();
             },
           ),
         ),
@@ -103,10 +108,6 @@ class _DecimalInputState extends State<DecimalInput> {
     String formattedPrefix = parts[0];
     String formattedSuffix = parts[1];
 
-    if (parts[0].isEmpty) {
-      formattedPrefix = '0';
-    }
-
     if (parts[1].isEmpty) {
       formattedSuffix = '00';
     } else if (parts[1].length == 1) {
@@ -114,7 +115,11 @@ class _DecimalInputState extends State<DecimalInput> {
     }
 
     if (formattedPrefix.length > 1 && formattedPrefix[0] == '0') {
-      formattedPrefix = formattedPrefix.replaceFirst('0', '');
+      formattedPrefix = formattedPrefix.replaceAll(RegExp(r'^0+'), '');
+    }
+
+    if (formattedPrefix.isEmpty) {
+      formattedPrefix = '0';
     }
 
     return '$formattedPrefix.$formattedSuffix';

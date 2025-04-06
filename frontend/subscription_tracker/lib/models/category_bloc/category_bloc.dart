@@ -10,16 +10,19 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       emit(CategoryState(newCats));
     });
 
-    on<UpdateCategoryEvent>((event, emit) {
+    on<RenameCategoryEvent>((event, emit) {
       final newCats = List<String>.from(state.categories)
-        ..[event.index] = event.category;
+        ..[event.index] = event.newName;
+
+      // final newCats = List<String>.from(state.categories)
+      // ..[event.index] = event.category;
 
       emit(CategoryState(newCats));
     });
 
     on<DeleteCategoryEvent>((event, emit) {
       final newCats = List<String>.from(state.categories)
-        ..removeAt(event.index);
+        ..remove(event.category);
 
       emit(CategoryState(newCats));
     });

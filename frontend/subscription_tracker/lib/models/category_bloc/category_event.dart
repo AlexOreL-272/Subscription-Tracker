@@ -6,15 +6,15 @@ class AddCategoryEvent extends CategoryEvent {
   AddCategoryEvent(this.category);
 }
 
-class UpdateCategoryEvent extends CategoryEvent {
+class RenameCategoryEvent extends CategoryEvent {
   final int index;
-  final String category;
+  final String newName;
 
-  UpdateCategoryEvent(this.index, this.category);
+  RenameCategoryEvent(this.index, this.newName);
 }
 
 class DeleteCategoryEvent extends CategoryEvent {
-  final int index;
+  final String category;
 
-  DeleteCategoryEvent(this.index);
+  DeleteCategoryEvent(this.category);
 }

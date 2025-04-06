@@ -171,11 +171,6 @@ class DropdownState<T> extends State<Dropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedItem = widget.items.firstWhere(
-      (item) => item == widget.value,
-      orElse: () => widget.items.first,
-    );
-
     return CompositedTransformTarget(
       link: _layerLink,
 
@@ -194,7 +189,7 @@ class DropdownState<T> extends State<Dropdown<T>> {
             children: [
               Flexible(
                 child: Text(
-                  selectedItem.toString(),
+                  widget.value.toString(),
                   style:
                       widget.buttonTextStyle ??
                       TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),

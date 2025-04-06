@@ -1102,15 +1102,7 @@ class _SubscriptionDetailsHeaderState
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    _captionFocusNode.addListener(_handleFocusChange);
-  }
-
-  @override
   void dispose() {
-    _captionFocusNode.removeListener(_handleFocusChange);
     _captionFocusNode.dispose();
     _captionController.dispose();
     _commentController.dispose();
@@ -1187,52 +1179,47 @@ class _SubscriptionDetailsHeaderState
                             _captionFocusNode.requestFocus();
                           },
 
-                          child: FocusScope(
-                            child: Focus(
-                              onFocusChange: (hasFocus) {
-                                if (!hasFocus) {
-                                  setState(() => _isEditing = false);
-                                  widget.onCaptionChanged(
-                                    _captionController.text,
-                                  );
-                                }
-                              },
+                          child:
+                              _isEditing
+                                  ? IntrinsicWidth(
+                                    child: TextField(
+                                      controller: _captionController,
+                                      focusNode: _captionFocusNode,
 
-                              child:
-                                  _isEditing
-                                      ? IntrinsicWidth(
-                                        child: TextField(
-                                          controller: _captionController,
-                                          focusNode: _captionFocusNode,
-
-                                          style: const TextStyle(
-                                            fontSize: 24.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-
-                                          decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            isCollapsed: true,
-                                          ),
-
-                                          onSubmitted: (value) {
-                                            widget.onCaptionChanged(value);
-                                            setState(() => _isEditing = false);
-                                          },
-                                        ),
-                                      )
-                                      : AutoSizeText(
-                                        widget.caption,
-                                        style: const TextStyle(
-                                          fontSize: 24.0,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 1,
-                                        minFontSize: 16.0,
-                                        overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                            ),
-                          ),
+
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        isCollapsed: true,
+                                      ),
+
+                                      onSubmitted: (value) {
+                                        widget.onCaptionChanged(value);
+                                        setState(() => _isEditing = false);
+                                      },
+
+                                      onTapOutside: (_) {
+                                        _captionFocusNode.unfocus();
+                                        widget.onCaptionChanged(
+                                          _captionController.text,
+                                        );
+                                        setState(() => _isEditing = false);
+                                      },
+                                    ),
+                                  )
+                                  : AutoSizeText(
+                                    widget.caption,
+                                    style: const TextStyle(
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    maxLines: 1,
+                                    minFontSize: 16.0,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                         ),
 
                         Row(
@@ -1316,13 +1303,6 @@ class _SubscriptionDetailsHeaderState
         ),
       ),
     );
-  }
-
-  void _handleFocusChange() {
-    if (!_captionFocusNode.hasFocus && _isEditing) {
-      setState(() => _isEditing = false);
-      widget.onCaptionChanged(_captionController.text);
-    }
   }
 }
 

@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'subscription_model.freezed.dart';
 part 'subscription_model.g.dart';
 
-@Freezed(equal: false, toJson: false, fromJson: false)
+@Freezed(equal: true, toJson: false, fromJson: false)
 @JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
 class SubscriptionModel with _$SubscriptionModel {
   const factory SubscriptionModel({
@@ -38,15 +38,4 @@ class SubscriptionModel with _$SubscriptionModel {
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>
       _$SubscriptionModelFromJson(json);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is SubscriptionModel &&
-            other.id == id);
-  }
-
-  @override
-  int get hashCode => id.hashCode;
 }

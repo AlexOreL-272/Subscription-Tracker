@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/models/category_bloc/category_event.dart';
 import 'package:subscription_tracker/models/category_bloc/category_state.dart';
+import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class CategorySelector extends StatefulWidget {
@@ -32,10 +35,14 @@ class _CategorySelectorState extends State<CategorySelector> {
 
           child: TabBar(
             controller: widget.tabController,
+
             tabs:
-                state.categories
-                    .map((category) => Tab(text: category))
-                    .toList(),
+                state.categories.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final category = entry.value;
+
+                  return Tab(child: Text(category));
+                }).toList(),
 
             labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
 
@@ -95,5 +102,178 @@ class _OverlineTabIndicatorPainter extends BoxPainter {
     );
 
     canvas.drawRRect(rect, _paint);
+  }
+}
+
+class _EditDeleteOverlay extends StatefulWidget {
+  final int index;
+  final String category;
+  final Widget child;
+
+  const _EditDeleteOverlay({
+    required this.index,
+    required this.category,
+    required this.child,
+  });
+
+  @override
+  State<_EditDeleteOverlay> createState() => _EditDeleteOverlayState();
+}
+
+// TODO: rethink this
+class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
+  final _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
+  void _showDeleteDialog(BuildContext context, String category, int index) {
+    showDialog(
+      context: context,
+
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Удалить категорию'),
+          content: Text(
+            'Вы уверены, что хотите удалить категорию "$category"?',
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Отмена'),
+            ),
+
+            TextButton(
+              onPressed: () {
+                context.read<CategoryBloc>().add(DeleteCategoryEvent(category));
+                Navigator.pop(context);
+
+                // If the deleted category was selected, move to the first tab
+                if (widget.index == index) {
+                  // widget.tabController.animateTo(0);
+                  // widget.onChanged(
+                  //   context.read<CategoryBloc>().state.categories[0],
+                  // );
+                }
+              },
+
+              child: const Text('Удалить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showRenameDialog(BuildContext context, String category, int index) {
+    final TextEditingController controller = TextEditingController(
+      text: category,
+    );
+
+    showDialog(
+      context: context,
+
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Переименовать'),
+
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Введите новое название категории',
+            ),
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+
+              child: const Text('Отмена'),
+            ),
+
+            TextButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  BlocProvider.of<CategoryBloc>(
+                    context,
+                  ).add(RenameCategoryEvent(index, controller.text.trim()));
+
+                  BlocProvider.of<SubscriptionBloc>(
+                    context,
+                  ).add(ResetCategoriesEvent(category, controller.text.trim()));
+
+                  Navigator.pop(context);
+                }
+              },
+
+              child: const Text('Сохранить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showOverlay() {
+    Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: WasubiColors.wasubiNeutral[400]!),
+      ),
+
+      clipBehavior: Clip.hardEdge,
+
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+
+        children: [
+          TextButton.icon(
+            icon: const Icon(Icons.mode_edit_outline_outlined),
+
+            label: const Text(
+              'Переименовать',
+              style: TextStyle(fontSize: 12.0),
+            ),
+
+            onPressed: () {
+              Navigator.pop(context);
+              _showRenameDialog(context, widget.category, widget.index);
+            },
+          ),
+
+          const Divider(height: 1.0),
+
+          TextButton.icon(
+            icon: const Icon(Icons.delete),
+
+            label: const Text('Delete Category'),
+
+            onPressed: () {
+              Navigator.pop(context);
+              _showDeleteDialog(context, widget.category, widget.index);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _hideOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+
+      child: GestureDetector(
+        onLongPress: _showOverlay,
+        behavior: HitTestBehavior.opaque,
+
+        child: widget.child,
+      ),
+    );
   }
 }
