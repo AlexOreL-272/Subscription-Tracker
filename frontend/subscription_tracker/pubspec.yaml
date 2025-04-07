@@ -23,6 +23,7 @@ dependencies:
   uuid: ^4.4.2
   material_dialogs: ^1.1.5
   email_validator: ^3.0.0
+  fl_chart: ^0.70.2
 
 dev_dependencies:
   flutter_test:
