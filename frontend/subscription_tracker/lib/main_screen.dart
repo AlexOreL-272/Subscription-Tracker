@@ -3,7 +3,7 @@ import 'package:subscription_tracker/widgets/navbar.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'pages/subscriptions/subscriptions_page.dart';
 import 'pages/statistics/statistics_screen.dart';
-import 'pages/profile/profile_screen.dart';
+import 'pages/profile/profile_page.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -48,6 +48,8 @@ class _AppState extends State<App> {
         ),
 
         bottomNavigationBar: SafeArea(
+          maintainBottomViewPadding: true,
+
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
 

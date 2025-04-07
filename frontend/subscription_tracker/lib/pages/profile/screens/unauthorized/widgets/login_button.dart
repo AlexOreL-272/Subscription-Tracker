@@ -47,22 +47,38 @@ class OutlinedLoginButton extends StatelessWidget {
   }
 }
 
-class FilledLoginButton extends StatelessWidget {
+class FilledButton extends StatelessWidget {
   final String label;
   final Color color;
+
+  final double? width;
+  final double height;
+
   final VoidCallback onPressed;
 
-  const FilledLoginButton({
+  final Key? formKey;
+
+  const FilledButton({
     required this.label,
     required this.color,
+
+    this.width,
+    required this.height,
+
     required this.onPressed,
+    this.formKey,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: onPressed,
+      onPressed: () {
+        if (formKey == null ||
+            (formKey as GlobalKey<FormState>).currentState!.validate()) {
+          onPressed();
+        }
+      },
 
       style: ButtonStyle(
         overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -73,7 +89,7 @@ class FilledLoginButton extends StatelessWidget {
         ),
 
         fixedSize: WidgetStateProperty.all(
-          Size(MediaQuery.of(context).size.width, 44.0),
+          Size(width ?? MediaQuery.of(context).size.width, height),
         ),
 
         backgroundColor: WidgetStateProperty.all(color),

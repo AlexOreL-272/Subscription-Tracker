@@ -9,8 +9,14 @@ const textTheme = TextTheme(
 
   titleMedium: TextStyle(
     fontFamily: 'Inter',
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     fontSize: 16.0,
+  ),
+
+  titleSmall: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w400,
+    fontSize: 14.0,
   ),
 
   labelMedium: TextStyle(

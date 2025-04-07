@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:subscription_tracker/pages/profile/screens/register/register_screen.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart';
-import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_field.dart';
+import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_form.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -18,6 +19,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
 
       children: [
+        // const SizedBox(height: 100.0),
+
         // header text
         Align(
           alignment: Alignment.center,
@@ -118,43 +121,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         const SizedBox(height: 48.0),
 
-        // email input
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
 
-          child: EmailField(
-            onSubmitted: (value) {
-              print(value);
-            },
-          ),
-        ),
-
-        const SizedBox(height: 12.0),
-
-        // password input
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-
-          child: PasswordField(
-            onSubmitted: (value) {
-              print(value);
-            },
-          ),
-        ),
-
-        const SizedBox(height: 12.0),
-
-        // login button
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-
-          child: FilledLoginButton(
-            label: 'Войти',
-            color: Theme.of(context).colorScheme.primary,
-            onPressed: () {
-              print('Login');
-            },
-          ),
+          child: const LoginForm(),
         ),
 
         const SizedBox(height: 8.0),
@@ -180,7 +150,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 child: TextButton(
                   onPressed: () {
-                    print('Register');
+                    showModalBottomSheet(
+                      context: context,
+                      // isScrollControlled: true,
+                      useSafeArea: true,
+
+                      builder: (context) {
+                        return const RegisterScreen();
+                      },
+                    );
                   },
 
                   style: ButtonStyle(

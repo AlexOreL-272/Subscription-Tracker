@@ -22,6 +22,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   uuid: ^4.4.2
   material_dialogs: ^1.1.5
+  email_validator: ^3.0.0
 
 dev_dependencies:
   flutter_test:

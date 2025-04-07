@@ -1,28 +1,48 @@
+import 'package:chopper/chopper.dart';
 import 'package:flutter/material.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart'
+    as login;
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
-class EmailField extends StatefulWidget {
+class _EmailField extends StatefulWidget {
   final ValueChanged<String> onSubmitted;
 
-  const EmailField({required this.onSubmitted, super.key});
+  const _EmailField({required this.onSubmitted});
 
   @override
-  State<EmailField> createState() => _EmailFieldState();
+  State<_EmailField> createState() => _EmailFieldState();
 }
 
-class _EmailFieldState extends State<EmailField> {
+class _EmailFieldState extends State<_EmailField> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+  bool _hasError = false;
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: _controller,
+      focusNode: _focusNode,
+
+      validator: (email) {
+        setState(() {
+          _hasError = email == null || !EmailValidator.validate(email);
+        });
+
+        if (_hasError) {
+          return 'Неверный формат e-mail';
+        }
+
+        return null;
+      },
 
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
@@ -42,6 +62,8 @@ class _EmailFieldState extends State<EmailField> {
           color: Theme.of(context).colorScheme.primary,
         ),
         alignLabelWithHint: true,
+
+        errorStyle: TextStyle(color: Color(0xFFFF5722)),
 
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.0),
@@ -83,35 +105,40 @@ class _EmailFieldState extends State<EmailField> {
         contentPadding: EdgeInsets.symmetric(vertical: 10.0),
         isDense: true,
 
-        constraints: BoxConstraints(minHeight: 44.0, maxHeight: 44.0),
+        constraints: BoxConstraints(
+          minHeight: 44.0,
+          maxHeight: _hasError ? 64.0 : 44.0,
+        ),
       ),
 
       style: Theme.of(context).textTheme.titleMedium,
 
-      onSubmitted: widget.onSubmitted,
+      onFieldSubmitted: widget.onSubmitted,
       onTapOutside: (event) {
         widget.onSubmitted(_controller.text);
-        FocusScope.of(context).unfocus();
+        _focusNode.unfocus();
       },
     );
   }
 }
 
-class PasswordField extends StatefulWidget {
+class _PasswordField extends StatefulWidget {
   final ValueChanged<String> onSubmitted;
 
-  const PasswordField({required this.onSubmitted, super.key});
+  const _PasswordField({required this.onSubmitted});
 
   @override
-  State<PasswordField> createState() => _PasswordFieldState();
+  State<_PasswordField> createState() => _PasswordFieldState();
 }
 
-class _PasswordFieldState extends State<PasswordField> {
+class _PasswordFieldState extends State<_PasswordField> {
   bool _isPasswordVisible = false;
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -120,6 +147,7 @@ class _PasswordFieldState extends State<PasswordField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _controller,
+      focusNode: _focusNode,
 
       obscureText: !_isPasswordVisible,
       keyboardType: TextInputType.visiblePassword,
@@ -204,8 +232,64 @@ class _PasswordFieldState extends State<PasswordField> {
       onSubmitted: widget.onSubmitted,
       onTapOutside: (event) {
         widget.onSubmitted(_controller.text);
-        FocusScope.of(context).unfocus();
+        _focusNode.unfocus();
       },
+    );
+  }
+}
+
+class LoginForm extends StatefulWidget {
+  const LoginForm({super.key});
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  String _submittedEmail = '';
+  String _submittedPassword = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+
+        children: [
+          // email input
+          _EmailField(
+            onSubmitted: (value) {
+              _submittedEmail = value;
+            },
+          ),
+
+          const SizedBox(height: 12.0),
+
+          // password input
+          _PasswordField(
+            onSubmitted: (value) {
+              _submittedPassword = value;
+            },
+          ),
+
+          const SizedBox(height: 10.0),
+
+          // login button
+          login.FilledButton(
+            label: 'Войти',
+            color: Theme.of(context).colorScheme.primary,
+            height: 44.0,
+            formKey: _formKey,
+            onPressed: () {
+              print('Login $_submittedEmail $_submittedPassword');
+            },
+          ),
+        ],
+      ),
     );
   }
 }
