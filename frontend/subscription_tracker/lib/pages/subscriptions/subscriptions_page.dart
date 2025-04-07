@@ -6,20 +6,20 @@ import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.
 import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
-import 'package:subscription_tracker/screens/subscriptions/widgets/category_selector.dart';
-import 'package:subscription_tracker/screens/subscriptions/widgets/subscription_info.dart';
-import 'package:subscription_tracker/screens/subscriptions/widgets/subscription_list.dart';
+import 'package:subscription_tracker/pages/subscriptions/widgets/category_selector.dart';
+import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
+import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_list.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'package:uuid/uuid.dart';
 
-class SubscriptionsScreen extends StatefulWidget {
-  const SubscriptionsScreen({super.key});
+class SubscriptionsPage extends StatefulWidget {
+  const SubscriptionsPage({super.key});
 
   @override
-  State<SubscriptionsScreen> createState() => _SubscriptionsScreenState();
+  State<SubscriptionsPage> createState() => _SubscriptionsPageState();
 }
 
-class _SubscriptionsScreenState extends State<SubscriptionsScreen>
+class _SubscriptionsPageState extends State<SubscriptionsPage>
     with TickerProviderStateMixin {
   final List<String> _categories = [];
   late TabController _tabController;

@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:subscription_tracker/screens/subscriptions/common/scripts/scripts.dart';
+import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class Dropdown<T> extends StatefulWidget {

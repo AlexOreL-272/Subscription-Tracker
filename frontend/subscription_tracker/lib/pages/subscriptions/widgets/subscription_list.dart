@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
-import 'package:subscription_tracker/screens/subscriptions/widgets/subscription_info.dart';
+import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
 
 class SubscriptionList extends StatefulWidget {
   final String category;

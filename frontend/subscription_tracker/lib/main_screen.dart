@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
-import 'screens/subscriptions/subscriptions_screen.dart';
-import 'screens/statistics/statistics_screen.dart';
-import 'screens/profile/profile_screen.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
+import 'pages/subscriptions/subscriptions_page.dart';
+import 'pages/statistics/statistics_screen.dart';
+import 'pages/profile/profile_page.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -12,14 +13,14 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  int _currentIndex = 0;
-  final _pageController = PageController();
+  int _currentIndex = 2;
+  final _pageController = PageController(initialPage: 2);
 
-  final _screens = <Widget>[
-    SubscriptionsScreen(),
+  final _pages = <Widget>[
+    SubscriptionsPage(),
 
     const StatisticsScreen(),
-    const ProfileScreen(),
+    const ProfilePage(),
   ];
 
   @override
@@ -32,9 +33,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Subscription Tracker',
-      theme: ThemeData(
-        // textTheme:
-      ),
+      theme: ThemeData(textTheme: textTheme),
 
       home: Scaffold(
         backgroundColor: Colors.white,
@@ -43,13 +42,17 @@ class _AppState extends State<App> {
           child: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            children: _screens,
+
+            children: _pages,
           ),
         ),
 
         bottomNavigationBar: SafeArea(
+          maintainBottomViewPadding: true,
+
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
+
             child: NavBar(
               onTapped: (index) {
                 if (_currentIndex == index) return;
