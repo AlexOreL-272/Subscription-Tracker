@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'pages/subscriptions/subscriptions_page.dart';
-import 'pages/statistics/statistics_screen.dart';
+import 'pages/statistics/statistics_page.dart';
 import 'pages/profile/profile_page.dart';
 
 class App extends StatefulWidget {
