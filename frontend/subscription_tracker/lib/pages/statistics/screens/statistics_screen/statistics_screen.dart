@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/widgets/bar_chart.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/widgets/pie_chart.dart';
 
 class StatisticsScreen extends StatelessWidget {
@@ -9,15 +10,23 @@ class StatisticsScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
 
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
 
-        children: [
-          DonutChart(),
+          children: [
+            const SizedBox(height: 16.0),
 
-          //
-        ],
+            const DonutChart(),
+
+            const SizedBox(height: 16.0),
+
+            const YearlyExpenseBarChart(),
+
+            const SizedBox(height: 16.0),
+          ],
+        ),
       ),
     );
   }
