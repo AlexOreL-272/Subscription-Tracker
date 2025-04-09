@@ -7,7 +7,7 @@ import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ru', null);
+  await initializeDateFormatting('ru_RU', null);
 
   runApp(
     MultiBlocProvider(

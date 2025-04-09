@@ -7,6 +7,12 @@ const textTheme = TextTheme(
     fontSize: 32.0,
   ),
 
+  titleLarge: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w500,
+    fontSize: 18.0,
+  ),
+
   titleMedium: TextStyle(
     fontFamily: 'Inter',
     fontWeight: FontWeight.w400,

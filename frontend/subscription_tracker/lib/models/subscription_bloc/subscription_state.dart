@@ -22,7 +22,7 @@ class SubscriptionState {
           notification: 30,
 
           color: 0xFF2196F3,
-          category: 'Все',
+          category: null,
 
           isActive: true,
 

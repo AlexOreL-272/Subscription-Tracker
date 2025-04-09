@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'pages/subscriptions/subscriptions_page.dart';
-import 'pages/statistics/statistics_screen.dart';
+import 'pages/statistics/statistics_page.dart';
 import 'pages/profile/profile_page.dart';
 
 class App extends StatefulWidget {
@@ -13,13 +13,13 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  int _currentIndex = 2;
-  final _pageController = PageController(initialPage: 2);
+  int _currentIndex = 0;
+  final _pageController = PageController(initialPage: 0);
 
   final _pages = <Widget>[
     SubscriptionsPage(),
 
-    const StatisticsScreen(),
+    const StatisticsPage(),
     const ProfilePage(),
   ];
 

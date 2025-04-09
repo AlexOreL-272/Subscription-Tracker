@@ -1,4 +1,3 @@
-import 'package:chopper/chopper.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart'
