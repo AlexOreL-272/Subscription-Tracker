@@ -33,8 +33,12 @@ class _EmailFieldState extends State<_EmailField> {
 
       validator: (email) {
         setState(() {
-          _hasError = email == null || !EmailValidator.validate(email);
+          _hasError = !(email != null && EmailValidator.validate(email));
         });
+
+        if (email == null) {
+          return 'Введите e-mail';
+        }
 
         if (_hasError) {
           return 'Неверный формат e-mail';
