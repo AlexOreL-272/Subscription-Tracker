@@ -13,7 +13,7 @@ class StatisticsPage extends StatelessWidget {
       backgroundColor: Colors.white,
 
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
 
         title: Text(

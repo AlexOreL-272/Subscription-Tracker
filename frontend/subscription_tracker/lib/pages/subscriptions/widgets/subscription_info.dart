@@ -173,8 +173,9 @@ class SubscriptionPreview extends StatelessWidget {
             children: [
               Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 12.0,
+                  spacing: 4.0,
 
                   children: [
                     Text(
@@ -222,11 +223,21 @@ class SubscriptionPreview extends StatelessWidget {
                   width: 48.0,
                   height: 48.0,
                   child: Center(
-                    child: Text(
-                      getInitials(subscription.caption),
+                    child:
+                        subscription.isActive
+                            ? Text(
+                              getInitials(subscription.caption),
 
-                      style: TextStyle(fontSize: 24.0, fontFamily: 'Inter'),
-                    ),
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontFamily: 'Inter',
+                              ),
+                            )
+                            : Icon(
+                              Icons.pause_circle_outline,
+                              color: Color(subscription.color),
+                              size: 36.0,
+                            ),
                   ),
                 ),
               ),
