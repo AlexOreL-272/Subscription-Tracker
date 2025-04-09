@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:subscription_tracker/common/scripts/scripts.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
@@ -19,10 +19,8 @@ class DonutChart extends StatefulWidget {
   ];
 
   static const int _maxSections = 5;
-
   static const String _defaultCategory = 'Остальное';
-
-  static final dafeFormat = DateFormat('MMMM yyyy');
+  static const dateFormat = RussianDateFormat.MMMMyyyy();
 
   const DonutChart({super.key});
 
@@ -96,7 +94,7 @@ class _DonutChartState extends State<DonutChart> {
                 ),
 
                 Text(
-                  DonutChart.dafeFormat.format(_selectedMonth),
+                  DonutChart.dateFormat.format(_selectedMonth),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: WasubiColors.wasubiNeutral[600]!,
                   ),

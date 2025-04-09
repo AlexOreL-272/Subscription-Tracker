@@ -13,8 +13,8 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  int _currentIndex = 1;
-  final _pageController = PageController(initialPage: 1);
+  int _currentIndex = 0;
+  final _pageController = PageController(initialPage: 0);
 
   final _pages = <Widget>[
     SubscriptionsPage(),

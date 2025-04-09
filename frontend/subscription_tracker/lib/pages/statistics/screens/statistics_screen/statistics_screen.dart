@@ -11,6 +11,8 @@ class StatisticsScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
 
       child: SingleChildScrollView(
+        clipBehavior: Clip.none,
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,

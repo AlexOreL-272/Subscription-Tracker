@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:subscription_tracker/common/scripts/scripts.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class YearlyExpenseBarChart extends StatelessWidget {
+  static const _shortDateFormat = RussianDateFormat.MMM();
+  static const _defaultDateFormat = RussianDateFormat.ddMMMMyyyy();
+
   const YearlyExpenseBarChart({super.key});
 
   @override
@@ -21,7 +24,7 @@ class YearlyExpenseBarChart extends StatelessWidget {
     final monthStart = DateTime(now.year, now.month);
     final monthLabels = List.generate(12, (i) {
       final date = DateTime(monthStart.year, monthStart.month + i);
-      return DateFormat.MMM().format(date);
+      return _shortDateFormat.format(date);
     });
 
     final monthlyTotals = _calculateMonthlyExpenses(subscriptions, monthStart);
@@ -146,7 +149,7 @@ class YearlyExpenseBarChart extends StatelessWidget {
             const SizedBox(height: 8.0),
 
             Text(
-              '${DateFormat('dd MMMM yyyy').format(monthStart)} - ${DateFormat('dd MMMM yyyy').format(DateTime(monthStart.year + 1, monthStart.month).subtract(const Duration(days: 1)))}',
+              '${_defaultDateFormat.format(monthStart)} - ${_defaultDateFormat.format(DateTime(monthStart.year + 1, monthStart.month).subtract(const Duration(days: 1)))}',
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ],
