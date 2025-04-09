@@ -32,8 +32,10 @@ class _EmailFieldState extends State<_EmailField> {
       focusNode: _focusNode,
 
       validator: (email) {
-        setState(() {
-          _hasError = email == null || !EmailValidator.validate(email);
+        _hasError = email == null || !EmailValidator.validate(email);
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {});
         });
 
         if (_hasError) {
