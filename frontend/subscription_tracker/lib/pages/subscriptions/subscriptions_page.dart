@@ -4,7 +4,6 @@ import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
 import 'package:subscription_tracker/models/category_bloc/category_state.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/category_selector.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
@@ -155,36 +154,11 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
 
-                  child: _TabViewContent(
-                    category: category,
-                    controller: _tabController,
-                  ),
+                  child: SubscriptionList(index: _categories.indexOf(category)),
                 );
               }).toList(),
         ),
       ),
-    );
-  }
-}
-
-class _TabViewContent extends StatelessWidget {
-  final String category;
-  final TabController controller;
-
-  const _TabViewContent({required this.category, required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    final currentCategory = category == 'Все' ? '' : category;
-
-    return BlocBuilder<SubscriptionBloc, SubscriptionState>(
-      buildWhen:
-          (previous, current) =>
-              previous.subscriptions != current.subscriptions,
-
-      builder: (context, state) {
-        return SubscriptionList(category: currentCategory);
-      },
     );
   }
 }

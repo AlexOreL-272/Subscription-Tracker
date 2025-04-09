@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
 
 class SubscriptionList extends StatefulWidget {
-  final String category;
+  final int index;
   final int pageSize;
 
-  const SubscriptionList({
-    required this.category,
-    this.pageSize = 10,
-    super.key,
-  });
+  const SubscriptionList({required this.index, this.pageSize = 10, super.key});
 
   @override
   State<SubscriptionList> createState() => _SubscriptionListState();
@@ -34,12 +31,16 @@ class _SubscriptionListState extends State<SubscriptionList>
       List<SubscriptionModel>
     >(
       selector: (state) {
-        if (widget.category.isEmpty) {
+        if (widget.index == 0) {
           return state.subscriptions.values.toList();
         }
 
+        final category = BlocProvider.of<CategoryBloc>(
+          context,
+        ).state.categories.elementAt(widget.index);
+
         return state.subscriptions.values
-            .where((sub) => sub.category == widget.category)
+            .where((sub) => sub.category == category)
             .toList();
       },
 

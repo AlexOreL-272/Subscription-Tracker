@@ -14,9 +14,6 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       final newCats = List<String>.from(state.categories)
         ..[event.index] = event.newName;
 
-      // final newCats = List<String>.from(state.categories)
-      // ..[event.index] = event.category;
-
       emit(CategoryState(newCats));
     });
 

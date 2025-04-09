@@ -224,7 +224,13 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress: () => _showOverlay(context),
+      onLongPress: () {
+        if (widget.category.isEmpty || widget.category == 'Все') {
+          return;
+        }
+
+        _showOverlay(context);
+      },
       behavior: HitTestBehavior.opaque,
 
       child: widget.child,
