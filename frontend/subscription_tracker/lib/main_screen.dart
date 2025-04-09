@@ -33,7 +33,13 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Subscription Tracker',
-      theme: ThemeData(textTheme: textTheme),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: WasubiColors.wasubiPurple,
+          dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
+        ),
+        textTheme: textTheme,
+      ),
 
       home: Scaffold(
         backgroundColor: Colors.white,

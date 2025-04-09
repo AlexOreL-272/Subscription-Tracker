@@ -9,7 +9,6 @@ import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/category_selector.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_list.dart';
-import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'package:uuid/uuid.dart';
 
 class SubscriptionsPage extends StatefulWidget {
@@ -62,7 +61,9 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
         centerTitle: true,
         backgroundColor: Colors.transparent,
 
-        actionsIconTheme: const IconThemeData(color: WasubiColors.wasubiPurple),
+        actionsIconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.primary,
+        ),
 
         actions: [
           IconButton(

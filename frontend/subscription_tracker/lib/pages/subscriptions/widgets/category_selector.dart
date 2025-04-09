@@ -41,7 +41,11 @@ class _CategorySelectorState extends State<CategorySelector> {
                   final index = entry.key;
                   final category = entry.value;
 
-                  return Tab(child: Text(category));
+                  return _EditDeleteOverlay(
+                    index: index,
+                    category: category,
+                    child: Tab(child: Text(category)),
+                  );
                 }).toList(),
 
             labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -52,11 +56,13 @@ class _CategorySelectorState extends State<CategorySelector> {
 
             tabAlignment: TabAlignment.start,
 
-            labelColor: WasubiColors.wasubiPurple,
+            labelColor: Theme.of(context).colorScheme.primary,
             unselectedLabelColor: WasubiColors.wasubiNeutral[500],
             dividerColor: Colors.transparent,
 
-            indicator: OverlineTabIndicator(color: WasubiColors.wasubiPurple),
+            indicator: OverlineTabIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             indicatorSize: TabBarIndicatorSize.tab,
 
             labelStyle: TextStyle(fontWeight: FontWeight.bold),
@@ -122,158 +128,264 @@ class _EditDeleteOverlay extends StatefulWidget {
 
 // TODO: rethink this
 class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
-  final _layerLink = LayerLink();
-  OverlayEntry? _overlayEntry;
-
   void _showDeleteDialog(BuildContext context, String category, int index) {
     showDialog(
       context: context,
-
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Удалить категорию'),
-          content: Text(
-            'Вы уверены, что хотите удалить категорию "$category"?',
-          ),
-
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Отмена'),
-            ),
-
-            TextButton(
-              onPressed: () {
-                context.read<CategoryBloc>().add(DeleteCategoryEvent(category));
-                Navigator.pop(context);
-
-                // If the deleted category was selected, move to the first tab
-                if (widget.index == index) {
-                  // widget.tabController.animateTo(0);
-                  // widget.onChanged(
-                  //   context.read<CategoryBloc>().state.categories[0],
-                  // );
-                }
-              },
-
-              child: const Text('Удалить'),
-            ),
-          ],
-        );
+        return _DeleteDialog(category: category, index: index);
       },
     );
   }
 
   void _showRenameDialog(BuildContext context, String category, int index) {
-    final TextEditingController controller = TextEditingController(
-      text: category,
-    );
-
     showDialog(
       context: context,
+      builder: (context) {
+        return _EditDialog(category: category, index: index);
+      },
+    );
+  }
+
+  void _showOverlay(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: false,
 
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Переименовать'),
-
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              hintText: 'Введите новое название категории',
-            ),
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: WasubiColors.wasubiNeutral[400]!),
           ),
 
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
 
-              child: const Text('Отмена'),
-            ),
+            children: [
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.mode_edit_outline_outlined,
+                  color: Colors.black,
+                ),
 
-            TextButton(
-              onPressed: () {
-                if (controller.text.trim().isNotEmpty) {
-                  BlocProvider.of<CategoryBloc>(
+                label: Text(
+                  'Переименовать',
+                  style: Theme.of(
                     context,
-                  ).add(RenameCategoryEvent(index, controller.text.trim()));
+                  ).textTheme.titleLarge?.copyWith(color: Colors.black),
+                ),
 
-                  BlocProvider.of<SubscriptionBloc>(
-                    context,
-                  ).add(ResetCategoriesEvent(category, controller.text.trim()));
-
+                onPressed: () {
                   Navigator.pop(context);
-                }
-              },
+                  _showRenameDialog(context, widget.category, widget.index);
+                },
 
-              child: const Text('Сохранить'),
-            ),
-          ],
+                style: ButtonStyle(
+                  overlayColor: WidgetStatePropertyAll(
+                    WasubiColors.wasubiNeutral[400]!,
+                  ),
+                ),
+              ),
+
+              const Divider(height: 1.0),
+
+              TextButton.icon(
+                icon: const Icon(Icons.delete, color: Colors.red),
+
+                label: Text(
+                  'Удалить',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: Colors.red),
+                ),
+
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showDeleteDialog(context, widget.category, widget.index);
+                },
+
+                style: ButtonStyle(
+                  overlayColor: WidgetStatePropertyAll(Colors.red[100]!),
+                ),
+              ),
+
+              const Divider(height: 1.0),
+            ],
+          ),
         );
       },
     );
   }
 
-  void _showOverlay() {
-    Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: WasubiColors.wasubiNeutral[400]!),
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: () => _showOverlay(context),
+      behavior: HitTestBehavior.opaque,
 
-      clipBehavior: Clip.hardEdge,
-
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-
-        children: [
-          TextButton.icon(
-            icon: const Icon(Icons.mode_edit_outline_outlined),
-
-            label: const Text(
-              'Переименовать',
-              style: TextStyle(fontSize: 12.0),
-            ),
-
-            onPressed: () {
-              Navigator.pop(context);
-              _showRenameDialog(context, widget.category, widget.index);
-            },
-          ),
-
-          const Divider(height: 1.0),
-
-          TextButton.icon(
-            icon: const Icon(Icons.delete),
-
-            label: const Text('Delete Category'),
-
-            onPressed: () {
-              Navigator.pop(context);
-              _showDeleteDialog(context, widget.category, widget.index);
-            },
-          ),
-        ],
-      ),
+      child: widget.child,
     );
   }
+}
 
-  void _hideOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+class _EditDialog extends StatefulWidget {
+  final String category;
+  final int index;
+
+  const _EditDialog({required this.category, required this.index});
+
+  @override
+  State<_EditDialog> createState() => _EditDialogState();
+}
+
+class _EditDialogState extends State<_EditDialog> {
+  late final _controller = TextEditingController(text: widget.category);
+  final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
+    return AlertDialog(
+      title: const Text('Переименовать'),
 
-      child: GestureDetector(
-        onLongPress: _showOverlay,
-        behavior: HitTestBehavior.opaque,
+      backgroundColor: Colors.white,
 
-        child: widget.child,
+      content: TextField(
+        controller: _controller,
+        focusNode: _focusNode,
+
+        decoration: InputDecoration(
+          hintText: 'Введите новое название категории',
+          hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: WasubiColors.wasubiNeutral[400]!,
+          ),
+
+          labelText: 'Название',
+          labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: WasubiColors.wasubiNeutral[400]!,
+          ),
+          floatingLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          alignLabelWithHint: true,
+
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: WasubiColors.wasubiNeutral[400]!,
+              width: 2.0,
+            ),
+          ),
+
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: WasubiColors.wasubiNeutral[400]!,
+              width: 2.0,
+            ),
+          ),
+
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2.0,
+            ),
+          ),
+
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(color: const Color(0xFFFF5722), width: 2.0),
+          ),
+
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: WasubiColors.wasubiNeutral[400]!,
+              width: 2.0,
+            ),
+          ),
+
+          isDense: true,
+        ),
+
+        style: Theme.of(context).textTheme.titleMedium,
+
+        maxLength: 15,
+
+        onTapOutside: (_) {
+          _focusNode.unfocus();
+        },
       ),
+
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+
+          child: const Text('Отмена'),
+        ),
+
+        TextButton(
+          onPressed: () {
+            if (_controller.text.trim().isNotEmpty) {
+              BlocProvider.of<CategoryBloc>(
+                context,
+              ).add(RenameCategoryEvent(widget.index, _controller.text.trim()));
+
+              BlocProvider.of<SubscriptionBloc>(context).add(
+                ResetCategoriesEvent(widget.category, _controller.text.trim()),
+              );
+
+              Navigator.pop(context);
+            }
+          },
+
+          child: const Text('Сохранить'),
+        ),
+      ],
+    );
+  }
+}
+
+class _DeleteDialog extends StatelessWidget {
+  final String category;
+  final int index;
+
+  const _DeleteDialog({required this.category, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Удалить категорию'),
+      content: Text('Вы уверены, что хотите удалить категорию "$category"?'),
+
+      backgroundColor: Colors.white,
+
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Отмена'),
+        ),
+
+        TextButton(
+          onPressed: () {
+            context.read<CategoryBloc>().add(DeleteCategoryEvent(category));
+            Navigator.pop(context);
+          },
+
+          child: const Text('Удалить'),
+        ),
+      ],
     );
   }
 }

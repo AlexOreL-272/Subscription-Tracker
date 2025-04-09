@@ -32,7 +32,7 @@ class _NavBarState extends State<NavBar> {
 
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: WasubiColors.wasubiPurple[100],
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: SizedBox(width: itemWidth, height: height),
@@ -114,7 +114,7 @@ class NavBarItem extends StatelessWidget {
             icon,
             color:
                 isSelected
-                    ? WasubiColors.wasubiPurple
+                    ? Theme.of(context).colorScheme.primary
                     : WasubiColors.wasubiNeutral[600],
             size: 24.0,
           ),
@@ -124,7 +124,7 @@ class NavBarItem extends StatelessWidget {
             style: TextStyle(
               color:
                   isSelected
-                      ? WasubiColors.wasubiPurple
+                      ? Theme.of(context).colorScheme.primary
                       : WasubiColors.wasubiNeutral[600],
               fontSize: 10.0,
               fontWeight: FontWeight.bold,

@@ -1057,7 +1057,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
   }
 
   Future<String?> _addCategory(BuildContext context) async {
-    String? newCategory = await showAdaptiveDialog<String>(
+    String? newCategory = await showDialog<String>(
       context: context,
 
       builder: (dialogCtx) {
@@ -1385,12 +1385,14 @@ class _DefaultTextInputState extends State<_DefaultTextInput> {
   }
 }
 
-class _AddCategoryDialog extends StatefulWidget {
+class _AddCategoryDialogOld extends StatefulWidget {
+  const _AddCategoryDialogOld();
+
   @override
-  State<_AddCategoryDialog> createState() => _AddCategoryDialogState();
+  State<_AddCategoryDialogOld> createState() => _AddCategoryDialogOldState();
 }
 
-class _AddCategoryDialogState extends State<_AddCategoryDialog> {
+class _AddCategoryDialogOldState extends State<_AddCategoryDialogOld> {
   final textController = TextEditingController();
 
   @override
@@ -1524,6 +1526,124 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AddCategoryDialog extends StatefulWidget {
+  const _AddCategoryDialog();
+
+  @override
+  State<_AddCategoryDialog> createState() => _AddCategoryDialogState();
+}
+
+class _AddCategoryDialogState extends State<_AddCategoryDialog> {
+  final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Добавить категорию'),
+
+      backgroundColor: Colors.white,
+
+      content: TextField(
+        controller: _controller,
+        focusNode: _focusNode,
+
+        decoration: InputDecoration(
+          hintText: 'Музыка',
+          hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: WasubiColors.wasubiNeutral[400]!,
+          ),
+
+          labelText: 'Название',
+          labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: WasubiColors.wasubiNeutral[400]!,
+          ),
+          floatingLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          alignLabelWithHint: true,
+
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: WasubiColors.wasubiNeutral[400]!,
+              width: 2.0,
+            ),
+          ),
+
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: WasubiColors.wasubiNeutral[400]!,
+              width: 2.0,
+            ),
+          ),
+
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2.0,
+            ),
+          ),
+
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(color: const Color(0xFFFF5722), width: 2.0),
+          ),
+
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            borderSide: BorderSide(
+              color: WasubiColors.wasubiNeutral[400]!,
+              width: 2.0,
+            ),
+          ),
+
+          isDense: true,
+
+          constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width,
+          ),
+        ),
+
+        style: Theme.of(context).textTheme.titleMedium,
+
+        maxLength: 15,
+
+        onTapOutside: (_) {
+          _focusNode.unfocus();
+        },
+      ),
+
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+
+          child: const Text('Отмена'),
+        ),
+
+        TextButton(
+          onPressed: () {
+            if (_controller.text.trim().isNotEmpty) {
+              Navigator.pop(context, _controller.text.trim());
+            }
+          },
+
+          child: const Text('Добавить'),
+        ),
+      ],
     );
   }
 }
