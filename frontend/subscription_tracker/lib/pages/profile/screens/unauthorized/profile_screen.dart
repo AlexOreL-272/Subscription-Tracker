@@ -153,25 +153,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   child: TextButton(
                     onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        isDismissible: false,
-                        useSafeArea: true,
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          isDismissible: false,
+                          useSafeArea: true,
 
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16.0),
-                            topRight: Radius.circular(16.0),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16.0),
+                              topRight: Radius.circular(16.0),
+                            ),
                           ),
-                        ),
 
-                        clipBehavior: Clip.hardEdge,
+                          clipBehavior: Clip.hardEdge,
 
-                        builder: (context) {
-                          return RegisterScreen();
-                        },
-                      );
+                          builder: (context) {
+                            return RegisterScreen();
+                          },
+                        );
+                      });
                     },
 
                     style: ButtonStyle(
