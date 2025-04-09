@@ -35,6 +35,5 @@ dev_dependencies:
   chopper_generator: ^8.1.0
   build_runner: ^2.4.15
 
-
 flutter:
   uses-material-design: true
