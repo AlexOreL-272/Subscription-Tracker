@@ -385,7 +385,14 @@ class _DeleteDialog extends StatelessWidget {
 
         TextButton(
           onPressed: () {
-            context.read<CategoryBloc>().add(DeleteCategoryEvent(category));
+            BlocProvider.of<CategoryBloc>(
+              context,
+            ).add(DeleteCategoryEvent(category));
+
+            BlocProvider.of<SubscriptionBloc>(
+              context,
+            ).add(ResetCategoriesEvent(category, null));
+
             Navigator.pop(context);
           },
 

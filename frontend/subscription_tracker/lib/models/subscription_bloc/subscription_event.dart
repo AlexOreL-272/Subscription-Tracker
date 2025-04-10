@@ -16,7 +16,7 @@ class UpdateSubscriptionEvent extends SubscriptionEvent {
 
 class ResetCategoriesEvent extends SubscriptionEvent {
   final String oldCategory;
-  final String newCategory;
+  final String? newCategory;
 
   ResetCategoriesEvent(this.oldCategory, this.newCategory);
 }
