@@ -35,8 +35,11 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       return MapEntry(stringKey, SubscriptionModel.fromJson(jsonValue));
     });
 
+    // sample debug data
+    // TODO: remove
     for (final entry in state.subscriptions.entries) {
       await _box.put(entry.key, entry.value.toJson());
+      subscriptions[entry.key] = entry.value;
     }
 
     emit(SubscriptionState(subscriptions));
