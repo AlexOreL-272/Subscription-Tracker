@@ -38,7 +38,7 @@ class SubscriptionListItem extends StatelessWidget {
             onDeleted: () {
               BlocProvider.of<SubscriptionBloc>(
                 context,
-              ).add(DeleteSubscriptionEvent(subscription));
+              ).add(DeleteSubscriptionEvent(subscription.id));
             },
           );
         },

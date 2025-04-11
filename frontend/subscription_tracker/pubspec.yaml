@@ -24,6 +24,10 @@ dependencies:
   material_dialogs: ^1.1.5
   email_validator: ^3.0.0
   fl_chart: ^0.70.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

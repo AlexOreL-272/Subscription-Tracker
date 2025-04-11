@@ -4,7 +4,7 @@ part 'subscription_model.freezed.dart';
 part 'subscription_model.g.dart';
 
 @Freezed(equal: true, toJson: false, fromJson: false)
-@JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class SubscriptionModel with _$SubscriptionModel {
   const factory SubscriptionModel({
     required String id,
@@ -38,4 +38,6 @@ class SubscriptionModel with _$SubscriptionModel {
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>
       _$SubscriptionModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SubscriptionModelToJson(this);
 }

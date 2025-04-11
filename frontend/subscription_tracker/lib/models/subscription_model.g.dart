@@ -34,3 +34,26 @@ SubscriptionModel _$SubscriptionModelFromJson(Map<String, dynamic> json) =>
       supportLink: json['support_link'] as String?,
       supportPhone: json['support_phone'] as String?,
     );
+
+Map<String, dynamic> _$SubscriptionModelToJson(SubscriptionModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'caption': instance.caption,
+      'comment': instance.comment,
+      'cost': instance.cost,
+      'currency': instance.currency,
+      'first_pay': instance.firstPay.toIso8601String(),
+      'interval': instance.interval,
+      'end_date': instance.endDate?.toIso8601String(),
+      'notification': instance.notification,
+      'color': instance.color,
+      'category': instance.category,
+      'is_active': instance.isActive,
+      'trial_active': instance.trialActive,
+      'trial_interval': instance.trialInterval,
+      'trial_cost': instance.trialCost,
+      'trial_end_date': instance.trialEndDate?.toIso8601String(),
+      'trial_notification': instance.trialNotification,
+      'support_link': instance.supportLink,
+      'support_phone': instance.supportPhone,
+    };

@@ -22,7 +22,9 @@ class ResetCategoriesEvent extends SubscriptionEvent {
 }
 
 class DeleteSubscriptionEvent extends SubscriptionEvent {
-  final SubscriptionModel subscription;
+  final String id;
 
-  DeleteSubscriptionEvent(this.subscription);
+  DeleteSubscriptionEvent(this.id);
 }
+
+class InitializeSubscriptionsEvent extends SubscriptionEvent {}

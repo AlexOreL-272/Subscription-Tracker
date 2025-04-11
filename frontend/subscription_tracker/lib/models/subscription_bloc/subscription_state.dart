@@ -5,7 +5,7 @@ class SubscriptionState {
 
   const SubscriptionState(this.subscriptions);
 
-  SubscriptionState.zero()
+  SubscriptionState.sample()
     : this({
         "asd": SubscriptionModel(
           id: "asd",

@@ -18,3 +18,5 @@ class DeleteCategoryEvent extends CategoryEvent {
 
   DeleteCategoryEvent(this.category);
 }
+
+class InitializeCategoriesEvent extends CategoryEvent {}
