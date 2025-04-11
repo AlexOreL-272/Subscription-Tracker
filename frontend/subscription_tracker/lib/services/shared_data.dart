@@ -6,6 +6,8 @@ class SharedData {
   static SharedData get instance => _instance;
 
   static const List<String> currencies = ['RUB', 'USD', 'EUR', 'UAH', 'KZT'];
+
+  static const selectCustomValue = 'Выбрать';
   static const Map<String, int> intervals = {
     '1 День': 1,
     '1 Неделя': 7,
@@ -14,6 +16,6 @@ class SharedData {
     '3 Месяца': 90,
     '6 Месяцев': 180,
     '1 Год': 365,
-    'Выбрать': 0,
+    selectCustomValue: 0,
   };
 }

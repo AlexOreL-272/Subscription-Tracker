@@ -38,8 +38,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     // sample debug data
     // TODO: remove
     for (final entry in state.subscriptions.entries) {
-      await _box.put(entry.key, entry.value.toJson());
-      subscriptions[entry.key] = entry.value;
+      if (!subscriptions.containsKey(entry.key)) {
+        await _box.put(entry.key, entry.value.toJson());
+        subscriptions[entry.key] = entry.value;
+      }
     }
 
     emit(SubscriptionState(subscriptions));

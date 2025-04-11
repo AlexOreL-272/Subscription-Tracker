@@ -557,7 +557,28 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                               ...SharedData.intervals.keys,
                             ],
 
-                            onChanged: (value) {
+                            onChanged: (value) async {
+                              if (value == SharedData.selectCustomValue) {
+                                final interval = await _selectInterval(context);
+
+                                if (interval != null) {
+                                  setState(() {
+                                    _newSubscription = _newSubscription
+                                        .copyWith(interval: interval);
+
+                                    if (interval !=
+                                        widget.subscription.interval) {
+                                      _hasChanged = true;
+                                    } else if (_newSubscription ==
+                                        widget.subscription) {
+                                      _hasChanged = false;
+                                    }
+                                  });
+                                }
+
+                                return;
+                              }
+
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
                                   interval: SharedData.intervals[value]!,
@@ -848,7 +869,28 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                               ...SharedData.intervals.keys,
                             ],
 
-                            onChanged: (value) {
+                            onChanged: (value) async {
+                              if (value == SharedData.selectCustomValue) {
+                                final interval = await _selectInterval(context);
+
+                                if (interval != null) {
+                                  setState(() {
+                                    _newSubscription = _newSubscription
+                                        .copyWith(trialInterval: interval);
+
+                                    if (interval !=
+                                        widget.subscription.trialInterval) {
+                                      _hasChanged = true;
+                                    } else if (_newSubscription ==
+                                        widget.subscription) {
+                                      _hasChanged = false;
+                                    }
+                                  });
+                                }
+
+                                return;
+                              }
+
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
                                   trialInterval: SharedData.intervals[value]!,
@@ -1066,6 +1108,18 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
     );
 
     return newCategory;
+  }
+
+  Future<int?> _selectInterval(BuildContext context) async {
+    final interval = await showDialog<int>(
+      context: context,
+
+      builder: (dialogCtx) {
+        return _IntervalDialog();
+      },
+    );
+
+    return interval;
   }
 }
 
@@ -1645,5 +1699,210 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
         ),
       ],
     );
+  }
+}
+
+class _IntervalDialog extends StatefulWidget {
+  final double itemHeight;
+  final int visibleItems;
+
+  const _IntervalDialog({this.itemHeight = 40, this.visibleItems = 5});
+
+  @override
+  State<_IntervalDialog> createState() => _IntervalDialogState();
+}
+
+class _IntervalDialogState extends State<_IntervalDialog> {
+  late int _selectedNumber;
+  late String _selectedUnit;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedNumber = 1;
+    _selectedUnit = _getLabelForNumber(_selectedNumber)[0];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double pickerHeight = widget.itemHeight * widget.visibleItems;
+    final double selectionOffset = (pickerHeight - widget.itemHeight) / 2;
+
+    return Dialog(
+      insetPadding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.white,
+
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+
+          children: [
+            Text(
+              'Выберите период оплаты',
+
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+
+            const SizedBox(height: 16.0),
+
+            SizedBox(
+              height: pickerHeight,
+
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: selectionOffset,
+                    left: 0,
+                    right: 0,
+
+                    child: Container(
+                      height: widget.itemHeight,
+                      decoration: BoxDecoration(
+                        color:
+                            Theme.of(context).colorScheme.surfaceContainerLow,
+
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      // number selector
+                      Expanded(
+                        child: ListWheelScrollView(
+                          itemExtent: widget.itemHeight,
+                          perspective: 0.01,
+                          diameterRatio: 1.8,
+
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              _selectedNumber = index + 1;
+                            });
+                          },
+
+                          children: List.generate(
+                            _getAmountForUnit(_selectedUnit),
+
+                            (index) => Center(
+                              child: Text(
+                                '${index + 1}',
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  color: WasubiColors.wasubiNeutral[450]!,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // unit selector
+                      Expanded(
+                        child: ListWheelScrollView(
+                          itemExtent: widget.itemHeight,
+                          perspective: 0.01,
+                          diameterRatio: 1.8,
+
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              _selectedUnit =
+                                  _getLabelForNumber(_selectedNumber)[index];
+                            });
+                          },
+
+                          children:
+                              _getLabelForNumber(_selectedNumber)
+                                  .map(
+                                    (unit) => Center(
+                                      child: Text(
+                                        unit,
+                                        style: TextStyle(
+                                          fontSize: 24.0,
+                                          color:
+                                              WasubiColors.wasubiNeutral[450]!,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16.0),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+
+                  child: const Text('Отмена'),
+                ),
+
+                const SizedBox(width: 8.0),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_calculateIntervalInDays());
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<String> _getLabelForNumber(int number) {
+    if (number % 20 == 1) {
+      return ['День', 'Месяц', 'Год'];
+    }
+
+    if (number % 20 >= 2 && number % 20 <= 4) {
+      return ['Дня', 'Месяца', 'Года'];
+    }
+
+    return ['Дней', 'Месяцев', 'Лет'];
+  }
+
+  int _getAmountForUnit(String unit) {
+    if (unit[0] == 'Д') {
+      return 31;
+    }
+
+    if (unit[0] == 'М') {
+      return 12;
+    }
+
+    return 3;
+  }
+
+  int _calculateIntervalInDays() {
+    switch (_selectedUnit[0]) {
+      case 'Д':
+        return _selectedNumber;
+
+      case 'М':
+        return _selectedNumber * 30;
+
+      case 'Г':
+        return _selectedNumber * 365;
+
+      default:
+        return 1;
+    }
   }
 }
