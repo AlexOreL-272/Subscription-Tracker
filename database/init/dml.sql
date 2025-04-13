@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
     end_date TIMESTAMP,
 
     category VARCHAR(15),    
-    color INT NOT NULL,
+    color BIGINT NOT NULL,
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
