@@ -15,83 +15,72 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return SizedBox(
+      height: 56.0,
 
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.0),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final itemWidth = constraints.maxWidth / 3;
+          final height = constraints.maxHeight;
 
-        child: SizedBox(
-          height: 56.0,
+          return Stack(
+            children: [
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                left: _selectedIndex * itemWidth,
 
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final itemWidth = constraints.maxWidth / 3;
-              final height = constraints.maxHeight;
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: SizedBox(width: itemWidth, height: height),
+                ),
+              ),
 
-              return Stack(
+              Row(
                 children: [
-                  AnimatedPositioned(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    left: _selectedIndex * itemWidth,
-
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: WasubiColors.wasubiPurple[100],
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: SizedBox(width: itemWidth, height: height),
+                  Expanded(
+                    child: NavBarItem(
+                      isSelected: _selectedIndex == 0,
+                      label: 'Подписки',
+                      icon: Icons.menu,
+                      onTapped: () {
+                        widget.onTapped(0);
+                        setState(() => _selectedIndex = 0);
+                      },
                     ),
                   ),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: NavBarItem(
-                          isSelected: _selectedIndex == 0,
-                          label: 'Подписки',
-                          icon: Icons.menu,
-                          onTapped: () {
-                            widget.onTapped(0);
-                            setState(() => _selectedIndex = 0);
-                          },
-                        ),
-                      ),
+                  Expanded(
+                    child: NavBarItem(
+                      isSelected: _selectedIndex == 1,
+                      label: 'Статистика',
+                      icon: Icons.insert_chart_outlined_sharp,
+                      onTapped: () {
+                        widget.onTapped(1);
+                        setState(() => _selectedIndex = 1);
+                      },
+                    ),
+                  ),
 
-                      Expanded(
-                        child: NavBarItem(
-                          isSelected: _selectedIndex == 1,
-                          label: 'Статистика',
-                          icon: Icons.insert_chart_outlined_sharp,
-                          onTapped: () {
-                            widget.onTapped(1);
-                            setState(() => _selectedIndex = 1);
-                          },
-                        ),
-                      ),
-
-                      Expanded(
-                        child: NavBarItem(
-                          isSelected: _selectedIndex == 2,
-                          label: 'Профиль',
-                          icon: Icons.person_outline_rounded,
-                          onTapped: () {
-                            widget.onTapped(2);
-                            setState(() => _selectedIndex = 2);
-                          },
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    child: NavBarItem(
+                      isSelected: _selectedIndex == 2,
+                      label: 'Профиль',
+                      icon: Icons.person_outline_rounded,
+                      onTapped: () {
+                        widget.onTapped(2);
+                        setState(() => _selectedIndex = 2);
+                      },
+                    ),
                   ),
                 ],
-              );
-            },
-          ),
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -125,7 +114,7 @@ class NavBarItem extends StatelessWidget {
             icon,
             color:
                 isSelected
-                    ? WasubiColors.wasubiPurple
+                    ? Theme.of(context).colorScheme.primary
                     : WasubiColors.wasubiNeutral[600],
             size: 24.0,
           ),
@@ -135,7 +124,7 @@ class NavBarItem extends StatelessWidget {
             style: TextStyle(
               color:
                   isSelected
-                      ? WasubiColors.wasubiPurple
+                      ? Theme.of(context).colorScheme.primary
                       : WasubiColors.wasubiNeutral[600],
               fontSize: 10.0,
               fontWeight: FontWeight.bold,

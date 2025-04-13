@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
-import 'screens/subscriptions/subscriptions_screen.dart';
-import 'screens/statistics/statistics_screen.dart';
-import 'screens/profile/profile_screen.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
+import 'pages/subscriptions/subscriptions_page.dart';
+import 'pages/statistics/statistics_page.dart';
+import 'pages/profile/profile_page.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -13,12 +14,13 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _currentIndex = 0;
-  final _pageController = PageController();
+  final _pageController = PageController(initialPage: 0);
 
-  final _screens = <Widget>[
-    const SubscriptionsScreen(),
-    const StatisticsScreen(),
-    const ProfileScreen(),
+  final _pages = <Widget>[
+    SubscriptionsPage(),
+
+    const StatisticsPage(),
+    const ProfilePage(),
   ];
 
   @override
@@ -32,34 +34,46 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: 'Subscription Tracker',
       theme: ThemeData(
-        // textTheme:
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: WasubiColors.wasubiPurple,
+          dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
+        ),
+        textTheme: textTheme,
       ),
 
       home: Scaffold(
         backgroundColor: Colors.white,
+
         body: SafeArea(
           child: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            children: _screens,
+
+            children: _pages,
           ),
         ),
 
         bottomNavigationBar: SafeArea(
-          child: NavBar(
-            onTapped: (index) {
-              if (_currentIndex == index) return;
+          maintainBottomViewPadding: true,
 
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
 
-              setState(() {
-                _currentIndex = index;
-              });
-            },
+            child: NavBar(
+              onTapped: (index) {
+                if (_currentIndex == index) return;
+
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
           ),
         ),
       ),

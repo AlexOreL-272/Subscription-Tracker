@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
 
 const textTheme = TextTheme(
-  bodySmall: TextStyle(
-    fontFamily: "Graphik LCG",
-    color: Colors.grey,
-    fontWeight: FontWeight.w100,
-    fontSize: 16.0,
-    height: 19.2 / 16.0,
+  headlineLarge: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.bold,
+    fontSize: 32.0,
   ),
 
-  bodyMedium: TextStyle(
-    fontFamily: "Graphik LCG",
-    color: Colors.black,
-    fontWeight: FontWeight.bold,
+  titleLarge: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w500,
+    fontSize: 18.0,
+  ),
+
+  titleMedium: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w400,
+    fontSize: 16.0,
+  ),
+
+  titleSmall: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w400,
     fontSize: 14.0,
   ),
 
-  bodyLarge: TextStyle(
-    fontFamily: "Graphik LCG",
-    color: Colors.black,
-    fontWeight: FontWeight.bold,
-    fontSize: 32.0,
-    height: 38.4 / 32.0,
+  labelMedium: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w500,
+    fontSize: 12.0,
+  ),
+
+  bodyMedium: TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w400,
+    fontSize: 14.0,
   ),
 );
 
@@ -71,4 +84,23 @@ extension WasubiColors on Colors {
       });
 
   static const int _wasubiNeutralValue = 0xFFFAFAFC;
+}
+
+enum ColorSeed {
+  baseColor('M3 Baseline', Color(0xff6750a4)),
+  indigo('Indigo', Colors.indigo), // 0xFF3F51B5
+  blue('Blue', Colors.blue), // 0xFF2196F3
+  teal('Teal', Colors.teal), // 0xFF009688
+  green('Green', Colors.green), // 0xFF4CAF50
+  yellow('Yellow', Colors.yellow), // 0xFFFFEB3B
+  orange('Orange', Colors.orange), // 0xFFFF9800
+  deepOrange('Deep Orange', Colors.deepOrange), //0xFFFF5722
+  pink('Pink', Colors.pink), // 0xFFE91E63
+  brightBlue('Bright Blue', Color(0xFF0000FF)),
+  brightGreen('Bright Green', Color(0xFF00FF00)),
+  brightRed('Bright Red', Color(0xFFFF0000));
+
+  const ColorSeed(this.label, this.color);
+  final String label;
+  final Color color;
 }
