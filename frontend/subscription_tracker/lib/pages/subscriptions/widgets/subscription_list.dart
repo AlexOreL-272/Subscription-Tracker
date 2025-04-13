@@ -7,10 +7,14 @@ import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
 
 class SubscriptionList extends StatefulWidget {
-  final int index;
+  final String category;
   final int pageSize;
 
-  const SubscriptionList({required this.index, this.pageSize = 10, super.key});
+  const SubscriptionList({
+    required this.category,
+    this.pageSize = 10,
+    super.key,
+  });
 
   @override
   State<SubscriptionList> createState() => _SubscriptionListState();
@@ -31,16 +35,16 @@ class _SubscriptionListState extends State<SubscriptionList>
       List<SubscriptionModel>
     >(
       selector: (state) {
-        if (widget.index == 0) {
+        if (widget.category.isEmpty || widget.category == 'Все') {
           return state.subscriptions.values.toList();
         }
 
-        final category = BlocProvider.of<CategoryBloc>(
-          context,
-        ).state.categories.elementAt(widget.index);
+        // final category = BlocProvider.of<CategoryBloc>(
+        //   context,
+        // ).state.categories.elementAt(widget.index);
 
         return state.subscriptions.values
-            .where((sub) => sub.category == category)
+            .where((sub) => sub.category == widget.category)
             .toList();
       },
 

@@ -154,7 +154,10 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
 
-                  child: SubscriptionList(index: _categories.indexOf(category)),
+                  child: SubscriptionList(
+                    key: ValueKey(category),
+                    category: category,
+                  ),
                 );
               }).toList(),
         ),
