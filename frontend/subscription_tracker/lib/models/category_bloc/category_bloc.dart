@@ -28,6 +28,11 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     _box = await Hive.openBox<List>(_boxName);
     final savedCategories = _box.get(categoriesKey);
 
+    // for debug only
+    // TODO: remove
+    // final savedCategories = <String>['Все', 'Android', 'iOS', 'Flutter'];
+    // await _box.put(categoriesKey, savedCategories);
+
     if (savedCategories != null && savedCategories.isNotEmpty) {
       emit(CategoryState(List<String>.from(savedCategories)));
     }

@@ -767,11 +767,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                               if (value == 'Добавить') {
                                 final newCategory = await _addCategory(context);
 
-                                if (newCategory == null ||
-                                    newCategory.isEmpty ||
-                                    BlocProvider.of<CategoryBloc>(
-                                      context,
-                                    ).state.categories.contains(newCategory)) {
+                                if (newCategory == null) {
                                   return;
                                 }
 
@@ -1594,6 +1590,7 @@ class _AddCategoryDialog extends StatefulWidget {
 class _AddCategoryDialogState extends State<_AddCategoryDialog> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -1604,100 +1601,122 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Добавить категорию'),
+    return Form(
+      key: _formKey,
 
-      backgroundColor: Colors.white,
+      child: AlertDialog(
+        title: const Text('Добавить категорию'),
 
-      content: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
+        backgroundColor: Colors.white,
 
-        decoration: InputDecoration(
-          hintText: 'Музыка',
-          hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: WasubiColors.wasubiNeutral[400]!,
-          ),
+        content: TextFormField(
+          controller: _controller,
+          focusNode: _focusNode,
 
-          labelText: 'Название',
-          labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: WasubiColors.wasubiNeutral[400]!,
-          ),
-          floatingLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          alignLabelWithHint: true,
-
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: WasubiColors.wasubiNeutral[400]!,
-              width: 2.0,
-            ),
-          ),
-
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: WasubiColors.wasubiNeutral[400]!,
-              width: 2.0,
-            ),
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
-              width: 2.0,
-            ),
-          ),
-
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(color: const Color(0xFFFF5722), width: 2.0),
-          ),
-
-          disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: WasubiColors.wasubiNeutral[400]!,
-              width: 2.0,
-            ),
-          ),
-
-          isDense: true,
-
-          constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width,
-          ),
-        ),
-
-        style: Theme.of(context).textTheme.titleMedium,
-
-        maxLength: 15,
-
-        onTapOutside: (_) {
-          _focusNode.unfocus();
-        },
-      ),
-
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-
-          child: const Text('Отмена'),
-        ),
-
-        TextButton(
-          onPressed: () {
-            if (_controller.text.trim().isNotEmpty) {
-              Navigator.pop(context, _controller.text.trim());
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Введите хотя бы один символ';
             }
+
+            if (BlocProvider.of<CategoryBloc>(
+              context,
+            ).state.categories.contains(value)) {
+              return 'Это название уже используется';
+            }
+
+            return null;
           },
 
-          child: const Text('Добавить'),
+          autovalidateMode: AutovalidateMode.onUnfocus,
+
+          decoration: InputDecoration(
+            hintText: 'Музыка',
+            hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: WasubiColors.wasubiNeutral[400]!,
+            ),
+
+            labelText: 'Название',
+            labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: WasubiColors.wasubiNeutral[400]!,
+            ),
+            floatingLabelStyle: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(color: Theme.of(context).colorScheme.primary),
+            alignLabelWithHint: true,
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: WasubiColors.wasubiNeutral[400]!,
+                width: 2.0,
+              ),
+            ),
+
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: WasubiColors.wasubiNeutral[400]!,
+                width: 2.0,
+              ),
+            ),
+
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2.0,
+              ),
+            ),
+
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: const Color(0xFFFF5722),
+                width: 2.0,
+              ),
+            ),
+
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: WasubiColors.wasubiNeutral[400]!,
+                width: 2.0,
+              ),
+            ),
+
+            isDense: true,
+
+            constraints: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width,
+            ),
+          ),
+
+          style: Theme.of(context).textTheme.titleMedium,
+
+          maxLength: 15,
+
+          onTapOutside: (_) {
+            _focusNode.unfocus();
+          },
         ),
-      ],
+
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+
+            child: const Text('Отмена'),
+          ),
+
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                Navigator.pop(context, _controller.text.trim());
+              }
+            },
+
+            child: const Text('Добавить'),
+          ),
+        ],
+      ),
     );
   }
 }

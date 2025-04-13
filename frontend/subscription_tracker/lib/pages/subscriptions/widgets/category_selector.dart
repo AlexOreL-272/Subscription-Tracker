@@ -252,6 +252,8 @@ class _EditDialogState extends State<_EditDialog> {
   late final _controller = TextEditingController(text: widget.category);
   final _focusNode = FocusNode();
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     _focusNode.dispose();
@@ -261,104 +263,129 @@ class _EditDialogState extends State<_EditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Переименовать'),
+    return Form(
+      key: _formKey,
 
-      backgroundColor: Colors.white,
+      child: AlertDialog(
+        title: const Text('Переименовать'),
 
-      content: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
+        backgroundColor: Colors.white,
 
-        decoration: InputDecoration(
-          hintText: 'Введите новое название категории',
-          hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: WasubiColors.wasubiNeutral[400]!,
-          ),
+        content: TextFormField(
+          controller: _controller,
+          focusNode: _focusNode,
 
-          labelText: 'Название',
-          labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: WasubiColors.wasubiNeutral[400]!,
-          ),
-          floatingLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          alignLabelWithHint: true,
-
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: WasubiColors.wasubiNeutral[400]!,
-              width: 2.0,
-            ),
-          ),
-
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: WasubiColors.wasubiNeutral[400]!,
-              width: 2.0,
-            ),
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
-              width: 2.0,
-            ),
-          ),
-
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(color: const Color(0xFFFF5722), width: 2.0),
-          ),
-
-          disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: BorderSide(
-              color: WasubiColors.wasubiNeutral[400]!,
-              width: 2.0,
-            ),
-          ),
-
-          isDense: true,
-        ),
-
-        style: Theme.of(context).textTheme.titleMedium,
-
-        maxLength: 15,
-
-        onTapOutside: (_) {
-          _focusNode.unfocus();
-        },
-      ),
-
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-
-          child: const Text('Отмена'),
-        ),
-
-        TextButton(
-          onPressed: () {
-            if (_controller.text.trim().isNotEmpty) {
-              BlocProvider.of<CategoryBloc>(
-                context,
-              ).add(RenameCategoryEvent(widget.index, _controller.text.trim()));
-
-              BlocProvider.of<SubscriptionBloc>(context).add(
-                ResetCategoriesEvent(widget.category, _controller.text.trim()),
-              );
-
-              Navigator.pop(context);
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Введите хотя бы один символ';
             }
+
+            if (BlocProvider.of<CategoryBloc>(
+              context,
+            ).state.categories.contains(value)) {
+              return 'Это название уже используется';
+            }
+
+            return null;
           },
 
-          child: const Text('Сохранить'),
+          autovalidateMode: AutovalidateMode.onUnfocus,
+
+          decoration: InputDecoration(
+            hintText: 'Введите новое название категории',
+            hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: WasubiColors.wasubiNeutral[400]!,
+            ),
+
+            labelText: 'Название',
+            labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: WasubiColors.wasubiNeutral[400]!,
+            ),
+            floatingLabelStyle: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(color: Theme.of(context).colorScheme.primary),
+            alignLabelWithHint: true,
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: WasubiColors.wasubiNeutral[400]!,
+                width: 2.0,
+              ),
+            ),
+
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: WasubiColors.wasubiNeutral[400]!,
+                width: 2.0,
+              ),
+            ),
+
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2.0,
+              ),
+            ),
+
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: const Color(0xFFFF5722),
+                width: 2.0,
+              ),
+            ),
+
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: BorderSide(
+                color: WasubiColors.wasubiNeutral[400]!,
+                width: 2.0,
+              ),
+            ),
+
+            isDense: true,
+          ),
+
+          style: Theme.of(context).textTheme.titleMedium,
+
+          maxLength: 15,
+
+          onTapOutside: (_) {
+            _focusNode.unfocus();
+          },
         ),
-      ],
+
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+
+            child: const Text('Отмена'),
+          ),
+
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                BlocProvider.of<CategoryBloc>(context).add(
+                  RenameCategoryEvent(widget.index, _controller.text.trim()),
+                );
+
+                BlocProvider.of<SubscriptionBloc>(context).add(
+                  ResetCategoriesEvent(
+                    widget.category,
+                    _controller.text.trim(),
+                  ),
+                );
+
+                Navigator.pop(context);
+              }
+            },
+
+            child: const Text('Сохранить'),
+          ),
+        ],
+      ),
     );
   }
 }
