@@ -16,21 +16,44 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."users" (
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
+
     caption VARCHAR(50) NOT NULL,
-    link TEXT,
-    tag VARCHAR(30),
-    category VARCHAR(30),
+    comment VARCHAR(100),
+
     cost REAL NOT NULL,
     currency VARCHAR(3) NOT NULL,
     first_pay TIMESTAMP NOT NULL,
     interval INT NOT NULL,     -- in days;
-    comment TEXT,
+    end_date TIMESTAMP,
+
+    category VARCHAR(15),    
     color INT NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    trial_active BOOLEAN NOT NULL DEFAULT FALSE,
+    trial_interval INT,
+    trial_cost REAL,
+    trial_end_date TIMESTAMP,
+
+    support_link TEXT,
+
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id)
 );
+
+CREATE TRIGGER "subscription_tracker"."trg_subscriptions"
+ON "subscription_tracker"."subscriptions"
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE "subscription_tracker"."subscriptions"
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."user_subscription" (
     user_id UUID NOT NULL DEFAULT gen_random_uuid(),

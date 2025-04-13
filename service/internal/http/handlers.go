@@ -567,16 +567,28 @@ func (h *Handler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	subId, err := h.subSaver.SaveSubscription(
+		createSubRequest.Subscription.Id,
+
 		createSubRequest.Subscription.Caption,
-		createSubRequest.Subscription.Link,
-		createSubRequest.Subscription.Tag,
-		createSubRequest.Subscription.Category,
+		createSubRequest.Subscription.Comment,
+
 		createSubRequest.Subscription.Cost,
 		createSubRequest.Subscription.Currency,
 		createSubRequest.Subscription.FirstPay,
 		createSubRequest.Subscription.Interval,
-		createSubRequest.Subscription.Comment,
+		createSubRequest.Subscription.EndDate,
+
+		createSubRequest.Subscription.Category,
 		createSubRequest.Subscription.Color,
+
+		createSubRequest.Subscription.IsActive,
+
+		createSubRequest.Subscription.TrialActive,
+		createSubRequest.Subscription.TrialInterval,
+		createSubRequest.Subscription.TrialCost,
+		createSubRequest.Subscription.TrialEndDate,
+
+		createSubRequest.Subscription.SupportLink,
 	)
 	if err != nil {
 		h.logger.
@@ -642,16 +654,27 @@ func (h *Handler) EditSubscription(w http.ResponseWriter, r *http.Request) {
 
 	err := h.subEditor.EditSubscription(
 		subId,
+
 		editSubRequest.Caption,
-		editSubRequest.Link,
-		editSubRequest.Tag,
-		editSubRequest.Category,
+		editSubRequest.Comment,
+
 		editSubRequest.Cost,
 		editSubRequest.Currency,
 		editSubRequest.FirstPay,
 		editSubRequest.Interval,
-		editSubRequest.Comment,
+		editSubRequest.EndDate,
+
+		editSubRequest.Category,
 		editSubRequest.Color,
+
+		editSubRequest.IsActive,
+
+		editSubRequest.TrialActive,
+		editSubRequest.TrialInterval,
+		editSubRequest.TrialCost,
+		editSubRequest.TrialEndDate,
+
+		editSubRequest.SupportLink,
 	)
 	if err != nil {
 		h.logger.

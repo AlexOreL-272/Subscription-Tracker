@@ -75,49 +75,151 @@ func (p *PostgresStorage) SaveUser(
 	return id, nil
 }
 
+func (p *PostgresStorage) DeleteUser(
+	id string,
+) error {
+	const op = "pgstorage.PostgresStorage.DeleteUser"
+
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// Build delete requests
+	deleteUserSubscriptionRequest := psql.Delete(userSubTableName).Where(squirrel.Eq{"user_id": id})
+	deleteSubscriptionRequest := psql.Delete(subTableName).Where(squirrel.Eq{"id": id})
+	deleteUserRequest := psql.Delete(userTableName).Where(squirrel.Eq{"id": id})
+
+	ctx := context.Background()
+
+	// Begin transaction
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	// Defer rollback in case anything fails
+	defer tx.Rollback()
+
+	// Delete user subscription
+	sqlDeleteUserSubscriptionRequest, args, err := deleteUserSubscriptionRequest.ToSql()
+	if err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	if _, err := tx.Exec(sqlDeleteUserSubscriptionRequest, args...); err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	// Delete subscription
+	sqlDeleteSubscriptionRequest, args, err := deleteSubscriptionRequest.ToSql()
+	if err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	if _, err := tx.Exec(sqlDeleteSubscriptionRequest, args...); err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	// Delete user
+	sqlDeleteUserRequest, args, err := deleteUserRequest.ToSql()
+	if err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	if _, err := tx.Exec(sqlDeleteUserRequest, args...); err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		return ctxerror.New(op, err)
+	}
+
+	return nil
+}
+
 func (p *PostgresStorage) SaveSubscription(
+	id *string,
+
 	caption string,
-	link string,
-	tag string,
-	category string,
+	comment *string,
+
 	cost float64,
 	currency string,
 	firstPay time.Time,
 	interval uint32,
-	comment string,
+	endDate *time.Time,
+
+	category *string,
 	color uint32,
+
+	isActive bool,
+
+	trialActive bool,
+	trialInterval *uint32,
+	trialCost *float64,
+	trialEndDate *time.Time,
+
+	supportLink *string,
 ) (string, error) {
 	const op = "pgstorage.PostgresStorage.SaveSubscription"
 
-	// Generate subscription ID
-	subID := uuid.New().String()
+	var subID string
+
+	if id != nil {
+		subID = *id
+	} else {
+		// Generate subscription ID
+		subID = uuid.New().String()
+	}
+
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 	// Build request
 	saveSubscriptionRequest := psql.Insert(subTableName).Columns(
 		"id",
-		"caption",
-		"link",
-		"tag",
-		"category",
-		"cost",
-		"currency",
-		"first_pay",
-		"interval",
-		"comment",
-		"color",
+
+		"caption", // caption
+		"comment", // comment
+
+		"cost",      // cost
+		"currency",  // currency
+		"first_pay", // first pay date
+		"interval",  // interval
+		"end_date",  // end date
+
+		"category", // category
+		"color",    // color
+
+		"is_active", // is active
+
+		"trial_active",   // trial active
+		"trial_interval", // trial interval
+		"trial_cost",     // trial cost
+		"trial_end_date", // trial end date
+
+		"support_link", // support link
 	).Values(
 		subID,
+
 		caption,
-		link,
-		tag,
-		category,
+		comment,
+
 		cost,
 		currency,
 		firstPay,
 		interval,
-		comment,
+		endDate,
+
+		category,
 		color,
+
+		isActive,
+
+		trialActive,
+		trialInterval,
+		trialCost,
+		trialEndDate,
+
+		supportLink,
 	)
 
 	// Insert subscription into database
@@ -182,17 +284,27 @@ func (p *PostgresStorage) GetSubscriptions(
 		// Build request in case of full result type
 		getSubscriptionsRequest = psql.Select(
 			"subs.id",
-			"subs.caption",
-			"subs.link",
-			"subs.tag",
-			"subs.category",
-			"subs.cost",
-			"subs.currency",
-			"subs.first_pay",
-			"subs.interval",
-			"subs.comment",
-			"subs.color",
-			"subs.created_at",
+
+			"subs.caption", // caption
+			"subs.comment", // comment
+
+			"subs.cost",      // cost
+			"subs.currency",  // currency
+			"subs.first_pay", // first pay date
+			"subs.interval",  // interval
+			"subs.end_date",  // end date
+
+			"subs.category", // category
+			"subs.color",    // color
+
+			"subs.is_active", // is active
+
+			"subs.trial_active",   // trial active
+			"subs.trial_interval", // trial interval
+			"subs.trial_cost",     // trial cost
+			"subs.trial_end_date", // trial end date
+
+			"subs.support_link", // support link
 		).
 			From(fmt.Sprintf("%s subs", subTableName)).
 			LeftJoin(fmt.Sprintf("%s user_subs ON %s", userSubTableName, "subs.id = user_subs.subs_id")).
@@ -305,16 +417,27 @@ func (p *PostgresStorage) GetSubscriptionById(
 
 func (p *PostgresStorage) EditSubscription(
 	id string,
-	caption string,
-	link string,
-	tag string,
-	category string,
-	cost float64,
-	currency string,
-	firstPay time.Time,
-	interval uint32,
-	comment string,
-	color uint32,
+
+	caption *string,
+	comment *string,
+
+	cost *float64,
+	currency *string,
+	firstPay *time.Time,
+	interval *uint32,
+	endDate *time.Time,
+
+	category *string,
+	color *uint32,
+
+	isActive *bool,
+
+	trialActive *bool,
+	trialInterval *uint32,
+	trialCost *float64,
+	trialEndDate *time.Time,
+
+	supportLink *string,
 ) error {
 	const op = "pgstorage.PostgresStorage.EditSubscription"
 
@@ -324,48 +447,65 @@ func (p *PostgresStorage) EditSubscription(
 	updateSubscriptionRequest := psql.Update(subTableName).Where(squirrel.Eq{"id": id})
 
 	// Add fields to update
-	if caption != "" {
+	if caption != nil {
 		updateSubscriptionRequest = updateSubscriptionRequest.Set("caption", caption)
 	}
 
-	if link != "" {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("link", link)
-	}
-
-	if tag != "" {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("tag", tag)
-	}
-
-	if category != "" {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("category", category)
-	}
-
-	if cost != 0 {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("cost", cost)
-	}
-
-	if currency != "" {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("currency", currency)
-	}
-
-	if !firstPay.IsZero() {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("first_pay", firstPay)
-	}
-
-	if interval != 0 {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("interval", interval)
-	}
-
-	if comment != "" {
+	if comment != nil {
 		updateSubscriptionRequest = updateSubscriptionRequest.Set("comment", comment)
 	}
 
-	if color != 0 {
-		updateSubscriptionRequest = updateSubscriptionRequest.Set("color", color)
+	if cost != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("cost", *cost)
 	}
 
-	// TODO: make trigger on update
-	updateSubscriptionRequest = updateSubscriptionRequest.Set("updated_at", time.Now())
+	if currency != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("currency", *currency)
+	}
+
+	if firstPay != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("first_pay", *firstPay)
+	}
+
+	if interval != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("interval", *interval)
+	}
+
+	if endDate != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("end_date", *endDate)
+	}
+
+	if category != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("category", *category)
+	}
+
+	if color != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("color", *color)
+	}
+
+	if isActive != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("is_active", *isActive)
+	}
+
+	if trialActive != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("trial_active", *trialActive)
+	}
+
+	if trialInterval != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("trial_interval", *trialInterval)
+	}
+
+	if trialCost != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("trial_cost", *trialCost)
+	}
+
+	if trialEndDate != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("trial_end_date", *trialEndDate)
+	}
+
+	if supportLink != nil {
+		updateSubscriptionRequest = updateSubscriptionRequest.Set("support_link", *supportLink)
+	}
 
 	// Update subscription
 	sqlUpdateSubscriptionRequest, args, err := updateSubscriptionRequest.ToSql()
