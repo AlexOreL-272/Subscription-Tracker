@@ -126,8 +126,10 @@ class _EditDeleteOverlay extends StatefulWidget {
   State<_EditDeleteOverlay> createState() => _EditDeleteOverlayState();
 }
 
-// TODO: rethink this
 class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
+  final _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
   void _showDeleteDialog(BuildContext context, String category, int index) {
     showDialog(
       context: context,
@@ -147,6 +149,153 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
   }
 
   void _showOverlay(BuildContext context) {
+    final renderBox = context.findRenderObject() as RenderBox;
+    final screenSize = MediaQuery.of(context).size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+
+    final availableRightSpace = screenSize.width - offset.dx - size.width;
+    final availableLeftSpace = offset.dx;
+
+    final showRight = availableRightSpace > availableLeftSpace;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _removeOverlay,
+
+          child: Stack(
+            children: [
+              Positioned(
+                width: 175.0,
+
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  targetAnchor:
+                      showRight ? Alignment.bottomLeft : Alignment.bottomRight,
+                  followerAnchor:
+                      showRight ? Alignment.topLeft : Alignment.topRight,
+                  showWhenUnlinked: false,
+
+                  child: Material(
+                    clipBehavior: Clip.hardEdge,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(
+                          color: WasubiColors.wasubiNeutral[400]!,
+                        ),
+                      ),
+
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(
+                              Icons.mode_edit_outline_outlined,
+                              color: Colors.black,
+                            ),
+
+                            label: Text(
+                              'Переименовать',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: Colors.black),
+                            ),
+
+                            onPressed: () {
+                              _removeOverlay();
+                              _showRenameDialog(
+                                context,
+                                widget.category,
+                                widget.index,
+                              );
+                            },
+
+                            style: ButtonStyle(
+                              overlayColor: WidgetStatePropertyAll(
+                                WasubiColors.wasubiNeutral[400]!,
+                              ),
+
+                              shape: WidgetStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+
+                              fixedSize: WidgetStatePropertyAll(
+                                Size(double.infinity, 40.0),
+                              ),
+
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+
+                          const Divider(
+                            height: 1.0,
+                            indent: 8.0,
+                            endIndent: 8.0,
+                          ),
+
+                          TextButton.icon(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+
+                            label: Text(
+                              'Удалить',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: Colors.red),
+                            ),
+
+                            onPressed: () {
+                              _removeOverlay();
+                              _showDeleteDialog(
+                                context,
+                                widget.category,
+                                widget.index,
+                              );
+                            },
+
+                            style: ButtonStyle(
+                              overlayColor: WidgetStatePropertyAll(
+                                Colors.red[100]!,
+                              ),
+
+                              shape: WidgetStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+
+                              visualDensity: VisualDensity.compact,
+
+                              fixedSize: WidgetStatePropertyAll(
+                                Size(double.infinity, 40.0),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+
+    return;
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
@@ -221,19 +370,28 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
     );
   }
 
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        if (widget.category.isEmpty || widget.category == 'Все') {
-          return;
-        }
+    return CompositedTransformTarget(
+      link: _layerLink,
 
-        _showOverlay(context);
-      },
-      behavior: HitTestBehavior.opaque,
+      child: GestureDetector(
+        onLongPress: () {
+          if (widget.category.isEmpty || widget.category == 'Все') {
+            return;
+          }
 
-      child: widget.child,
+          _showOverlay(context);
+        },
+        behavior: HitTestBehavior.opaque,
+
+        child: widget.child,
+      ),
     );
   }
 }
