@@ -44,16 +44,20 @@ CREATE TABLE IF NOT EXISTS "subscription_tracker"."subscriptions" (
     PRIMARY KEY (id)
 );
 
-CREATE TRIGGER "subscription_tracker"."trg_subscriptions"
-ON "subscription_tracker"."subscriptions"
-AFTER UPDATE
-AS
+CREATE FUNCTION updated_at_trigger_function() RETURNS trigger AS $$
 BEGIN
-    SET NOCOUNT ON;
     UPDATE "subscription_tracker"."subscriptions"
     SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.id;
-END
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_subscriptions
+AFTER UPDATE ON "subscription_tracker"."subscriptions"
+FOR EACH ROW
+EXECUTE FUNCTION updated_at_trigger_function();
 
 CREATE TABLE IF NOT EXISTS "subscription_tracker"."user_subscription" (
     user_id UUID NOT NULL DEFAULT gen_random_uuid(),
