@@ -15,20 +15,36 @@ type UserSaver interface {
 		surname string,
 		email string,
 	) (string, error)
+
+	DeleteUser(
+		id string,
+	) error
 }
 
 type SubscriptionSaver interface {
 	SaveSubscription(
+		id *string,
+
 		caption string,
-		link string,
-		tag string,
-		category string,
+		comment *string,
+
 		cost float64,
 		currency string,
 		firstPay time.Time,
 		interval uint32,
-		comment string,
+		endDate *time.Time,
+
+		category *string,
 		color uint32,
+
+		isActive bool,
+
+		trialActive bool,
+		trialInterval *uint32,
+		trialCost *float64,
+		trialEndDate *time.Time,
+
+		supportLink *string,
 	) (string, error)
 
 	AssignSubscriptionToUser(
@@ -40,16 +56,27 @@ type SubscriptionSaver interface {
 type SubscriptionEditor interface {
 	EditSubscription(
 		id string,
-		caption string,
-		link string,
-		tag string,
-		category string,
-		cost float64,
-		currency string,
-		firstPay time.Time,
-		interval uint32,
-		comment string,
-		color uint32,
+
+		caption *string,
+		comment *string,
+
+		cost *float64,
+		currency *string,
+		firstPay *time.Time,
+		interval *uint32,
+		endDate *time.Time,
+
+		category *string,
+		color *uint32,
+
+		isActive *bool,
+
+		trialActive *bool,
+		trialInterval *uint32,
+		trialCost *float64,
+		trialEndDate *time.Time,
+
+		supportLink *string,
 	) error
 }
 
