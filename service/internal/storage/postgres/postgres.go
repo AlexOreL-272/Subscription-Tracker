@@ -375,28 +375,28 @@ func (p *PostgresStorage) GetSubscriptionById(
 
 	// Build request
 	getSubscriptionByIDRequest := psql.Select(
-		"subs.id",
+		"id",
 
-		"subs.caption", // caption
-		"subs.comment", // comment
+		"caption", // caption
+		"comment", // comment
 
-		"subs.cost",      // cost
-		"subs.currency",  // currency
-		"subs.first_pay", // first pay date
-		"subs.interval",  // interval
-		"subs.end_date",  // end date
+		"cost",      // cost
+		"currency",  // currency
+		"first_pay", // first pay date
+		"interval",  // interval
+		"end_date",  // end date
 
-		"subs.category", // category
-		"subs.color",    // color
+		"category", // category
+		"color",    // color
 
-		"subs.is_active", // is active
+		"is_active", // is active
 
-		"subs.trial_active",   // trial active
-		"subs.trial_interval", // trial interval
-		"subs.trial_cost",     // trial cost
-		"subs.trial_end_date", // trial end date
+		"trial_active",   // trial active
+		"trial_interval", // trial interval
+		"trial_cost",     // trial cost
+		"trial_end_date", // trial end date
 
-		"subs.support_link", // support link
+		"support_link", // support link
 	).
 		From(subTableName).
 		Where(squirrel.Eq{"id": id})
