@@ -25,4 +25,6 @@ class UserRegisterEvent extends UserEvent {
   );
 }
 
+class UserDeleteAccountEvent extends UserEvent {}
+
 class InitializeUserEvent extends UserEvent {}

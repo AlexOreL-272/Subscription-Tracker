@@ -50,4 +50,11 @@ final class _$SubsApiService extends SubsApiService {
     final Request $request = Request('POST', $url, client.baseUrl, body: $body);
     return client.send<LoginDto, LoginDto>($request);
   }
+
+  @override
+  Future<Response<UserDto>> getUserInfo(String userId) {
+    final Uri $url = Uri.parse('http://alexorel.ru/users/${userId}');
+    final Request $request = Request('GET', $url, client.baseUrl);
+    return client.send<UserDto, UserDto>($request);
+  }
 }

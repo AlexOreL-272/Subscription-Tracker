@@ -26,6 +26,7 @@ dependencies:
   fl_chart: ^0.70.2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  currency_converter_pro: ^0.0.7
 
 dev_dependencies:
   flutter_test:

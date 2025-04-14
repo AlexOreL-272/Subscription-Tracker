@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:subscription_tracker/main_screen.dart';
 import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/models/ui_color_bloc/ui_color_bloc.dart';
 import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
 
 Future<void> main() async {
@@ -18,6 +19,7 @@ Future<void> main() async {
         BlocProvider<CategoryBloc>(create: (context) => CategoryBloc()),
         BlocProvider<SubscriptionBloc>(create: (context) => SubscriptionBloc()),
         BlocProvider<UserBloc>(create: (context) => UserBloc()),
+        BlocProvider<UIColorBloc>(create: (context) => UIColorBloc()),
       ],
 
       child: const App(),

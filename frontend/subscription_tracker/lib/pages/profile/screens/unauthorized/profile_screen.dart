@@ -21,7 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
 
         children: [
-          const SizedBox(height: 100.0),
+          const SizedBox(height: 72.0),
 
           // header text
           Align(

@@ -25,3 +25,19 @@ class LoginRequestDto with _$LoginRequestDto {
 
   Map<String, dynamic> toJson() => _$LoginRequestDtoToJson(this);
 }
+
+@Freezed(equal: true, toJson: false, fromJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
+class UserDto with _$UserDto {
+  const factory UserDto({
+    required String id,
+    required String surname,
+    required String fullName,
+    required String email,
+  }) = _UserDto;
+
+  const UserDto._();
+
+  factory UserDto.fromJson(Map<String, dynamic> json) =>
+      _$UserDtoFromJson(json);
+}

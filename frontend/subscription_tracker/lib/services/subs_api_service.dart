@@ -30,4 +30,7 @@ abstract class SubsApiService extends ChopperService {
   Future<Response<LoginDto>> login({
     @Body() required LoginRequestDto loginRequest,
   });
+
+  @GET(path: '/users/{userId}')
+  Future<Response<UserDto>> getUserInfo(@Path('userId') String userId);
 }

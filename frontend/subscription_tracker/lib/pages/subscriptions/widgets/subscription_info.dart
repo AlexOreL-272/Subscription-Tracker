@@ -14,7 +14,7 @@ import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.
 import 'package:subscription_tracker/pages/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/decimal_input.dart';
-import 'package:subscription_tracker/pages/subscriptions/widgets/divided_list.dart';
+import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';

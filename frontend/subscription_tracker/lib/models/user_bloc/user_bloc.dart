@@ -19,6 +19,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<InitializeUserEvent>(_initialize);
     on<UserLogInEvent>(_logIn);
     on<UserLogOutEvent>(_logOut);
+    on<UserDeleteAccountEvent>(_deleteAccount);
     on<UserRegisterEvent>(_register);
 
     add(InitializeUserEvent());
@@ -41,26 +42,49 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
     await Future.delayed(const Duration(seconds: 1));
 
-    if (loginResponse.isSuccessful) {
-      emit(
-        UserState.authorized(
-          loginResponse.body!.id,
-          event.email,
-          'Фамилия',
-          'Имя Отчество',
-          loginResponse.body!.accessToken,
-        ),
-      );
-    } else {
+    if (!loginResponse.isSuccessful) {
       emit(
         UserState.error(
           '${loginResponse.statusCode} ${loginResponse.error.toString()}',
         ),
       );
+
+      return;
     }
+
+    final userInfoResponse = await apiService.getUserInfo(
+      loginResponse.body!.id,
+    );
+
+    if (!userInfoResponse.isSuccessful) {
+      emit(
+        UserState.error(
+          '${userInfoResponse.statusCode} ${userInfoResponse.error.toString()}',
+        ),
+      );
+
+      return;
+    }
+
+    emit(
+      UserState.authorized(
+        loginResponse.body!.id,
+        userInfoResponse.body!.email,
+        userInfoResponse.body!.surname,
+        userInfoResponse.body!.fullName,
+        loginResponse.body!.accessToken,
+      ),
+    );
   }
 
-  Future<void> _logOut(UserLogOutEvent event, Emitter<UserState> emit) async {}
+  Future<void> _logOut(UserLogOutEvent event, Emitter<UserState> emit) async {
+    emit(UserState.unauthorized());
+  }
+
+  Future<void> _deleteAccount(
+    UserDeleteAccountEvent event,
+    Emitter<UserState> emit,
+  ) async {}
 
   Future<void> _register(
     UserRegisterEvent event,
