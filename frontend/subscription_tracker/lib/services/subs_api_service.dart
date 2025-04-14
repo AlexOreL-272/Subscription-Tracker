@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
+import 'package:subscription_tracker/dto/auth/login_dto.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/services/json_converter.dart';
 
@@ -23,5 +24,10 @@ abstract class SubsApiService extends ChopperService {
     @Query('category') String? category,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
+  });
+
+  @POST(path: '/login')
+  Future<Response<LoginDto>> login({
+    @Body() required LoginRequestDto loginRequest,
   });
 }

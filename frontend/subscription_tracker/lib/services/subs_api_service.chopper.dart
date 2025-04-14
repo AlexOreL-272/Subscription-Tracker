@@ -42,4 +42,12 @@ final class _$SubsApiService extends SubsApiService {
     );
     return client.send<List<SubscriptionModel>, SubscriptionModel>($request);
   }
+
+  @override
+  Future<Response<LoginDto>> login({required LoginRequestDto loginRequest}) {
+    final Uri $url = Uri.parse('http://alexorel.ru/login');
+    final $body = loginRequest;
+    final Request $request = Request('POST', $url, client.baseUrl, body: $body);
+    return client.send<LoginDto, LoginDto>($request);
+  }
 }

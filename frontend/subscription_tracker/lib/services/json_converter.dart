@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
-import 'package:subscription_tracker/services/subscription_mapping.dart';
+import 'package:subscription_tracker/services/json_mapping.dart';
 
 typedef $JsonFactory<T> = T Function(Map<String, dynamic> json);
 

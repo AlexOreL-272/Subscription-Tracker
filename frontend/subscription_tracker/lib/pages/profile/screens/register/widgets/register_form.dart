@@ -119,7 +119,6 @@ class _RegisterFormState extends State<RegisterForm> {
               color: Theme.of(context).colorScheme.primary,
               width: MediaQuery.of(context).size.width / 1.5,
               height: 36.0,
-              formKey: _formKey,
               onPressed: () {
                 print(
                   'Register: $_submittedSurname $_submittedName $_submittedMiddleName $_submittedEmail $_submittedPassword',

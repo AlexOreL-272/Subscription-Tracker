@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class OutlinedLoginButton extends StatelessWidget {
@@ -47,7 +49,7 @@ class OutlinedLoginButton extends StatelessWidget {
   }
 }
 
-class FilledButton extends StatelessWidget {
+class FilledButton extends StatefulWidget {
   final String label;
   final Color color;
 
@@ -56,7 +58,7 @@ class FilledButton extends StatelessWidget {
 
   final VoidCallback onPressed;
 
-  final Key? formKey;
+  final isLoading;
 
   const FilledButton({
     required this.label,
@@ -66,41 +68,184 @@ class FilledButton extends StatelessWidget {
     required this.height,
 
     required this.onPressed,
-    this.formKey,
+
+    this.isLoading = false,
+
     super.key,
   });
 
   @override
+  State<FilledButton> createState() => _FilledButtonState();
+}
+
+class _FilledButtonState extends State<FilledButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat();
+  }
+
+  @override
+  void didUpdateWidget(FilledButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isLoading && !_animationController.isAnimating) {
+      _animationController.repeat();
+    } else if (!widget.isLoading) {
+      _animationController.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        if (formKey == null ||
-            (formKey as GlobalKey<FormState>).currentState!.validate()) {
-          onPressed();
-        }
-      },
+    final buttonWidth = widget.width ?? MediaQuery.of(context).size.width;
 
-      style: ButtonStyle(
-        overlayColor: WidgetStateProperty.all(Colors.transparent),
-        splashFactory: NoSplash.splashFactory,
+    return Stack(
+      alignment: Alignment.center,
 
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      children: [
+        TextButton(
+          onPressed: () {
+            if (widget.isLoading) {
+              return;
+            }
+
+            widget.onPressed();
+          },
+
+          style: ButtonStyle(
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
+            splashFactory: NoSplash.splashFactory,
+
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+            ),
+
+            fixedSize: WidgetStateProperty.all(
+              Size(buttonWidth, widget.height),
+            ),
+
+            backgroundColor: WidgetStateProperty.all(
+              widget.isLoading ? Colors.white : widget.color,
+            ),
+          ),
+
+          child: Text(
+            widget.label,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: widget.isLoading ? Colors.black : Colors.white,
+            ),
+          ),
         ),
 
-        fixedSize: WidgetStateProperty.all(
-          Size(width ?? MediaQuery.of(context).size.width, height),
-        ),
+        if (widget.isLoading)
+          IgnorePointer(
+            child: AnimatedBuilder(
+              animation: _animationController,
 
-        backgroundColor: WidgetStateProperty.all(color),
-      ),
+              builder: (context, child) {
+                return CustomPaint(
+                  size: Size(buttonWidth, widget.height),
 
-      child: Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(color: Colors.white),
-      ),
+                  painter: _GapBorderPainter(
+                    progress: _animationController.value,
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2.0,
+                    gapSize: 200,
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
     );
+  }
+}
+
+class _GapBorderPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  final double width;
+  final double gapSize;
+
+  _GapBorderPainter({
+    required this.progress,
+    required this.color,
+    required this.width,
+    required this.gapSize,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = width
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
+
+    final rect = Rect.fromLTWH(
+      width / 2,
+      width / 2,
+      size.width - width,
+      size.height - width,
+    );
+    const borderRadius = Radius.circular(16);
+
+    final gapStart = progress;
+    final gapEnd = (gapStart + (gapSize / _calculatePerimeter(size))) % 1.0;
+
+    _drawBorderPart(canvas, rect, borderRadius, paint, gapEnd, gapStart);
+  }
+
+  void _drawBorderPart(
+    Canvas canvas,
+    Rect rect,
+    Radius borderRadius,
+    Paint paint,
+    double start,
+    double end,
+  ) {
+    final path = Path()..addRRect(RRect.fromRectAndRadius(rect, borderRadius));
+
+    final metrics = path.computeMetrics().first;
+    final totalLength = metrics.length;
+    final gapStart = start * totalLength;
+    final gapEnd = end * totalLength;
+
+    if (gapStart < gapEnd) {
+      final extractPath = metrics.extractPath(gapStart, gapEnd);
+      canvas.drawPath(extractPath, paint);
+    } else {
+      final extractPath1 = metrics.extractPath(gapStart, totalLength);
+      final extractPath2 = metrics.extractPath(0, gapEnd);
+      canvas.drawPath(extractPath1, paint);
+      canvas.drawPath(extractPath2, paint);
+    }
+  }
+
+  double _calculatePerimeter(Size size) {
+    const cornerLength = 2 * pi * 16 / 4;
+    final straightLength = 2 * (size.width + size.height - 4 * 16);
+    return straightLength + 4 * cornerLength;
+  }
+
+  @override
+  bool shouldRepaint(covariant _GapBorderPainter oldDelegate) {
+    return progress != oldDelegate.progress ||
+        color != oldDelegate.color ||
+        width != oldDelegate.width ||
+        gapSize != oldDelegate.gapSize;
   }
 }
