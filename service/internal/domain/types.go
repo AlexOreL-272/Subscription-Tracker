@@ -10,11 +10,11 @@ type UserCredentials struct {
 }
 
 type User struct {
-	Id string `json:"id"`
+	Id string `json:"id" db:"id"`
 
-	FullName string `json:"full_name"`
-	Surname  string `json:"surname"`
-	Email    string `json:"email"`
+	FullName string `json:"full_name" db:"full_name"`
+	Surname  string `json:"surname" db:"surname"`
+	Email    string `json:"email" db:"email"`
 }
 
 type EditableSubscription struct {
