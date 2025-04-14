@@ -21,6 +21,12 @@ type UserSaver interface {
 	) error
 }
 
+type UserProvider interface {
+	GetUserByID(
+		id string,
+	) (*domain.User, error)
+}
+
 type SubscriptionSaver interface {
 	SaveSubscription(
 		id *string,

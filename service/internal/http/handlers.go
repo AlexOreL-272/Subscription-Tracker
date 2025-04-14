@@ -24,6 +24,7 @@ type Handler struct {
 	authClient       auth.Auth
 	idPManager       idprovider.IdentityProviderManager
 	userSaver        storage.UserSaver
+	userProvider     storage.UserProvider
 	subSaver         storage.SubscriptionSaver
 	subProvider      storage.SubscriptionProvider
 	subEditor        storage.SubscriptionEditor
@@ -41,6 +42,7 @@ func New(
 	authClient auth.Auth,
 	idPManager idprovider.IdentityProviderManager,
 	userSaver storage.UserSaver,
+	userProvider storage.UserProvider,
 	subSaver storage.SubscriptionSaver,
 	subProvider storage.SubscriptionProvider,
 	subEditor storage.SubscriptionEditor,
@@ -58,6 +60,7 @@ func New(
 		authClient:       authClient,
 		idPManager:       idPManager,
 		userSaver:        userSaver,
+		userProvider:     userProvider,
 		subSaver:         subSaver,
 		subProvider:      subProvider,
 		subEditor:        subEditor,
@@ -439,6 +442,39 @@ func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
+	const handler = "http.Handler.GetUserByID"
+
+	userId := chi.URLParam(r, "user_id")
+
+	user, err := h.userProvider.GetUserByID(userId)
+	if err != nil {
+		if errors.Is(err, storage.ErrNotFound) {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to get user by id", zap.Error(err))
+		http.Error(w, "failed to get user by id", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
 }
 
 func (h *Handler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {

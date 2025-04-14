@@ -75,6 +75,40 @@ func (p *PostgresStorage) SaveUser(
 	return id, nil
 }
 
+func (p *PostgresStorage) GetUserByID(
+	id string,
+) (*domain.User, error) {
+	const op = "pgstorage.PostgresStorage.GetUserByID"
+
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// Build select request
+	selectUserRequest := psql.Select(
+		"id",
+		"full_name",
+		"surname",
+		"email",
+	).From(userTableName).Where(squirrel.Eq{"id": id})
+
+	// Select user by ID
+	sqlSelectUserRequest, args, err := selectUserRequest.ToSql()
+	if err != nil {
+		return nil, ctxerror.New(op, err)
+	}
+
+	// Execute select request
+	var user []domain.User
+	if err := p.db.Select(&user, sqlSelectUserRequest, args...); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ctxerror.New(op, storage.ErrNotFound)
+		}
+
+		return nil, ctxerror.New(op, err)
+	}
+
+	return &user[0], nil
+}
+
 func (p *PostgresStorage) DeleteUser(
 	id string,
 ) error {

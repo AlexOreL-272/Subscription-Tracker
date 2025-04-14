@@ -9,6 +9,14 @@ type UserCredentials struct {
 	Password string `json:"password"`
 }
 
+type User struct {
+	Id string `json:"id"`
+
+	FullName string `json:"full_name"`
+	Surname  string `json:"surname"`
+	Email    string `json:"email"`
+}
+
 type EditableSubscription struct {
 	Caption *string `json:"caption,omitempty"`
 	Comment *string `json:"comment,omitempty"`

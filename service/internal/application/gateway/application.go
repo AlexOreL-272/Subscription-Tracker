@@ -157,6 +157,7 @@ func New(
 		keycloakClient,     // auth.Auth
 		keycloakIdPManager, // idpmanager.IdentityProviderManager
 		postgresDB,         // storage.UserSaver
+		postgresDB,         // storage.UserProvider
 		postgresDB,         // storage.SubscriptionSaver
 		postgresDB,         // storage.SubscriptionProvider
 		postgresDB,         // storage.SubscriptionEditor
@@ -276,6 +277,9 @@ func setupRouter(
 	router.Post("/subscriptions", handler.CreateSubscription)
 	router.Put("/subscriptions/{sub_id}", handler.EditSubscription)
 	router.Delete("/subscriptions/{sub_id}", handler.DeleteSubscription)
+
+	// <=========== USER ENDPOINTS ===========>
+	router.Get("/users/{user_id}", handler.GetUserByID)
 
 	// <=========== TEST ENDPOINTS ===========>
 	router.Get("/random", static.ServeRandomFile)
