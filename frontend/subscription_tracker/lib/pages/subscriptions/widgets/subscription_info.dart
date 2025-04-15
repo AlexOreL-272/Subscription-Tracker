@@ -66,6 +66,11 @@ class SubscriptionListItem extends StatelessWidget {
     Dialogs.bottomMaterialDialog(
       context: context,
 
+      color:
+          Theme.of(context).colorScheme.brightness == Brightness.dark
+              ? Color(0xFF121212)
+              : Colors.white,
+
       title: 'Удалить подписку',
       msg: 'Действительно удалить подписку?',
 
@@ -229,6 +234,7 @@ class SubscriptionPreview extends StatelessWidget {
                               getInitials(subscription.caption),
 
                               style: TextStyle(
+                                color: Colors.black87,
                                 fontSize: 24.0,
                                 fontFamily: 'Inter',
                               ),
@@ -303,7 +309,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
         },
 
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor:
+              Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Color(0xFF121212)
+                  : Colors.white,
           resizeToAvoidBottomInset: true,
 
           appBar: AppBar(
@@ -354,7 +363,11 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
           ),
 
           body: Theme(
-            data: ThemeData(colorScheme: colorScheme),
+            data: ThemeData(
+              colorScheme: colorScheme.copyWith(
+                brightness: Theme.of(context).colorScheme.brightness,
+              ),
+            ),
 
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -421,10 +434,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             value: _newSubscription.cost,
                             currency: _newSubscription.currency,
 
-                            textStyle: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            textStyle: Theme.of(context).textTheme.titleMedium,
 
                             onChanged: (value) {
                               final newCost =
@@ -606,7 +616,11 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
+                              color:
+                                  Theme.of(context).colorScheme.brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
                               fontWeight: FontWeight.w400,
                             ),
@@ -617,10 +631,18 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
+                              color:
+                                  Theme.of(context).colorScheme.brightness ==
+                                          Brightness.dark
+                                      ? Color(0xFF282828)
+                                      : Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                               border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
+                                color:
+                                    Theme.of(context).colorScheme.brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withAlpha(20)
+                                        : WasubiColors.wasubiNeutral[400]!,
                               ),
                             ),
                           ),
@@ -741,10 +763,18 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             },
 
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color:
+                                  Theme.of(context).colorScheme.brightness ==
+                                          Brightness.dark
+                                      ? Color(0xFF282828)
+                                      : Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                               border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
+                                color:
+                                    Theme.of(context).colorScheme.brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withAlpha(20)
+                                        : WasubiColors.wasubiNeutral[400]!,
                               ),
                             ),
                           ),
@@ -804,7 +834,11 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
+                              color:
+                                  Theme.of(context).colorScheme.brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
                               fontWeight: FontWeight.w400,
                             ),
@@ -815,10 +849,18 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
+                              color:
+                                  Theme.of(context).colorScheme.brightness ==
+                                          Brightness.dark
+                                      ? Color(0xFF282828)
+                                      : Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                               border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
+                                color:
+                                    Theme.of(context).colorScheme.brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withAlpha(20)
+                                        : WasubiColors.wasubiNeutral[400]!,
                               ),
                             ),
                           ),
@@ -942,10 +984,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             value: _newSubscription.trialCost,
                             currency: _newSubscription.currency,
 
-                            textStyle: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            textStyle: Theme.of(context).textTheme.titleMedium,
 
                             onChanged: (value) {
                               final newCost =
@@ -1174,12 +1213,26 @@ class _SubscriptionDetailsHeaderState
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
+        color:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Color(0xFF282828)
+                : Color.fromARGB(255, 248, 249, 250),
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        border: Border.all(
+          color:
+              Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Colors.white.withAlpha(20)
+                  : Colors.grey[200]!,
+
+          width: 1.0,
+        ),
+
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
+            color:
+                Theme.of(context).colorScheme.brightness == Brightness.dark
+                    ? Colors.white.withAlpha(10)
+                    : Colors.black.withAlpha(10),
             blurRadius: 2.0,
             spreadRadius: 1.0,
           ),
@@ -1247,9 +1300,16 @@ class _SubscriptionDetailsHeaderState
                                       controller: _captionController,
                                       focusNode: _captionFocusNode,
 
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.w500,
+                                        color:
+                                            Theme.of(
+                                                      context,
+                                                    ).colorScheme.brightness ==
+                                                    Brightness.dark
+                                                ? Colors.white
+                                                : Colors.black87,
                                       ),
 
                                       decoration: InputDecoration(
@@ -1340,8 +1400,21 @@ class _SubscriptionDetailsHeaderState
                             ? 'Без комментариев...'
                             : null,
                     hintStyle: TextStyle(
-                      color: WasubiColors.wasubiNeutral[700]!,
+                      color:
+                          Theme.of(context).colorScheme.brightness ==
+                                  Brightness.dark
+                              ? Colors.white
+                              : WasubiColors.wasubiNeutral[700]!,
                       fontSize: 14.0,
+                    ),
+
+                    counterStyle: TextStyle(
+                      color:
+                          Theme.of(context).colorScheme.brightness ==
+                                  Brightness.dark
+                              ? Colors.white
+                              : WasubiColors.wasubiNeutral[700]!,
+                      fontSize: 12.0,
                     ),
                   ),
 
@@ -1354,7 +1427,11 @@ class _SubscriptionDetailsHeaderState
                   textInputAction: TextInputAction.done,
 
                   style: TextStyle(
-                    color: WasubiColors.wasubiNeutral[700]!,
+                    color:
+                        Theme.of(context).colorScheme.brightness ==
+                                Brightness.dark
+                            ? Colors.white
+                            : WasubiColors.wasubiNeutral[700]!,
                     fontSize: 14.0,
                   ),
                 ),
@@ -1607,7 +1684,10 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
       child: AlertDialog(
         title: const Text('Добавить категорию'),
 
-        backgroundColor: Colors.white,
+        backgroundColor:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Color(0xFF121212)
+                : Colors.white,
 
         content: TextFormField(
           controller: _controller,
@@ -1750,7 +1830,10 @@ class _IntervalDialogState extends State<_IntervalDialog> {
 
     return Dialog(
       insetPadding: const EdgeInsets.all(16.0),
-      backgroundColor: Colors.white,
+      backgroundColor:
+          Theme.of(context).colorScheme.brightness == Brightness.dark
+              ? Color(0xFF121212)
+              : Colors.white,
 
       child: Padding(
         padding: const EdgeInsets.all(16.0),

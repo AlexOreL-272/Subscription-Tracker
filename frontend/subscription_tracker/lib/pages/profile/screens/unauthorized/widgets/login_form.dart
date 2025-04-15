@@ -68,7 +68,10 @@ class _EmailFieldState extends State<_EmailField> {
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.alternate_email_rounded),
-        prefixIconColor: Colors.black,
+        prefixIconColor:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
 
         hintText: 'E-Mail',
         hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -189,7 +192,10 @@ class _PasswordFieldState extends State<_PasswordField> {
 
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.lock_outline_rounded),
-        prefixIconColor: Colors.black,
+        prefixIconColor:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
 
         suffixIcon: IconButton(
           onPressed: () {

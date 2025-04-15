@@ -15,12 +15,27 @@ class DividedNamedList extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
+        color:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Color(0xFF282828)
+                : Color.fromARGB(255, 248, 249, 250),
+
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        border: Border.all(
+          color:
+              Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Colors.white.withAlpha(20)
+                  : Colors.grey[200]!,
+
+          width: 1.0,
+        ),
+
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
+            color:
+                Theme.of(context).colorScheme.brightness == Brightness.dark
+                    ? Colors.white.withAlpha(10)
+                    : Colors.black.withAlpha(10),
             blurRadius: 2.0,
             spreadRadius: 1.0,
           ),
@@ -66,7 +81,11 @@ class NamedEntry extends StatelessWidget {
               child: Text(
                 name,
                 style: TextStyle(
-                  color: Colors.grey[900],
+                  color:
+                      Theme.of(context).colorScheme.brightness ==
+                              Brightness.dark
+                          ? Colors.white
+                          : Colors.grey[900],
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -149,12 +168,26 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
+        color:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Color(0xFF282828)
+                : Color.fromARGB(255, 248, 249, 250),
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        border: Border.all(
+          color:
+              Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Colors.white.withAlpha(20)
+                  : Colors.grey[200]!,
+
+          width: 1.0,
+        ),
+
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
+            color:
+                Theme.of(context).colorScheme.brightness == Brightness.dark
+                    ? Colors.white.withAlpha(10)
+                    : Colors.black.withAlpha(10),
             blurRadius: 2.0,
             spreadRadius: 1.0,
           ),
@@ -181,7 +214,11 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
                   trackColor: WidgetStatePropertyAll(
                     Theme.of(context).colorScheme.primaryContainer,
                   ),
-                  thumbColor: WidgetStatePropertyAll(Colors.white),
+                  thumbColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.brightness == Brightness.dark
+                        ? Color(0xFF3F3F3F)
+                        : Colors.white,
+                  ),
                   trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
 
                   padding: EdgeInsets.zero,

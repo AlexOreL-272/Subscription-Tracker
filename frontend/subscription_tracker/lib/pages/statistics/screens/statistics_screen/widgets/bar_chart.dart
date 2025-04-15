@@ -32,7 +32,10 @@ class YearlyExpenseBarChart extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: WasubiColors.wasubiNeutral[100]!,
+        color:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Color(0xFF282828)
+                : WasubiColors.wasubiNeutral[100]!,
         borderRadius: BorderRadius.circular(8.0),
 
         boxShadow: [
@@ -56,7 +59,10 @@ class YearlyExpenseBarChart extends StatelessWidget {
             Text(
               'Расходы за следующий год',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: WasubiColors.wasubiNeutral[600]!,
+                color:
+                    Theme.of(context).colorScheme.brightness == Brightness.dark
+                        ? Colors.white
+                        : WasubiColors.wasubiNeutral[600]!,
                 fontWeight: FontWeight.bold,
               ),
             ),

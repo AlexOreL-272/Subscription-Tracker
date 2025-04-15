@@ -12,7 +12,7 @@ class UIColorBloc extends Bloc<UIColorEvent, UIColorState> {
     UpdateUIColorEvent event,
     Emitter<UIColorState> emit,
   ) async {
-    emit(UIColorState(color: event.color));
+    emit(UIColorState(color: event.color, isDark: state.isDark));
   }
 
   Future<void> _updateDarkMode(

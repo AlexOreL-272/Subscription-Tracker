@@ -41,14 +41,15 @@ class _AppState extends State<App> {
 
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: BlocProvider.of<UIColorBloc>(context).state.color,
+              seedColor: state.color,
               dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
+              brightness: state.isDark ? Brightness.dark : Brightness.light,
             ),
             textTheme: textTheme,
           ),
 
           home: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: state.isDark ? Color(0xFF121212) : Colors.white,
 
             body: SafeArea(
               child: PageView(

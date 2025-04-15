@@ -38,8 +38,16 @@ class _UIColorPickerState extends State<UIColorPicker> {
 
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.grey[200]!),
+          color:
+              Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Color(0xFF282828)
+                  : Colors.white,
+          border: Border.all(
+            color:
+                Theme.of(context).colorScheme.brightness == Brightness.dark
+                    ? Colors.white.withAlpha(20)
+                    : Colors.grey[200]!,
+          ),
           borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(

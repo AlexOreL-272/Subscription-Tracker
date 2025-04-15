@@ -54,12 +54,18 @@ class _DonutChartState extends State<DonutChart> {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: WasubiColors.wasubiNeutral[100]!,
+        color:
+            Theme.of(context).colorScheme.brightness == Brightness.dark
+                ? Color(0xFF282828)
+                : WasubiColors.wasubiNeutral[100]!,
         borderRadius: BorderRadius.circular(10.0),
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
+            color:
+                Theme.of(context).colorScheme.brightness == Brightness.dark
+                    ? Colors.white.withAlpha(10)
+                    : Colors.black.withAlpha(10),
             blurRadius: 2.0,
             spreadRadius: 1.0,
           ),
@@ -87,7 +93,11 @@ class _DonutChartState extends State<DonutChart> {
                   child: Text(
                     'Траты за',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: WasubiColors.wasubiNeutral[600]!,
+                      color:
+                          Theme.of(context).colorScheme.brightness ==
+                                  Brightness.dark
+                              ? Colors.white
+                              : WasubiColors.wasubiNeutral[600]!,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -96,7 +106,11 @@ class _DonutChartState extends State<DonutChart> {
                 Text(
                   DonutChart.dateFormat.format(_selectedMonth),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: WasubiColors.wasubiNeutral[600]!,
+                    color:
+                        Theme.of(context).colorScheme.brightness ==
+                                Brightness.dark
+                            ? Colors.white
+                            : WasubiColors.wasubiNeutral[600]!,
                   ),
                 ),
 

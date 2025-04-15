@@ -73,6 +73,13 @@ class _ColorPickerState extends State<ColorPicker> {
                   followerAnchor: Alignment.bottomRight,
 
                   child: Material(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          widget.decoration?.borderRadius ??
+                          BorderRadius.circular(8.0),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+
                     child: Container(
                       decoration: widget.decoration,
                       clipBehavior: Clip.hardEdge,
@@ -127,6 +134,7 @@ class _ColorPickerState extends State<ColorPicker> {
         child: SizedBox(
           width: widget.buttonSize,
           height: widget.buttonSize,
+
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.transparent,
