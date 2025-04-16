@@ -2,34 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/common/scripts/scripts.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
+import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
-class YearlyExpenseBarChart extends StatelessWidget {
+class YearlyExpenseBarChart extends StatefulWidget {
   static const _shortDateFormat = RussianDateFormat.MMM();
   static const _defaultDateFormat = RussianDateFormat.ddMMMMyyyy();
 
   const YearlyExpenseBarChart({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final subscriptions =
-        BlocProvider.of<SubscriptionBloc>(
-          context,
-        ).state.subscriptions.values.toList();
+  State<YearlyExpenseBarChart> createState() => _YearlyExpenseBarChartState();
+}
+
+class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
+  late List<double> _monthlyTotals;
+  late double _maxTotal;
+
+  late DateTime _monthStart;
+  late final List<String> _monthLabels;
+
+  @override
+  void initState() {
+    super.initState();
 
     final now = DateTime.now();
-    final monthStart = DateTime(now.year, now.month);
-    final monthLabels = List.generate(12, (i) {
-      final date = DateTime(monthStart.year, monthStart.month + i);
-      return _shortDateFormat.format(date);
+    _monthStart = DateTime(now.year, now.month);
+
+    _monthLabels = List.generate(12, (i) {
+      final date = DateTime(_monthStart.year, _monthStart.month + i);
+      return YearlyExpenseBarChart._shortDateFormat.format(date);
     });
 
-    final monthlyTotals = _calculateMonthlyExpenses(subscriptions, monthStart);
-    final maxTotal = monthlyTotals.reduce((a, b) => a > b ? a : b);
+    _monthlyTotals = _calculateMonthlyExpenses(
+      context,
 
+      BlocProvider.of<SubscriptionBloc>(
+        context,
+      ).state.subscriptions.values.toList(),
+
+      _monthStart,
+    );
+
+    _maxTotal = _monthlyTotals.reduce((a, b) => a > b ? a : b);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
 
@@ -80,12 +103,12 @@ class YearlyExpenseBarChart extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           final index = _sanitizeValue(value).toInt();
 
-                          if (index < 0 || index >= monthLabels.length) {
+                          if (index < 0 || index >= _monthLabels.length) {
                             return const SizedBox();
                           }
 
                           return Text(
-                            monthLabels[index],
+                            _monthLabels[index],
                             style: Theme.of(context).textTheme.labelMedium
                                 ?.copyWith(fontWeight: FontWeight.w400),
                           );
@@ -116,12 +139,12 @@ class YearlyExpenseBarChart extends StatelessWidget {
 
                   barGroups: List.generate(12, (index) {
                     final value = double.parse(
-                      monthlyTotals[index].toStringAsFixed(2),
+                      _monthlyTotals[index].toStringAsFixed(2),
                     );
 
                     final color = _getColorForValue(
                       value,
-                      maxTotal,
+                      _maxTotal,
                       low: Color(0xFF81C784),
                       mid: Color(0xFFFFF176),
                       high: Color(0xFFE57373),
@@ -152,7 +175,7 @@ class YearlyExpenseBarChart extends StatelessWidget {
             const SizedBox(height: 8.0),
 
             Text(
-              '${_defaultDateFormat.format(monthStart)} - ${_defaultDateFormat.format(DateTime(monthStart.year + 1, monthStart.month).subtract(const Duration(days: 1)))}',
+              '${YearlyExpenseBarChart._defaultDateFormat.format(_monthStart)} - ${YearlyExpenseBarChart._defaultDateFormat.format(DateTime(_monthStart.year + 1, _monthStart.month).subtract(const Duration(days: 1)))}',
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ],
@@ -183,9 +206,15 @@ class YearlyExpenseBarChart extends StatelessWidget {
   }
 
   List<double> _calculateMonthlyExpenses(
+    BuildContext context,
     List<SubscriptionModel> subs,
     DateTime startMonth,
   ) {
+    final selectedCurrency =
+        BlocProvider.of<SettingsBloc>(context).state.currency;
+
+    final currencyRepo = RepositoryProvider.of<CurrencyRepo>(context);
+
     final totals = List<double>.filled(12, 0.0);
 
     for (final sub in subs) {
@@ -217,7 +246,12 @@ class YearlyExpenseBarChart extends StatelessWidget {
                     ? sub.trialEndDate!
                     : endDate,
           );
-          total += trialCharges * sub.trialCost!;
+
+          total += currencyRepo.convert(
+            trialCharges * sub.trialCost!,
+            sub.currency,
+            selectedCurrency,
+          );
 
           if (sub.trialEndDate!.isBefore(monthEnd)) {
             final postTrialStart = sub.trialEndDate!.add(
@@ -231,7 +265,12 @@ class YearlyExpenseBarChart extends StatelessWidget {
               intervalDays: sub.interval,
               cutoff: endDate,
             );
-            total += regularCharges * sub.cost;
+
+            total += currencyRepo.convert(
+              regularCharges * sub.cost,
+              sub.currency,
+              selectedCurrency,
+            );
           }
         } else {
           final regularCharges = countCharges(
@@ -241,7 +280,12 @@ class YearlyExpenseBarChart extends StatelessWidget {
             intervalDays: sub.interval,
             cutoff: endDate,
           );
-          total += regularCharges * sub.cost;
+
+          total += currencyRepo.convert(
+            regularCharges * sub.cost,
+            sub.currency,
+            selectedCurrency,
+          );
         }
 
         totals[i] += total;

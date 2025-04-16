@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/ui_color_bloc/ui_color_bloc.dart';
-import 'package:subscription_tracker/models/ui_color_bloc/ui_color_event.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_event.dart';
 import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
 import 'package:subscription_tracker/models/user_bloc/user_event.dart';
 import 'package:subscription_tracker/models/user_bloc/user_state.dart';
@@ -88,13 +88,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     child: TextToggleSwitch(
                       initialIndex:
-                          BlocProvider.of<UIColorBloc>(context).state.isDark
+                          BlocProvider.of<SettingsBloc>(context).state.isDark
                               ? 1
                               : 0,
 
                       options: ['Светлая', 'Темная'],
                       onChanged: (value) {
-                        BlocProvider.of<UIColorBloc>(
+                        BlocProvider.of<SettingsBloc>(
                           context,
                         ).add(UpdateUIDarkModeEvent(value == 1));
                       },
@@ -118,9 +118,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     name: 'Валюта',
 
                     child: CurrencySelector(
-                      currency: 'RUB',
+                      currency:
+                          BlocProvider.of<SettingsBloc>(context).state.currency,
                       onChanged: (value) {
-                        print('Currency changed to $value');
+                        if (value.isEmpty ||
+                            value ==
+                                BlocProvider.of<SettingsBloc>(
+                                  context,
+                                ).state.currency) {
+                          return;
+                        }
+
+                        BlocProvider.of<SettingsBloc>(
+                          context,
+                        ).add(UpdateCurrencyEvent(value));
                       },
                     ),
                   ),
@@ -150,9 +161,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
 
               UIColorPicker(
-                color: BlocProvider.of<UIColorBloc>(context).state.color,
+                color: BlocProvider.of<SettingsBloc>(context).state.color,
                 onChanged: (color) {
-                  BlocProvider.of<UIColorBloc>(
+                  BlocProvider.of<SettingsBloc>(
                     context,
                   ).add(UpdateUIColorEvent(color));
                 },

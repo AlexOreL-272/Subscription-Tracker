@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/common/scripts/scripts.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
+import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
+import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class DonutChart extends StatefulWidget {
@@ -31,7 +34,7 @@ class DonutChart extends StatefulWidget {
 class _DonutChartState extends State<DonutChart> {
   double _total = 0.0;
   DateTime _selectedMonth = DateTime.now();
-  List<MapEntry<String, double>> sortedCostsPerCategory = [];
+  List<MapEntry<String, double>> _sortedCostsPerCategory = [];
 
   @override
   void initState() {
@@ -40,17 +43,22 @@ class _DonutChartState extends State<DonutChart> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedCurrency =
+        SharedData.currenciesSymbols[BlocProvider.of<SettingsBloc>(
+          context,
+        ).state.currency];
+
     final subscriptions =
         BlocProvider.of<SubscriptionBloc>(
           context,
         ).state.subscriptions.values.toList();
 
-    sortedCostsPerCategory = _calculateMonthlyCategoryStats(
+    _sortedCostsPerCategory = _calculateMonthlyCategoryStats(
       subscriptions,
       _selectedMonth,
     );
 
-    _total = sortedCostsPerCategory.fold<double>(0, (sum, e) => sum + e.value);
+    _total = _sortedCostsPerCategory.fold<double>(0, (sum, e) => sum + e.value);
 
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
@@ -149,7 +157,7 @@ class _DonutChartState extends State<DonutChart> {
                 ),
 
                 Text(
-                  '${_total.toStringAsFixed(2)} ₽',
+                  '${_total.toStringAsFixed(2)} $selectedCurrency',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -158,7 +166,7 @@ class _DonutChartState extends State<DonutChart> {
 
           const SizedBox(height: 32.0),
 
-          _Legend(labels: sortedCostsPerCategory.map((e) => e.key).toList()),
+          _Legend(labels: _sortedCostsPerCategory.map((e) => e.key).toList()),
 
           const SizedBox(height: 16.0),
         ],
@@ -168,10 +176,10 @@ class _DonutChartState extends State<DonutChart> {
 
   List<PieChartSectionData> _showingSections(BuildContext context) {
     return List<PieChartSectionData>.generate(
-      min(sortedCostsPerCategory.length, DonutChart._maxSections),
+      min(_sortedCostsPerCategory.length, DonutChart._maxSections),
 
       (index) {
-        final cost = sortedCostsPerCategory[index].value;
+        final cost = _sortedCostsPerCategory[index].value;
 
         return PieChartSectionData(
           color: DonutChart._colors[index],
@@ -184,7 +192,6 @@ class _DonutChartState extends State<DonutChart> {
     );
   }
 
-  // TODO: add currency conversion
   Map<String, double> _getMonthlyCategoryCostsWithTrial(
     List<SubscriptionModel> subscriptions,
     DateTime selectedMonth,
@@ -196,6 +203,10 @@ class _DonutChartState extends State<DonutChart> {
     ).subtract(Duration(days: 1));
 
     final Map<String, double> categoryTotals = {};
+
+    final selectedCurrency =
+        BlocProvider.of<SettingsBloc>(context).state.currency;
+    final currencyRepo = RepositoryProvider.of<CurrencyRepo>(context);
 
     for (var sub in subscriptions) {
       if (!sub.isActive) continue;
@@ -225,7 +236,11 @@ class _DonutChartState extends State<DonutChart> {
           cutoff: trialEnd.isBefore(effectiveEnd) ? trialEnd : effectiveEnd,
         );
 
-        totalCost += trialCharges * sub.trialCost!;
+        totalCost += currencyRepo.convert(
+          trialCharges * sub.trialCost!,
+          sub.currency,
+          selectedCurrency,
+        );
 
         // If subscription continues after trial within this month
         if (trialEnd.isBefore(monthEnd)) {
@@ -239,7 +254,11 @@ class _DonutChartState extends State<DonutChart> {
             cutoff: effectiveEnd,
           );
 
-          totalCost += regularCharges * sub.cost;
+          totalCost += currencyRepo.convert(
+            regularCharges * sub.cost,
+            sub.currency,
+            selectedCurrency,
+          );
         }
       } else {
         // No trial, use regular values
@@ -251,7 +270,11 @@ class _DonutChartState extends State<DonutChart> {
           cutoff: effectiveEnd,
         );
 
-        totalCost += charges * sub.cost;
+        totalCost += currencyRepo.convert(
+          charges * sub.cost,
+          sub.currency,
+          selectedCurrency,
+        );
       }
 
       if (totalCost >= 0) {

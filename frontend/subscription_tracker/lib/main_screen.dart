@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/ui_color_bloc/ui_color_bloc.dart';
-import 'package:subscription_tracker/models/ui_color_bloc/ui_color_state.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_state.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'pages/subscriptions/subscriptions_page.dart';
@@ -34,7 +34,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UIColorBloc, UIColorState>(
+    return BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
         return MaterialApp(
           title: 'Subscription Tracker',
