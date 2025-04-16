@@ -19,6 +19,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$LoginDto {
   String get id => throw _privateConstructorUsedError;
   String get accessToken => throw _privateConstructorUsedError;
+  String get refreshToken => throw _privateConstructorUsedError;
 
   /// Create a copy of LoginDto
   /// with the given fields replaced by the non-null parameter values.
@@ -32,7 +33,7 @@ abstract class $LoginDtoCopyWith<$Res> {
   factory $LoginDtoCopyWith(LoginDto value, $Res Function(LoginDto) then) =
       _$LoginDtoCopyWithImpl<$Res, LoginDto>;
   @useResult
-  $Res call({String id, String accessToken});
+  $Res call({String id, String accessToken, String refreshToken});
 }
 
 /// @nodoc
@@ -49,7 +50,11 @@ class _$LoginDtoCopyWithImpl<$Res, $Val extends LoginDto>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? id = null, Object? accessToken = null}) {
+  $Res call({
+    Object? id = null,
+    Object? accessToken = null,
+    Object? refreshToken = null,
+  }) {
     return _then(
       _value.copyWith(
             id:
@@ -61,6 +66,11 @@ class _$LoginDtoCopyWithImpl<$Res, $Val extends LoginDto>
                 null == accessToken
                     ? _value.accessToken
                     : accessToken // ignore: cast_nullable_to_non_nullable
+                        as String,
+            refreshToken:
+                null == refreshToken
+                    ? _value.refreshToken
+                    : refreshToken // ignore: cast_nullable_to_non_nullable
                         as String,
           )
           as $Val,
@@ -77,7 +87,7 @@ abstract class _$$LoginDtoImplCopyWith<$Res>
   ) = __$$LoginDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String accessToken});
+  $Res call({String id, String accessToken, String refreshToken});
 }
 
 /// @nodoc
@@ -93,7 +103,11 @@ class __$$LoginDtoImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? id = null, Object? accessToken = null}) {
+  $Res call({
+    Object? id = null,
+    Object? accessToken = null,
+    Object? refreshToken = null,
+  }) {
     return _then(
       _$LoginDtoImpl(
         id:
@@ -106,6 +120,11 @@ class __$$LoginDtoImplCopyWithImpl<$Res>
                 ? _value.accessToken
                 : accessToken // ignore: cast_nullable_to_non_nullable
                     as String,
+        refreshToken:
+            null == refreshToken
+                ? _value.refreshToken
+                : refreshToken // ignore: cast_nullable_to_non_nullable
+                    as String,
       ),
     );
   }
@@ -114,16 +133,22 @@ class __$$LoginDtoImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$LoginDtoImpl implements _LoginDto {
-  const _$LoginDtoImpl({required this.id, required this.accessToken});
+  const _$LoginDtoImpl({
+    required this.id,
+    required this.accessToken,
+    required this.refreshToken,
+  });
 
   @override
   final String id;
   @override
   final String accessToken;
+  @override
+  final String refreshToken;
 
   @override
   String toString() {
-    return 'LoginDto(id: $id, accessToken: $accessToken)';
+    return 'LoginDto(id: $id, accessToken: $accessToken, refreshToken: $refreshToken)';
   }
 
   @override
@@ -133,11 +158,13 @@ class _$LoginDtoImpl implements _LoginDto {
             other is _$LoginDtoImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.accessToken, accessToken) ||
-                other.accessToken == accessToken));
+                other.accessToken == accessToken) &&
+            (identical(other.refreshToken, refreshToken) ||
+                other.refreshToken == refreshToken));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, accessToken);
+  int get hashCode => Object.hash(runtimeType, id, accessToken, refreshToken);
 
   /// Create a copy of LoginDto
   /// with the given fields replaced by the non-null parameter values.
@@ -152,12 +179,15 @@ abstract class _LoginDto implements LoginDto {
   const factory _LoginDto({
     required final String id,
     required final String accessToken,
+    required final String refreshToken,
   }) = _$LoginDtoImpl;
 
   @override
   String get id;
   @override
   String get accessToken;
+  @override
+  String get refreshToken;
 
   /// Create a copy of LoginDto
   /// with the given fields replaced by the non-null parameter values.
@@ -323,6 +353,349 @@ abstract class _LoginRequestDto extends LoginRequestDto {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$LoginRequestDtoImplCopyWith<_$LoginRequestDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$RegisterDto {
+  String get id => throw _privateConstructorUsedError;
+
+  /// Create a copy of RegisterDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $RegisterDtoCopyWith<RegisterDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RegisterDtoCopyWith<$Res> {
+  factory $RegisterDtoCopyWith(
+    RegisterDto value,
+    $Res Function(RegisterDto) then,
+  ) = _$RegisterDtoCopyWithImpl<$Res, RegisterDto>;
+  @useResult
+  $Res call({String id});
+}
+
+/// @nodoc
+class _$RegisterDtoCopyWithImpl<$Res, $Val extends RegisterDto>
+    implements $RegisterDtoCopyWith<$Res> {
+  _$RegisterDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of RegisterDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? id = null}) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$RegisterDtoImplCopyWith<$Res>
+    implements $RegisterDtoCopyWith<$Res> {
+  factory _$$RegisterDtoImplCopyWith(
+    _$RegisterDtoImpl value,
+    $Res Function(_$RegisterDtoImpl) then,
+  ) = __$$RegisterDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id});
+}
+
+/// @nodoc
+class __$$RegisterDtoImplCopyWithImpl<$Res>
+    extends _$RegisterDtoCopyWithImpl<$Res, _$RegisterDtoImpl>
+    implements _$$RegisterDtoImplCopyWith<$Res> {
+  __$$RegisterDtoImplCopyWithImpl(
+    _$RegisterDtoImpl _value,
+    $Res Function(_$RegisterDtoImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of RegisterDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? id = null}) {
+    return _then(
+      _$RegisterDtoImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$RegisterDtoImpl implements _RegisterDto {
+  const _$RegisterDtoImpl({required this.id});
+
+  @override
+  final String id;
+
+  @override
+  String toString() {
+    return 'RegisterDto(id: $id)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RegisterDtoImpl &&
+            (identical(other.id, id) || other.id == id));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id);
+
+  /// Create a copy of RegisterDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RegisterDtoImplCopyWith<_$RegisterDtoImpl> get copyWith =>
+      __$$RegisterDtoImplCopyWithImpl<_$RegisterDtoImpl>(this, _$identity);
+}
+
+abstract class _RegisterDto implements RegisterDto {
+  const factory _RegisterDto({required final String id}) = _$RegisterDtoImpl;
+
+  @override
+  String get id;
+
+  /// Create a copy of RegisterDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$RegisterDtoImplCopyWith<_$RegisterDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$RegisterRequestDto {
+  String get fullName => throw _privateConstructorUsedError;
+  String get surname => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
+  String get password => throw _privateConstructorUsedError;
+
+  /// Create a copy of RegisterRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $RegisterRequestDtoCopyWith<RegisterRequestDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RegisterRequestDtoCopyWith<$Res> {
+  factory $RegisterRequestDtoCopyWith(
+    RegisterRequestDto value,
+    $Res Function(RegisterRequestDto) then,
+  ) = _$RegisterRequestDtoCopyWithImpl<$Res, RegisterRequestDto>;
+  @useResult
+  $Res call({String fullName, String surname, String email, String password});
+}
+
+/// @nodoc
+class _$RegisterRequestDtoCopyWithImpl<$Res, $Val extends RegisterRequestDto>
+    implements $RegisterRequestDtoCopyWith<$Res> {
+  _$RegisterRequestDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of RegisterRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? fullName = null,
+    Object? surname = null,
+    Object? email = null,
+    Object? password = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            fullName:
+                null == fullName
+                    ? _value.fullName
+                    : fullName // ignore: cast_nullable_to_non_nullable
+                        as String,
+            surname:
+                null == surname
+                    ? _value.surname
+                    : surname // ignore: cast_nullable_to_non_nullable
+                        as String,
+            email:
+                null == email
+                    ? _value.email
+                    : email // ignore: cast_nullable_to_non_nullable
+                        as String,
+            password:
+                null == password
+                    ? _value.password
+                    : password // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$RegisterRequestDtoImplCopyWith<$Res>
+    implements $RegisterRequestDtoCopyWith<$Res> {
+  factory _$$RegisterRequestDtoImplCopyWith(
+    _$RegisterRequestDtoImpl value,
+    $Res Function(_$RegisterRequestDtoImpl) then,
+  ) = __$$RegisterRequestDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String fullName, String surname, String email, String password});
+}
+
+/// @nodoc
+class __$$RegisterRequestDtoImplCopyWithImpl<$Res>
+    extends _$RegisterRequestDtoCopyWithImpl<$Res, _$RegisterRequestDtoImpl>
+    implements _$$RegisterRequestDtoImplCopyWith<$Res> {
+  __$$RegisterRequestDtoImplCopyWithImpl(
+    _$RegisterRequestDtoImpl _value,
+    $Res Function(_$RegisterRequestDtoImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of RegisterRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? fullName = null,
+    Object? surname = null,
+    Object? email = null,
+    Object? password = null,
+  }) {
+    return _then(
+      _$RegisterRequestDtoImpl(
+        fullName:
+            null == fullName
+                ? _value.fullName
+                : fullName // ignore: cast_nullable_to_non_nullable
+                    as String,
+        surname:
+            null == surname
+                ? _value.surname
+                : surname // ignore: cast_nullable_to_non_nullable
+                    as String,
+        email:
+            null == email
+                ? _value.email
+                : email // ignore: cast_nullable_to_non_nullable
+                    as String,
+        password:
+            null == password
+                ? _value.password
+                : password // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$RegisterRequestDtoImpl extends _RegisterRequestDto {
+  const _$RegisterRequestDtoImpl({
+    required this.fullName,
+    required this.surname,
+    required this.email,
+    required this.password,
+  }) : super._();
+
+  @override
+  final String fullName;
+  @override
+  final String surname;
+  @override
+  final String email;
+  @override
+  final String password;
+
+  @override
+  String toString() {
+    return 'RegisterRequestDto(fullName: $fullName, surname: $surname, email: $email, password: $password)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RegisterRequestDtoImpl &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
+            (identical(other.surname, surname) || other.surname == surname) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.password, password) ||
+                other.password == password));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, fullName, surname, email, password);
+
+  /// Create a copy of RegisterRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RegisterRequestDtoImplCopyWith<_$RegisterRequestDtoImpl> get copyWith =>
+      __$$RegisterRequestDtoImplCopyWithImpl<_$RegisterRequestDtoImpl>(
+        this,
+        _$identity,
+      );
+}
+
+abstract class _RegisterRequestDto extends RegisterRequestDto {
+  const factory _RegisterRequestDto({
+    required final String fullName,
+    required final String surname,
+    required final String email,
+    required final String password,
+  }) = _$RegisterRequestDtoImpl;
+  const _RegisterRequestDto._() : super._();
+
+  @override
+  String get fullName;
+  @override
+  String get surname;
+  @override
+  String get email;
+  @override
+  String get password;
+
+  /// Create a copy of RegisterRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$RegisterRequestDtoImplCopyWith<_$RegisterRequestDtoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

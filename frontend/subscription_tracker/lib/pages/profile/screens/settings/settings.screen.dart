@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/models/ui_color_bloc/ui_color_bloc.dart';
 import 'package:subscription_tracker/models/ui_color_bloc/ui_color_event.dart';
 import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/models/user_bloc/user_event.dart';
 import 'package:subscription_tracker/models/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/profile/screens/settings/widgets/color_picker.dart';
 import 'package:subscription_tracker/pages/profile/screens/settings/widgets/delete_button.dart';
@@ -219,8 +220,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       name: 'Удалить аккаунт',
 
                       child: DeleteButton(
-                        onPressed: () {
-                          print('Delete account');
+                        onPressed: () async {
+                          final isDeleted = await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return _DeleteDialog();
+                            },
+                          );
+
+                          if (!isDeleted) {
+                            return;
+                          }
+
+                          BlocProvider.of<UserBloc>(
+                            context,
+                          ).add(UserLogOutEvent());
+
+                          Navigator.of(context).pop();
                         },
                       ),
                     ),
@@ -244,6 +260,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DeleteDialog extends StatelessWidget {
+  const _DeleteDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
+    return AlertDialog(
+      title: const Text('Удалить аккаунт'),
+      content: Text(
+        'Вы уверены, что хотите удалить Ваш аккаунт? Сохраненные подписки останутся на Вашем устройстве',
+      ),
+
+      backgroundColor: backgroundColor,
+
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Отмена'),
+        ),
+
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+
+          child: const Text('Удалить'),
+        ),
+      ],
     );
   }
 }

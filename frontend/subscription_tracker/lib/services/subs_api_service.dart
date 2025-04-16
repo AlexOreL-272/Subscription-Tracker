@@ -17,6 +17,16 @@ abstract class SubsApiService extends ChopperService {
     return _$SubsApiService(client);
   }
 
+  @POST(path: '/login')
+  Future<Response<LoginDto>> login({
+    @Body() required LoginRequestDto loginRequest,
+  });
+
+  @POST(path: '/register')
+  Future<Response<RegisterDto>> register({
+    @Body() required RegisterRequestDto registerRequest,
+  });
+
   @GET(path: '/subscriptions')
   Future<Response<List<SubscriptionModel>>> getSubscriptions({
     @Query('user_id') required String userId,
@@ -24,11 +34,6 @@ abstract class SubsApiService extends ChopperService {
     @Query('category') String? category,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
-  });
-
-  @POST(path: '/login')
-  Future<Response<LoginDto>> login({
-    @Body() required LoginRequestDto loginRequest,
   });
 
   @GET(path: '/users/{userId}')

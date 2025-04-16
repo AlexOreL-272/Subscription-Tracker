@@ -20,8 +20,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
+        print(state.fullName);
+
         final fullName = state.fullName ?? noData;
         final splitted = fullName.split(' ');
+
+        print(splitted);
+        print(splitted.length);
+
         final name = splitted.first;
         final middleName = splitted.length > 1 ? splitted.last : noData;
 
