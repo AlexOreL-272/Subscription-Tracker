@@ -97,7 +97,8 @@ class _ColorPickerState extends State<ColorPicker> {
                             index,
                             size: widget.pickerSize.height * 0.8,
                             isChecked:
-                                _selectedColor == ColorSeed.values[index].color,
+                                _selectedColor.toARGB32() ==
+                                ColorSeed.values[index].color.toARGB32(),
                           );
                         },
 
