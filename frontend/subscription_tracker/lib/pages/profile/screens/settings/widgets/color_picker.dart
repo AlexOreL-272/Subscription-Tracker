@@ -66,7 +66,9 @@ class _UIColorPickerState extends State<UIColorPicker> {
               return _buildColorPickerItem(
                 index,
                 size: widget.pickerSize.height * 0.8,
-                isChecked: _selectedColor == UIColorSeed.values[index].color,
+                isChecked:
+                    _selectedColor.toARGB32() ==
+                    UIColorSeed.values[index].color.toARGB32(),
               );
             },
 

@@ -171,102 +171,134 @@ class _SlideableWidgetState extends State<SlideableWidget>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return GestureDetector(
-          onHorizontalDragUpdate: _handleDragUpdate,
-          onHorizontalDragEnd: _handleDragEnd,
-          child: Stack(
-            children: [
-              // Right action button (appears when swiping right-to-left)
-              if (widget.rightIcon != null && _swipeDirection > 0) ...{
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      margin: EdgeInsets.only(
-                        right:
-                            _buttonNeedJump
-                                ? _buttonJumpThreshold * constraints.maxWidth -
-                                    _iconSize
-                                : 0,
-                      ),
+        return TapRegion(
+          onTapOutside: (event) {
+            setState(() {
+              _wasSwipedPastThreshold = false;
+              _swipeDirection = 0;
+              _buttonNeedJump = false;
+              _animationController.animateTo(0.0);
+            });
+          },
 
-                      child: IconButton(
-                        onPressed: () async {
-                          await _animationController.reverse();
-                          widget.onRightActionPressed?.call();
+          onTapInside: (event) {
+            if (event.delta == Offset.zero) {
+              return;
+            }
 
-                          _buttonNeedJump = false;
-                          _wasSwipedPastThreshold = false;
-                          _swipeDirection = 0;
-                        },
+            if (_animationController.value >= _buttonVisibleThreshold) {
+              _animationController.animateTo(_buttonVisibleThreshold);
+              setState(() {
+                _wasSwipedPastThreshold = false;
+                _swipeDirection = 0;
+                _buttonNeedJump = false;
+                _animationController.animateTo(0.0);
+              });
+            }
+          },
 
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
 
-                        iconSize: _iconSize,
-                        icon: widget.rightIcon!,
-                      ),
-                    ),
-                  ),
-                ),
-              },
+            onHorizontalDragUpdate: _handleDragUpdate,
+            onHorizontalDragEnd: _handleDragEnd,
 
-              // Left action button (appears when swiping left-to-right)
-              if (widget.leftIcon != null && _swipeDirection < 0) ...{
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      margin: EdgeInsets.only(
-                        left:
-                            _buttonNeedJump
-                                ? _buttonJumpThreshold * constraints.maxWidth -
-                                    _iconSize
-                                : 0,
-                      ),
+            child: Stack(
+              children: [
+                // Right action button (appears when swiping right-to-left)
+                if (widget.rightIcon != null && _swipeDirection > 0) ...{
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        margin: EdgeInsets.only(
+                          right:
+                              _buttonNeedJump
+                                  ? _buttonJumpThreshold *
+                                          constraints.maxWidth -
+                                      _iconSize
+                                  : 0,
+                        ),
 
-                      child: IconButton(
-                        onPressed: () async {
-                          await _animationController.animateTo(0.0);
-                          widget.onLeftActionPressed?.call();
+                        child: IconButton(
+                          onPressed: () async {
+                            await _animationController.reverse();
+                            widget.onRightActionPressed?.call();
 
-                          _buttonNeedJump = false;
-                          _wasSwipedPastThreshold = false;
-                          _swipeDirection = 0;
-                        },
+                            _buttonNeedJump = false;
+                            _wasSwipedPastThreshold = false;
+                            _swipeDirection = 0;
+                          },
 
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
 
-                        iconSize: _iconSize,
-
-                        icon: widget.leftIcon!,
+                          iconSize: _iconSize,
+                          icon: widget.rightIcon!,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              },
-
-              // The main container content that slides
-              AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(
-                      _swipeDirection *
-                          -1 *
-                          _animationController.value *
-                          MediaQuery.of(context).size.width,
-                      0,
-                    ),
-                    child: child,
-                  );
                 },
-                child: widget.child,
-              ),
-            ],
+
+                // Left action button (appears when swiping left-to-right)
+                if (widget.leftIcon != null && _swipeDirection < 0) ...{
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        margin: EdgeInsets.only(
+                          left:
+                              _buttonNeedJump
+                                  ? _buttonJumpThreshold *
+                                          constraints.maxWidth -
+                                      _iconSize
+                                  : 0,
+                        ),
+
+                        child: IconButton(
+                          onPressed: () async {
+                            await _animationController.animateTo(0.0);
+                            widget.onLeftActionPressed?.call();
+
+                            _buttonNeedJump = false;
+                            _wasSwipedPastThreshold = false;
+                            _swipeDirection = 0;
+                          },
+
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+
+                          iconSize: _iconSize,
+
+                          icon: widget.leftIcon!,
+                        ),
+                      ),
+                    ),
+                  ),
+                },
+
+                // The main container content that slides
+                AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(
+                        _swipeDirection *
+                            -1 *
+                            _animationController.value *
+                            MediaQuery.of(context).size.width,
+                        0,
+                      ),
+                      child: child,
+                    );
+                  },
+                  child: widget.child,
+                ),
+              ],
+            ),
           ),
         );
       },
