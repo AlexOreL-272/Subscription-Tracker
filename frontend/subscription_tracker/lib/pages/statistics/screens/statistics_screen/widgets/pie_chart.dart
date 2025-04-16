@@ -416,31 +416,27 @@ class _DonutChartState extends State<DonutChart> {
 
           const SizedBox(height: 16.0),
 
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
+          DatePicker(
+            start: _selectedFrom,
+            end: _selectedTo,
 
-            child: DatePicker(
-              start: _selectedFrom,
-              end: _selectedTo,
+            onChanged: (value) {
+              if (value.key == null || value.value == null) {
+                return;
+              }
 
-              onChanged: (value) {
-                if (value.key == null || value.value == null) {
-                  return;
-                }
+              setState(() {
+                _selectedFrom = value.key!;
+                _selectedTo = value.value!;
+              });
+            },
 
-                setState(() {
-                  _selectedFrom = value.key!;
-                  _selectedTo = value.value!;
-                });
-              },
-
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-
-              textStyle: TextStyle(color: uiColor.text, fontSize: 16.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8.0),
             ),
+
+            textStyle: TextStyle(color: uiColor.text, fontSize: 16.0),
           ),
 
           const SizedBox(height: 16.0),
