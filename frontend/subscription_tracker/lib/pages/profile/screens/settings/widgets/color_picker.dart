@@ -32,26 +32,21 @@ class _UIColorPickerState extends State<UIColorPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return SizedBox(
       width: widget.pickerSize.width,
       height: widget.pickerSize.height,
 
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color:
-              Theme.of(context).colorScheme.brightness == Brightness.dark
-                  ? Color(0xFF282828)
-                  : Colors.white,
-          border: Border.all(
-            color:
-                Theme.of(context).colorScheme.brightness == Brightness.dark
-                    ? Colors.white.withAlpha(20)
-                    : Colors.grey[200]!,
-          ),
+          color: uiColor.container,
+          border: Border.all(color: uiColor.border),
           borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
+              color: uiColor.shadow,
               blurRadius: 2.0,
               spreadRadius: 1.0,
             ),

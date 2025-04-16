@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class OutlinedLoginButton extends StatelessWidget {
   final String label;
@@ -109,6 +110,10 @@ class _FilledButtonState extends State<FilledButton>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     final buttonWidth = widget.width ?? MediaQuery.of(context).size.width;
 
     return Stack(
@@ -137,14 +142,17 @@ class _FilledButtonState extends State<FilledButton>
             ),
 
             backgroundColor: WidgetStateProperty.all(
-              widget.isLoading ? Colors.white : widget.color,
+              widget.isLoading ? backgroundColor : widget.color,
             ),
           ),
 
           child: Text(
             widget.label,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: widget.isLoading ? Colors.black : Colors.white,
+              color:
+                  widget.isLoading ^ isDark
+                      ? UIBaseColors.textLight
+                      : UIBaseColors.textDark,
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class CurrencySelector extends StatefulWidget {
   final String currency;
@@ -23,6 +24,8 @@ class _CurrencySelectorState extends State<CurrencySelector> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+
     return TextButton.icon(
       onPressed: () async {
         final newCurrency = await _selectCurrency(context);
@@ -36,24 +39,24 @@ class _CurrencySelectorState extends State<CurrencySelector> {
         }
       },
 
-      label: Text(_selectedCurrency),
+      label: Text(
+        _selectedCurrency,
+        style: textTheme.titleMedium!.copyWith(
+          color:
+              isDark ? colorScheme.onPrimary : colorScheme.onPrimaryContainer,
+        ),
+      ),
 
       icon: Icon(
         Icons.keyboard_arrow_right,
-        color: colorScheme.onPrimaryContainer,
+        color: isDark ? colorScheme.onPrimary : colorScheme.onPrimaryContainer,
       ),
 
       iconAlignment: IconAlignment.end,
 
       style: ButtonStyle(
-        textStyle: WidgetStateProperty.all<TextStyle>(
-          textTheme.titleMedium!.copyWith(
-            color: colorScheme.onPrimaryContainer,
-          ),
-        ),
-
         backgroundColor: WidgetStateProperty.all<Color>(
-          colorScheme.primaryContainer,
+          isDark ? colorScheme.primary : colorScheme.primaryContainer,
         ),
 
         shape: WidgetStateProperty.all<OutlinedBorder>(
@@ -104,11 +107,14 @@ class _CurrencyScreenState extends State<_CurrencyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: uiColor.background,
 
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: uiColor.background,
         surfaceTintColor: Colors.transparent,
 
         leading: IconButton(
@@ -126,12 +132,12 @@ class _CurrencyScreenState extends State<_CurrencyScreen> {
 
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: uiColor.container,
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(color: uiColor.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(10),
+                color: uiColor.shadow,
                 blurRadius: 2.0,
                 spreadRadius: 1.0,
               ),

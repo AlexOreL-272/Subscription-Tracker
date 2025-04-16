@@ -30,12 +30,12 @@ class YearlyExpenseBarChart extends StatelessWidget {
     final monthlyTotals = _calculateMonthlyExpenses(subscriptions, monthStart);
     final maxTotal = monthlyTotals.reduce((a, b) => a > b ? a : b);
 
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF282828)
-                : WasubiColors.wasubiNeutral[100]!,
+        color: uiColor.container,
         borderRadius: BorderRadius.circular(8.0),
 
         boxShadow: [
@@ -59,10 +59,7 @@ class YearlyExpenseBarChart extends StatelessWidget {
             Text(
               'Расходы за следующий год',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color:
-                    Theme.of(context).colorScheme.brightness == Brightness.dark
-                        ? Colors.white
-                        : WasubiColors.wasubiNeutral[600]!,
+                color: uiColor.secondaryText,
                 fontWeight: FontWeight.bold,
               ),
             ),

@@ -42,7 +42,10 @@ class _AppState extends State<App> {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               seedColor: state.color,
-              dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
+              dynamicSchemeVariant:
+                  state.isDark
+                      ? DynamicSchemeVariant.tonalSpot
+                      : DynamicSchemeVariant.vibrant,
               brightness: state.isDark ? Brightness.dark : Brightness.light,
             ),
             textTheme: textTheme,

@@ -63,13 +63,15 @@ class SubscriptionListItem extends StatelessWidget {
   }
 
   void _showDeleteDialog(BuildContext context, {VoidCallback? onDeleted}) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     Dialogs.bottomMaterialDialog(
       context: context,
 
-      color:
-          Theme.of(context).colorScheme.brightness == Brightness.dark
-              ? Color(0xFF121212)
-              : Colors.white,
+      color: backgroundColor,
 
       title: 'Удалить подписку',
       msg: 'Действительно удалить подписку?',
@@ -300,6 +302,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
       seedColor: Color(_newSubscription.color),
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16.0),
 
@@ -309,10 +314,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
         },
 
         child: Scaffold(
-          backgroundColor:
-              Theme.of(context).colorScheme.brightness == Brightness.dark
-                  ? Color(0xFF121212)
-                  : Colors.white,
+          backgroundColor: uiColor.background,
           resizeToAvoidBottomInset: true,
 
           appBar: AppBar(
@@ -617,8 +619,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                             dropdownTextStyle: TextStyle(
                               color:
-                                  Theme.of(context).colorScheme.brightness ==
-                                          Brightness.dark
+                                  isDark
                                       ? Colors.white
                                       : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
@@ -631,19 +632,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).colorScheme.brightness ==
-                                          Brightness.dark
-                                      ? Color(0xFF282828)
-                                      : Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color:
-                                    Theme.of(context).colorScheme.brightness ==
-                                            Brightness.dark
-                                        ? Colors.white.withAlpha(20)
-                                        : WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
@@ -763,19 +754,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             },
 
                             decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).colorScheme.brightness ==
-                                          Brightness.dark
-                                      ? Color(0xFF282828)
-                                      : Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color:
-                                    Theme.of(context).colorScheme.brightness ==
-                                            Brightness.dark
-                                        ? Colors.white.withAlpha(20)
-                                        : WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
@@ -835,8 +816,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                             dropdownTextStyle: TextStyle(
                               color:
-                                  Theme.of(context).colorScheme.brightness ==
-                                          Brightness.dark
+                                  isDark
                                       ? Colors.white
                                       : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
@@ -849,19 +829,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).colorScheme.brightness ==
-                                          Brightness.dark
-                                      ? Color(0xFF282828)
-                                      : Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color:
-                                    Theme.of(context).colorScheme.brightness ==
-                                            Brightness.dark
-                                        ? Colors.white.withAlpha(20)
-                                        : WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
@@ -1211,31 +1181,18 @@ class _SubscriptionDetailsHeaderState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF282828)
-                : Color.fromARGB(255, 248, 249, 250),
+        color: uiColor.container,
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(
-          color:
-              Theme.of(context).colorScheme.brightness == Brightness.dark
-                  ? Colors.white.withAlpha(20)
-                  : Colors.grey[200]!,
-
-          width: 1.0,
-        ),
+        border: Border.all(color: uiColor.border, width: 1.0),
 
         boxShadow: [
-          BoxShadow(
-            color:
-                Theme.of(context).colorScheme.brightness == Brightness.dark
-                    ? Colors.white.withAlpha(10)
-                    : Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
         ],
       ),
 
@@ -1269,7 +1226,11 @@ class _SubscriptionDetailsHeaderState
                       child: Center(
                         child: Text(
                           getInitials(_captionController.value.text),
-                          style: TextStyle(fontSize: 42.0, fontFamily: 'Inter'),
+                          style: TextStyle(
+                            fontSize: 42.0,
+                            fontFamily: 'Inter',
+                            color: uiColor.text,
+                          ),
                         ),
                       ),
                     ),
@@ -1303,13 +1264,7 @@ class _SubscriptionDetailsHeaderState
                                       style: TextStyle(
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.w500,
-                                        color:
-                                            Theme.of(
-                                                      context,
-                                                    ).colorScheme.brightness ==
-                                                    Brightness.dark
-                                                ? Colors.white
-                                                : Colors.black87,
+                                        color: uiColor.text,
                                       ),
 
                                       decoration: InputDecoration(
@@ -1333,9 +1288,10 @@ class _SubscriptionDetailsHeaderState
                                   )
                                   : AutoSizeText(
                                     widget.caption,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 24.0,
                                       fontWeight: FontWeight.w500,
+                                      color: uiColor.text,
                                     ),
                                     maxLines: 1,
                                     minFontSize: 16.0,
@@ -1361,6 +1317,7 @@ class _SubscriptionDetailsHeaderState
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w400,
+                                color: uiColor.text,
                               ),
                             ),
                           ],
@@ -1400,20 +1357,12 @@ class _SubscriptionDetailsHeaderState
                             ? 'Без комментариев...'
                             : null,
                     hintStyle: TextStyle(
-                      color:
-                          Theme.of(context).colorScheme.brightness ==
-                                  Brightness.dark
-                              ? Colors.white
-                              : WasubiColors.wasubiNeutral[700]!,
+                      color: uiColor.secondaryText,
                       fontSize: 14.0,
                     ),
 
                     counterStyle: TextStyle(
-                      color:
-                          Theme.of(context).colorScheme.brightness ==
-                                  Brightness.dark
-                              ? Colors.white
-                              : WasubiColors.wasubiNeutral[700]!,
+                      color: uiColor.secondaryText,
                       fontSize: 12.0,
                     ),
                   ),
@@ -1427,11 +1376,7 @@ class _SubscriptionDetailsHeaderState
                   textInputAction: TextInputAction.done,
 
                   style: TextStyle(
-                    color:
-                        Theme.of(context).colorScheme.brightness ==
-                                Brightness.dark
-                            ? Colors.white
-                            : WasubiColors.wasubiNeutral[700]!,
+                    color: uiColor.secondaryText,
                     fontSize: 14.0,
                   ),
                 ),
@@ -1678,16 +1623,16 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return Form(
       key: _formKey,
 
       child: AlertDialog(
         title: const Text('Добавить категорию'),
 
-        backgroundColor:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF121212)
-                : Colors.white,
+        backgroundColor: uiColor.background,
 
         content: TextFormField(
           controller: _controller,
@@ -1825,15 +1770,15 @@ class _IntervalDialogState extends State<_IntervalDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     final double pickerHeight = widget.itemHeight * widget.visibleItems;
     final double selectionOffset = (pickerHeight - widget.itemHeight) / 2;
 
     return Dialog(
       insetPadding: const EdgeInsets.all(16.0),
-      backgroundColor:
-          Theme.of(context).colorScheme.brightness == Brightness.dark
-              ? Color(0xFF121212)
-              : Colors.white,
+      backgroundColor: uiColor.background,
 
       child: Padding(
         padding: const EdgeInsets.all(16.0),

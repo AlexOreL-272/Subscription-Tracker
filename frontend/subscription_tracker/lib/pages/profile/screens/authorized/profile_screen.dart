@@ -4,6 +4,7 @@ import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
 import 'package:subscription_tracker/models/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/widgets/divided_list.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -51,8 +52,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Center(
                         child: Text(
                           getInitials(state.fullName ?? 'No Name'),
-                          style: Theme.of(context).textTheme.headlineLarge
-                              ?.copyWith(fontWeight: FontWeight.w500),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: UIBaseColors.textLight,
+                          ),
                         ),
                       ),
                     ),

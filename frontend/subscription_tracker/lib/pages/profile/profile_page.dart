@@ -7,23 +7,22 @@ import 'package:subscription_tracker/pages/profile/screens/unauthorized/profile_
     as unauthorized;
 import 'package:subscription_tracker/pages/profile/screens/authorized/profile_screen.dart'
     as authorized;
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.brightness == Brightness.dark
-              ? Color(0xFF121212)
-              : Colors.white,
+      backgroundColor: backgroundColor,
 
       appBar: AppBar(
-        backgroundColor:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF121212)
-                : Colors.white,
+        backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
 
         title: Text('Профиль', style: Theme.of(context).textTheme.titleLarge),

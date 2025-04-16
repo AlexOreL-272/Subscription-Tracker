@@ -13,3 +13,5 @@ class UpdateUIDarkModeEvent extends UIColorEvent {
 
   UpdateUIDarkModeEvent(this.isDark);
 }
+
+class InitializeUIEvent extends UIColorEvent {}

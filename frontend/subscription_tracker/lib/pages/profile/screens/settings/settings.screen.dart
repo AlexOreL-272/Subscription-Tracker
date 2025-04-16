@@ -22,17 +22,14 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.brightness == Brightness.dark
-              ? Color(0xFF121212)
-              : Colors.white,
+      backgroundColor: uiColor.background,
 
       appBar: AppBar(
-        backgroundColor:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF121212)
-                : Colors.white,
+        backgroundColor: uiColor.background,
         surfaceTintColor: Colors.transparent,
 
         leading: IconButton(
@@ -89,6 +86,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     name: 'Тема',
 
                     child: TextToggleSwitch(
+                      initialIndex:
+                          BlocProvider.of<UIColorBloc>(context).state.isDark
+                              ? 1
+                              : 0,
+
                       options: ['Светлая', 'Темная'],
                       onChanged: (value) {
                         BlocProvider.of<UIColorBloc>(
@@ -130,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(
                   'В этой валюте будет отображаться статистика по подпискам',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: WasubiColors.wasubiNeutral[600]!,
+                    color: uiColor.secondaryText,
                   ),
                 ),
               ),
@@ -186,15 +188,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(
                   'Свяжитесь со мной если у вас есть вопросы, предложения или Вы заметили ошибку ❤️',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: WasubiColors.wasubiNeutral[600]!,
+                    color: uiColor.secondaryText,
                   ),
                 ),
               ),
 
               const SizedBox(height: 16.0),
 
+              // danger zone
               ExpandableDividedNamedList(
                 label: 'Необратимые действия',
+
+                trackColor:
+                    isDark ? Theme.of(context).colorScheme.primary : null,
 
                 children: [
                   NamedEntry(
@@ -230,7 +236,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(
                   'Выражаю благодарность за помощь в тестировании приложения: Ansam, ED1LOAD, Xenocious',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: WasubiColors.wasubiNeutral[600]!,
+                    color: uiColor.secondaryText,
                   ),
                 ),
               ),

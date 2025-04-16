@@ -45,6 +45,9 @@ class _EmailFieldState extends State<_EmailField> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
     return TextFormField(
       controller: _controller,
       focusNode: _focusNode,
@@ -68,10 +71,7 @@ class _EmailFieldState extends State<_EmailField> {
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.alternate_email_rounded),
-        prefixIconColor:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+        prefixIconColor: textColor,
 
         hintText: 'E-Mail',
         hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -183,6 +183,9 @@ class _PasswordFieldState extends State<_PasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
@@ -192,10 +195,7 @@ class _PasswordFieldState extends State<_PasswordField> {
 
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.lock_outline_rounded),
-        prefixIconColor:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+        prefixIconColor: textColor,
 
         suffixIcon: IconButton(
           onPressed: () {

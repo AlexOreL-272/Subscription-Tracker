@@ -105,6 +105,58 @@ enum ColorSeed {
   final Color color;
 }
 
+class UIBaseColors {
+  final Color background;
+  final Color container;
+  final Color border;
+  final Color shadow;
+  final Color text;
+  final Color secondaryText;
+
+  const UIBaseColors({
+    required this.background,
+    required this.container,
+    required this.border,
+    required this.shadow,
+    required this.text,
+    required this.secondaryText,
+  });
+
+  UIBaseColors.light()
+    : background = backgroundLight,
+      container = containerLight,
+      border = borderLight,
+      shadow = shadowLight,
+      text = textLight,
+      secondaryText = secondaryTextLight;
+
+  UIBaseColors.dark()
+    : background = backgroundDark,
+      container = containerDark,
+      border = borderDark,
+      shadow = shadowDark,
+      text = textDark,
+      secondaryText = secondaryTextDark;
+
+  static const Color backgroundLight = Colors.white;
+  static const Color backgroundDark = Color(0xFF121212);
+
+  static const Color containerLight = Color(0xFFF8F9FA);
+  static const Color containerDark = Color(0xFF282828);
+
+  static final Color borderLight = Colors.grey[200]!;
+  static final Color borderDark = Colors.white.withAlpha(20);
+
+  static final Color shadowLight = Colors.black.withAlpha(10);
+  static final Color shadowDark = Colors.white.withAlpha(10);
+
+  static const Color textLight = Colors.black;
+  static const Color textDark = Colors.white;
+
+  static final Color secondaryTextLight = WasubiColors.wasubiNeutral[700]!;
+  static final Color secondaryTextDark = Colors.white.withAlpha(210);
+}
+
 enum UIColorSeed {
   baseColor('Base', Color(0xFF6750A4)),
   indigo('Indigo', Colors.indigo), // 0xFF3F51B5

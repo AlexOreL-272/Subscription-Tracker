@@ -52,23 +52,16 @@ class _DonutChartState extends State<DonutChart> {
 
     _total = sortedCostsPerCategory.fold<double>(0, (sum, e) => sum + e.value);
 
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF282828)
-                : WasubiColors.wasubiNeutral[100]!,
+        color: uiColor.container,
         borderRadius: BorderRadius.circular(10.0),
 
         boxShadow: [
-          BoxShadow(
-            color:
-                Theme.of(context).colorScheme.brightness == Brightness.dark
-                    ? Colors.white.withAlpha(10)
-                    : Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
         ],
       ),
 
@@ -93,11 +86,7 @@ class _DonutChartState extends State<DonutChart> {
                   child: Text(
                     'Траты за',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color:
-                          Theme.of(context).colorScheme.brightness ==
-                                  Brightness.dark
-                              ? Colors.white
-                              : WasubiColors.wasubiNeutral[600]!,
+                      color: uiColor.secondaryText,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -106,11 +95,7 @@ class _DonutChartState extends State<DonutChart> {
                 Text(
                   DonutChart.dateFormat.format(_selectedMonth),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.brightness ==
-                                Brightness.dark
-                            ? Colors.white
-                            : WasubiColors.wasubiNeutral[600]!,
+                    color: uiColor.secondaryText,
                   ),
                 ),
 

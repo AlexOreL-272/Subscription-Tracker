@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TextToggleSwitch extends StatefulWidget {
+  final int initialIndex;
   final List<String> options;
   final ValueChanged<int> onChanged;
   final double width;
@@ -12,6 +13,7 @@ class TextToggleSwitch extends StatefulWidget {
 
   const TextToggleSwitch({
     super.key,
+    this.initialIndex = 0,
     required this.options,
     required this.onChanged,
     this.width = 200.0,
@@ -33,7 +35,7 @@ class _TextToggleSwitchState extends State<TextToggleSwitch>
     with SingleTickerProviderStateMixin {
   static const _spacing = 2.0;
 
-  int _selectedIndex = 0;
+  late int _selectedIndex = widget.initialIndex;
 
   @override
   Widget build(BuildContext context) {

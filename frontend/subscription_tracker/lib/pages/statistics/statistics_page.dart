@@ -3,23 +3,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/statistics_screen.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class StatisticsPage extends StatelessWidget {
   const StatisticsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.brightness == Brightness.dark
-              ? Color(0xFF121212)
-              : Colors.white,
+      backgroundColor: backgroundColor,
 
       appBar: AppBar(
-        backgroundColor:
-            Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? Color(0xFF121212)
-                : Colors.white,
+        backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
 
         title: Text(
