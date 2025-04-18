@@ -1159,24 +1159,29 @@ class _SubscriptionDetailsHeaderState
   final _commentFocusNode = FocusNode();
 
   @override
-  void didUpdateWidget(covariant _SubscriptionDetailsHeader oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void initState() {
+    super.initState();
 
-    if (widget.caption != oldWidget.caption) {
-      _captionController.text = widget.caption;
-    }
-
-    if (widget.comment != oldWidget.comment) {
-      _commentController.text = widget.comment ?? '';
-    }
+    _captionFocusNode.addListener(_handleCaptionFocusChanged);
   }
 
   @override
   void dispose() {
+    _captionFocusNode.removeListener(_handleCaptionFocusChanged);
     _captionFocusNode.dispose();
     _captionController.dispose();
     _commentController.dispose();
     super.dispose();
+  }
+
+  void _handleCaptionFocusChanged() {
+    if (!_captionFocusNode.hasFocus) {
+      widget.onCaptionChanged(_captionController.text);
+
+      setState(() {
+        _isEditing = false;
+      });
+    }
   }
 
   @override

@@ -7,6 +7,8 @@ class UserLogInEvent extends UserEvent {
   UserLogInEvent(this.email, this.password);
 }
 
+class UserGoogleAuthEvent extends UserEvent {}
+
 class UserLogOutEvent extends UserEvent {}
 
 class UserRegisterEvent extends UserEvent {

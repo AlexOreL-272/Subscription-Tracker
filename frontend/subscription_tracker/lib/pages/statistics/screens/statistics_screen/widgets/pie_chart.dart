@@ -407,7 +407,7 @@ class _DonutChartState extends State<DonutChart> {
           const SizedBox(height: 16.0),
 
           Text(
-            'Траты за',
+            'Траты за период',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: uiColor.secondaryText,
               fontWeight: FontWeight.bold,

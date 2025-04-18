@@ -1,7 +1,12 @@
+import 'dart:async';
 import 'dart:convert' as convert;
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:hive/hive.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:subscription_tracker/dto/auth/login_dto.dart';
 import 'package:subscription_tracker/models/user_bloc/user_event.dart';
 import 'package:subscription_tracker/models/user_bloc/user_state.dart';
@@ -21,6 +26,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc() : super(UserState.unauthorized()) {
     on<InitializeUserEvent>(_initialize);
     on<UserLogInEvent>(_logIn);
+    on<UserGoogleAuthEvent>(_googleAuth);
     on<UserLogOutEvent>(_logOut);
     on<UserDeleteAccountEvent>(_deleteAccount);
     on<UserRegisterEvent>(_register);
@@ -96,6 +102,93 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     }
 
     emit(authorizedUserState);
+  }
+
+  Future<void> _googleAuth(
+    UserGoogleAuthEvent event,
+    Emitter<UserState> emit,
+  ) async {
+    emit(UserState.pending());
+
+    try {
+      const callbackUrlScheme = 'com.wasubi.auth';
+      const authUrl = 'http://alexorel.ru/auth?provider=google';
+
+      final result = await FlutterWebAuth2.authenticate(
+        url: authUrl,
+        callbackUrlScheme: callbackUrlScheme,
+      ).timeout(
+        const Duration(seconds: 120),
+        onTimeout: () {
+          throw TimeoutException('Authentication timed out after 2 minutes');
+        },
+      );
+
+      if (result.isEmpty) {
+        throw Exception('Empty response from authentication flow');
+      }
+
+      final uri = Uri.parse(result);
+
+      final accessToken = uri.queryParameters['access_token'] ?? '';
+      final refreshToken = uri.queryParameters['refresh_token'] ?? '';
+
+      if (accessToken.isEmpty || refreshToken.isEmpty) {
+        debugPrint('Available query parameters: ${uri.queryParameters}');
+        throw Exception('No valid token found in callback. Received: $result');
+      }
+
+      final decodedToken = JwtDecoder.decode(accessToken);
+      final id = decodedToken['sub'];
+
+      final userInfo = await apiService.getUserInfo(id);
+
+      if (!userInfo.isSuccessful) {
+        throw Exception('Failed to get user info');
+      }
+
+      final userState = UserState(
+        authStatus: AuthStatus.authorized,
+        id: decodedToken['sub'],
+        email: userInfo.body!.email,
+        surname: userInfo.body!.surname,
+        fullName: userInfo.body!.fullName,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+
+      await _box.put(_userKey, convert.jsonEncode(userState));
+
+      _saveOperations++;
+      if (_saveOperations >= _compactionThreshold) {
+        _saveOperations = 0;
+        await _box.compact();
+      }
+
+      emit(userState);
+
+      return;
+    } on PlatformException catch (e) {
+      if (e.code == 'CANCELED') {
+        debugPrint('User explicitly canceled authentication');
+      } else {
+        debugPrint('Platform error during authentication: ${e.toString()}');
+      }
+
+      emit(UserState.unauthorized());
+      rethrow;
+    } on TimeoutException catch (e) {
+      debugPrint('Authentication timeout: ${e.message}');
+
+      emit(UserState.unauthorized());
+      rethrow;
+    } catch (e, stackTrace) {
+      debugPrint('Authentication failed: $e');
+      debugPrint('Stack trace: $stackTrace');
+
+      emit(UserState.unauthorized());
+      rethrow;
+    }
   }
 
   Future<void> _logOut(UserLogOutEvent event, Emitter<UserState> emit) async {
