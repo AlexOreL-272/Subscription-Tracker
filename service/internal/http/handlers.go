@@ -16,6 +16,7 @@ import (
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
 	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications"
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -282,17 +283,20 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	appCallbackURL := fmt.Sprintf("com.wasubi.auth://auth?token=%s", uuid.New().String())
+	http.Redirect(w, r, appCallbackURL, http.StatusFound)
 
-	if err := json.NewEncoder(w).Encode(user); err != nil {
-		h.logger.
-			With(zap.String("operation", handler)).
-			Error("failed to encode response", zap.Error(err))
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusOK)
 
-		return
-	}
+	// if err := json.NewEncoder(w).Encode(user); err != nil {
+	// 	h.logger.
+	// 		With(zap.String("operation", handler)).
+	// 		Error("failed to encode response", zap.Error(err))
+	// 	http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+	// 	return
+	// }
 }
 
 func (h *Handler) LoginWithYandex(w http.ResponseWriter, r *http.Request) {
