@@ -29,5 +29,5 @@ type IdentityProvider interface {
 
 type IdentityProviderManager interface {
 	GetRedirectURL(providerType IdProviderType) (string, error)
-	HandleIdPCallback(code string) (*domain.UserInfo, error)
+	HandleIdPCallback(code string) (*domain.UserInfo, *oauth2.Token, error)
 }

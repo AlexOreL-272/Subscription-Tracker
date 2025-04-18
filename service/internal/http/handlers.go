@@ -16,7 +16,6 @@ import (
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
 	"github.com/AlexOreL-272/Subscription-Tracker/pkg/notifications"
 	"github.com/go-chi/chi"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -257,7 +256,7 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	const handler = "http.Handler.AuthCallback"
 
 	// get user from identity provider
-	user, err := h.idPManager.HandleIdPCallback(r.FormValue("code"))
+	user, token, err := h.idPManager.HandleIdPCallback(r.FormValue("code"))
 	if err != nil {
 		h.logger.
 			With(zap.String("operation", handler)).
@@ -283,7 +282,11 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appCallbackURL := fmt.Sprintf("com.wasubi.auth://auth?token=%s", uuid.New().String())
+	appCallbackURL := fmt.Sprintf(
+		"com.wasubi.auth://auth?access_token=%s&refresh_token=%s",
+		token.AccessToken,
+		token.RefreshToken,
+	)
 	http.Redirect(w, r, appCallbackURL, http.StatusFound)
 
 	// w.Header().Set("Content-Type", "application/json")
