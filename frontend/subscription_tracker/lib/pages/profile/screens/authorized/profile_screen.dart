@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/models/user_bloc/user_event.dart';
 import 'package:subscription_tracker/models/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/widgets/divided_list.dart';
@@ -18,6 +19,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
         final fullName = state.fullName ?? noData;
@@ -96,7 +100,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     name: 'Фамилия',
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(state.surname ?? noData),
+                      child: Text(
+                        state.surname ?? noData,
+                        style: TextStyle(color: textColor),
+                      ),
                     ),
                   ),
 
@@ -104,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     name: 'Имя',
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(name),
+                      child: Text(name, style: TextStyle(color: textColor)),
                     ),
                   ),
 
@@ -112,7 +119,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     name: 'Отчество',
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(middleName),
+                      child: Text(
+                        middleName,
+                        style: TextStyle(color: textColor),
+                      ),
                     ),
                   ),
 
@@ -120,7 +130,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     name: 'E-Mail',
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(state.email ?? noData),
+                      child: Text(
+                        state.email ?? noData,
+                        style: TextStyle(color: textColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16.0),
+
+              // logout
+              Text(
+                'Управление аккаунтом',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              // logout
+              DividedNamedList(
+                children: [
+                  NamedEntry(
+                    name: 'Выйти из аккаунта',
+
+                    child: TextButton.icon(
+                      onPressed: () {
+                        BlocProvider.of<UserBloc>(
+                          context,
+                        ).add(UserLogOutEvent());
+                      },
+
+                      icon: const Icon(Icons.logout),
+
+                      label: Text(
+                        'Выйти',
+
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+
+                      style: ButtonStyle(
+                        padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(horizontal: 8.0),
+                        ),
+                      ),
                     ),
                   ),
                 ],

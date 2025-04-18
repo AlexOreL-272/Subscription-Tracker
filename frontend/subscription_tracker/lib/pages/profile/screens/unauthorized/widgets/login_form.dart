@@ -186,7 +186,7 @@ class _PasswordFieldState extends State<_PasswordField> {
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
 
-    return TextField(
+    return TextFormField(
       controller: _controller,
       focusNode: _focusNode,
 
@@ -270,13 +270,10 @@ class _PasswordFieldState extends State<_PasswordField> {
 
       style: Theme.of(context).textTheme.titleMedium,
 
-      onSubmitted: widget.onSubmitted,
+      onFieldSubmitted: widget.onSubmitted,
       onTapOutside: (event) {
         widget.onSubmitted(_controller.text);
         _focusNode.unfocus();
-      },
-      onEditingComplete: () {
-        widget.onSubmitted(_controller.text);
       },
     );
   }
