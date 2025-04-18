@@ -5,7 +5,32 @@ class SharedData {
 
   static SharedData get instance => _instance;
 
-  static const List<String> currencies = ['RUB', 'USD', 'EUR', 'UAH', 'KZT'];
+  static const String devEmail = 'shevchuk.aa@phystech.edu';
+
+  static const List<String> currencies = [
+    'BYN',
+    'RUB',
+    'UAH',
+    'KZT',
+    'USD',
+    'EUR',
+  ];
+  static const Map<String, String> currenciesSymbols = {
+    'BYN': 'Br',
+    'RUB': '₽',
+    'UAH': '₴',
+    'KZT': '₸',
+    'USD': '\$',
+    'EUR': '€',
+  };
+  static const List<String> currenciesDescriptions = [
+    'Белорусский рубль',
+    'Российский рубль',
+    'Украинская гривна',
+    'Казахский тенге',
+    'Доллар США',
+    'Евро',
+  ];
 
   static const selectCustomValue = 'Выбрать';
   static const Map<String, int> intervals = {

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/models/user_bloc/user_event.dart';
+import 'package:subscription_tracker/models/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart'
     as login;
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
@@ -19,14 +23,31 @@ class _EmailFieldState extends State<_EmailField> {
   bool _hasError = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
     _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
 
+  void _handleFocusChange() {
+    if (!_focusNode.hasFocus) {
+      widget.onSubmitted(_controller.text);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
     return TextFormField(
       controller: _controller,
       focusNode: _focusNode,
@@ -50,7 +71,7 @@ class _EmailFieldState extends State<_EmailField> {
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.alternate_email_rounded),
-        prefixIconColor: Colors.black,
+        prefixIconColor: textColor,
 
         hintText: 'E-Mail',
         hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -140,14 +161,31 @@ class _PasswordFieldState extends State<_PasswordField> {
   final _focusNode = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
     _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
 
+  void _handleFocusChange() {
+    if (!_focusNode.hasFocus) {
+      widget.onSubmitted(_controller.text);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
@@ -157,7 +195,7 @@ class _PasswordFieldState extends State<_PasswordField> {
 
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.lock_outline_rounded),
-        prefixIconColor: Colors.black,
+        prefixIconColor: textColor,
 
         suffixIcon: IconButton(
           onPressed: () {
@@ -237,6 +275,9 @@ class _PasswordFieldState extends State<_PasswordField> {
         widget.onSubmitted(_controller.text);
         _focusNode.unfocus();
       },
+      onEditingComplete: () {
+        widget.onSubmitted(_controller.text);
+      },
     );
   }
 }
@@ -255,43 +296,82 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
+    return BlocListener<UserBloc, UserState>(
+      listener: (context, state) {
+        if (state.authStatus == AuthStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.errorMessage ?? 'Произошла ошибка',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
 
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
+              ),
+            ),
+          );
+        }
+      },
 
-        children: [
-          // email input
-          _EmailField(
-            onSubmitted: (value) {
-              _submittedEmail = value;
-            },
-          ),
+      child: BlocBuilder<UserBloc, UserState>(
+        builder: (context, state) {
+          return Form(
+            key: _formKey,
 
-          const SizedBox(height: 12.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
 
-          // password input
-          _PasswordField(
-            onSubmitted: (value) {
-              _submittedPassword = value;
-            },
-          ),
+              children: [
+                // email input
+                _EmailField(
+                  onSubmitted: (value) {
+                    _submittedEmail = value;
+                  },
+                ),
 
-          const SizedBox(height: 10.0),
+                const SizedBox(height: 12.0),
 
-          // login button
-          login.FilledButton(
-            label: 'Войти',
-            color: Theme.of(context).colorScheme.primary,
-            height: 44.0,
-            formKey: _formKey,
-            onPressed: () {
-              print('Login $_submittedEmail $_submittedPassword');
-            },
-          ),
-        ],
+                // password input
+                _PasswordField(
+                  onSubmitted: (value) {
+                    _submittedPassword = value;
+                  },
+                ),
+
+                const SizedBox(height: 10.0),
+
+                // login button
+                login.FilledButton(
+                  label:
+                      state.authStatus == AuthStatus.pending
+                          ? 'Входим...'
+                          : 'Войти',
+
+                  color: Theme.of(context).colorScheme.primary,
+                  height: 44.0,
+
+                  isLoading: state.authStatus == AuthStatus.pending,
+
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      BlocProvider.of<UserBloc>(context).add(
+                        UserLogInEvent(_submittedEmail, _submittedPassword),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

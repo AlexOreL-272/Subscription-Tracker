@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/models/user_bloc/user_event.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/register_screen.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_form.dart';
@@ -21,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
 
         children: [
-          const SizedBox(height: 100.0),
+          const SizedBox(height: 72.0),
 
           // header text
           Align(
@@ -61,10 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: Icons.g_translate_outlined,
               color: Color(0xFFECA519),
               onPressed: () async {
-                print('Login via Google');
-                // await launchUrl(
-                //   Uri.parse('http://alexorel.ru/auth?provider=google'),
-                // );
+                BlocProvider.of<UserBloc>(context).add(UserGoogleAuthEvent());
               },
             ),
           ),

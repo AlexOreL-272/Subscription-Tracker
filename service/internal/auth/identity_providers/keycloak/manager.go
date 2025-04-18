@@ -50,26 +50,26 @@ func (k *KeycloakOauthConfig) GetRedirectURL(providerType idprovider.IdProviderT
 
 func (k *KeycloakOauthConfig) HandleIdPCallback(
 	code string,
-) (*domain.UserInfo, error) {
+) (*domain.UserInfo, *oauth2.Token, error) {
 	const op = "idprovider.HandleIdPCallback"
 	// TODO: add state check
 
 	token, err := k.oauthCfg.Exchange(context.Background(), code)
 	if err != nil {
-		return nil, ctxerror.New(op, err)
+		return nil, nil, ctxerror.New(op, err)
 	}
 
 	client := k.oauthCfg.Client(context.Background(), token)
 
 	userInfo, err := client.Get(k.userInfoEndpoint)
 	if err != nil {
-		return nil, ctxerror.New(op, err)
+		return nil, nil, ctxerror.New(op, err)
 	}
 
 	var user domain.UserInfo
 	if err := json.NewDecoder(userInfo.Body).Decode(&user); err != nil {
-		return nil, ctxerror.New(op, err)
+		return nil, nil, ctxerror.New(op, err)
 	}
 
-	return &user, nil
+	return &user, token, nil
 }

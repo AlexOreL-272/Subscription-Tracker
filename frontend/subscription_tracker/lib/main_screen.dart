@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_state.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'pages/subscriptions/subscriptions_page.dart';
@@ -31,52 +34,61 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Subscription Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: WasubiColors.wasubiPurple,
-          dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
-        ),
-        textTheme: textTheme,
-      ),
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, state) {
+        return MaterialApp(
+          title: 'Subscription Tracker',
 
-      home: Scaffold(
-        backgroundColor: Colors.white,
-
-        body: SafeArea(
-          child: PageView(
-            controller: _pageController,
-            physics: const NeverScrollableScrollPhysics(),
-
-            children: _pages,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: state.color,
+              dynamicSchemeVariant:
+                  state.isDark
+                      ? DynamicSchemeVariant.tonalSpot
+                      : DynamicSchemeVariant.vibrant,
+              brightness: state.isDark ? Brightness.dark : Brightness.light,
+            ),
+            textTheme: textTheme,
           ),
-        ),
 
-        bottomNavigationBar: SafeArea(
-          maintainBottomViewPadding: true,
+          home: Scaffold(
+            backgroundColor: state.isDark ? Color(0xFF121212) : Colors.white,
 
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            body: SafeArea(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
 
-            child: NavBar(
-              onTapped: (index) {
-                if (_currentIndex == index) return;
+                children: _pages,
+              ),
+            ),
 
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
+            bottomNavigationBar: SafeArea(
+              maintainBottomViewPadding: true,
 
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+
+                child: NavBar(
+                  onTapped: (index) {
+                    if (_currentIndex == index) return;
+
+                    _pageController.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

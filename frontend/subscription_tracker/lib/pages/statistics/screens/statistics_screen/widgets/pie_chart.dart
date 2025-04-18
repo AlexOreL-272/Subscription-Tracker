@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/common/scripts/scripts.dart';
+import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
 import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
+import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/widgets/date_picker.dart';
+import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
+import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
-class DonutChart extends StatefulWidget {
+class DonutChartOld extends StatefulWidget {
   static const List<Color> _colors = [
     Colors.blueAccent,
     Colors.pinkAccent,
@@ -22,16 +26,16 @@ class DonutChart extends StatefulWidget {
   static const String _defaultCategory = 'Остальное';
   static const dateFormat = RussianDateFormat.MMMMyyyy();
 
-  const DonutChart({super.key});
+  const DonutChartOld({super.key});
 
   @override
-  State<DonutChart> createState() => _DonutChartState();
+  State<DonutChartOld> createState() => _DonutChartOldState();
 }
 
-class _DonutChartState extends State<DonutChart> {
+class _DonutChartOldState extends State<DonutChartOld> {
   double _total = 0.0;
   DateTime _selectedMonth = DateTime.now();
-  List<MapEntry<String, double>> sortedCostsPerCategory = [];
+  List<MapEntry<String, double>> _sortedCostsPerCategory = [];
 
   @override
   void initState() {
@@ -40,29 +44,33 @@ class _DonutChartState extends State<DonutChart> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedCurrency =
+        SharedData.currenciesSymbols[BlocProvider.of<SettingsBloc>(
+          context,
+        ).state.currency];
+
     final subscriptions =
         BlocProvider.of<SubscriptionBloc>(
           context,
         ).state.subscriptions.values.toList();
 
-    sortedCostsPerCategory = _calculateMonthlyCategoryStats(
+    _sortedCostsPerCategory = _calculateMonthlyCategoryStats(
       subscriptions,
       _selectedMonth,
     );
 
-    _total = sortedCostsPerCategory.fold<double>(0, (sum, e) => sum + e.value);
+    _total = _sortedCostsPerCategory.fold<double>(0, (sum, e) => sum + e.value);
+
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: WasubiColors.wasubiNeutral[100]!,
+        color: uiColor.container,
         borderRadius: BorderRadius.circular(10.0),
 
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
         ],
       ),
 
@@ -87,16 +95,16 @@ class _DonutChartState extends State<DonutChart> {
                   child: Text(
                     'Траты за',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: WasubiColors.wasubiNeutral[600]!,
+                      color: uiColor.secondaryText,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
 
                 Text(
-                  DonutChart.dateFormat.format(_selectedMonth),
+                  DonutChartOld.dateFormat.format(_selectedMonth),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: WasubiColors.wasubiNeutral[600]!,
+                    color: uiColor.secondaryText,
                   ),
                 ),
 
@@ -150,7 +158,7 @@ class _DonutChartState extends State<DonutChart> {
                 ),
 
                 Text(
-                  '${_total.toStringAsFixed(2)} ₽',
+                  '${_total.toStringAsFixed(2)} $selectedCurrency',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -159,7 +167,7 @@ class _DonutChartState extends State<DonutChart> {
 
           const SizedBox(height: 32.0),
 
-          _Legend(labels: sortedCostsPerCategory.map((e) => e.key).toList()),
+          _Legend(labels: _sortedCostsPerCategory, currency: selectedCurrency!),
 
           const SizedBox(height: 16.0),
         ],
@@ -169,13 +177,13 @@ class _DonutChartState extends State<DonutChart> {
 
   List<PieChartSectionData> _showingSections(BuildContext context) {
     return List<PieChartSectionData>.generate(
-      min(sortedCostsPerCategory.length, DonutChart._maxSections),
+      min(_sortedCostsPerCategory.length, DonutChartOld._maxSections),
 
       (index) {
-        final cost = sortedCostsPerCategory[index].value;
+        final cost = _sortedCostsPerCategory[index].value;
 
         return PieChartSectionData(
-          color: DonutChart._colors[index],
+          color: DonutChartOld._colors[index],
           value: cost + 1e-3,
           showTitle: false,
           title: cost.toStringAsFixed(2),
@@ -185,7 +193,6 @@ class _DonutChartState extends State<DonutChart> {
     );
   }
 
-  // TODO: add currency conversion
   Map<String, double> _getMonthlyCategoryCostsWithTrial(
     List<SubscriptionModel> subscriptions,
     DateTime selectedMonth,
@@ -198,12 +205,16 @@ class _DonutChartState extends State<DonutChart> {
 
     final Map<String, double> categoryTotals = {};
 
+    final selectedCurrency =
+        BlocProvider.of<SettingsBloc>(context).state.currency;
+    final currencyRepo = RepositoryProvider.of<CurrencyRepo>(context);
+
     for (var sub in subscriptions) {
       if (!sub.isActive) continue;
 
       final category =
           sub.category == null || sub.category == 'Все'
-              ? DonutChart._defaultCategory
+              ? DonutChartOld._defaultCategory
               : sub.category!;
 
       final effectiveEnd =
@@ -226,7 +237,11 @@ class _DonutChartState extends State<DonutChart> {
           cutoff: trialEnd.isBefore(effectiveEnd) ? trialEnd : effectiveEnd,
         );
 
-        totalCost += trialCharges * sub.trialCost!;
+        totalCost += currencyRepo.convert(
+          trialCharges * sub.trialCost!,
+          sub.currency,
+          selectedCurrency,
+        );
 
         // If subscription continues after trial within this month
         if (trialEnd.isBefore(monthEnd)) {
@@ -240,7 +255,11 @@ class _DonutChartState extends State<DonutChart> {
             cutoff: effectiveEnd,
           );
 
-          totalCost += regularCharges * sub.cost;
+          totalCost += currencyRepo.convert(
+            regularCharges * sub.cost,
+            sub.currency,
+            selectedCurrency,
+          );
         }
       } else {
         // No trial, use regular values
@@ -252,7 +271,304 @@ class _DonutChartState extends State<DonutChart> {
           cutoff: effectiveEnd,
         );
 
-        totalCost += charges * sub.cost;
+        totalCost += currencyRepo.convert(
+          charges * sub.cost,
+          sub.currency,
+          selectedCurrency,
+        );
+      }
+
+      if (totalCost >= 0) {
+        categoryTotals[category] = (categoryTotals[category] ?? .0) + totalCost;
+      }
+    }
+
+    return categoryTotals;
+  }
+
+  List<MapEntry<String, double>> _getTopNCategories(Map<String, double> input) {
+    final entries =
+        input.entries.toList()..sort((a, b) {
+          // ensure that 'others' category at the end of the list
+          if (a.key == DonutChartOld._defaultCategory) {
+            return 1;
+          }
+
+          if (b.key == DonutChartOld._defaultCategory) {
+            return -1;
+          }
+
+          return b.value.compareTo(a.value);
+        });
+
+    if (entries.length <= DonutChartOld._maxSections) return entries;
+
+    final topN = entries.take(DonutChartOld._maxSections - 1).toList();
+    final otherSum = entries
+        .skip(DonutChartOld._maxSections - 1)
+        .fold<double>(0, (sum, e) => sum + e.value);
+
+    topN.add(MapEntry(DonutChartOld._defaultCategory, otherSum));
+
+    return topN;
+  }
+
+  List<MapEntry<String, double>> _calculateMonthlyCategoryStats(
+    List<SubscriptionModel> allSubs,
+    DateTime selectedMonth,
+  ) {
+    final categoryCosts = _getMonthlyCategoryCostsWithTrial(
+      allSubs,
+      selectedMonth,
+    );
+
+    return _getTopNCategories(categoryCosts);
+  }
+}
+
+class DonutChart extends StatefulWidget {
+  static const List<Color> _colors = [
+    Colors.blueAccent,
+    Colors.pinkAccent,
+    Colors.tealAccent,
+    Colors.deepPurpleAccent,
+    Colors.yellow,
+  ];
+
+  static const int _maxSections = 5;
+  static const String _defaultCategory = 'Остальное';
+  static const dateFormat = RussianDateFormat.ddMMMMyyyy();
+
+  const DonutChart({super.key});
+
+  @override
+  State<DonutChart> createState() => _DonutChartState();
+}
+
+class _DonutChartState extends State<DonutChart> {
+  double _total = 0.0;
+
+  late DateTime _selectedFrom;
+  late DateTime _selectedTo;
+
+  List<MapEntry<String, double>> _sortedCostsPerCategory = [];
+
+  @override
+  void initState() {
+    final now = DateTime.now();
+    _selectedFrom = DateTime(now.year, now.month);
+    _selectedTo = DateTime(
+      now.year,
+      now.month + 1,
+    ).subtract(const Duration(days: 1));
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedCurrency =
+        SharedData.currenciesSymbols[BlocProvider.of<SettingsBloc>(
+          context,
+        ).state.currency];
+
+    final subscriptions =
+        BlocProvider.of<SubscriptionBloc>(
+          context,
+        ).state.subscriptions.values.toList();
+
+    _sortedCostsPerCategory = _calculateMonthlyCategoryStats(
+      subscriptions,
+      _selectedFrom,
+      _selectedTo,
+    );
+
+    _total = _sortedCostsPerCategory.fold<double>(0, (sum, e) => sum + e.value);
+
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: uiColor.container,
+        borderRadius: BorderRadius.circular(10.0),
+
+        boxShadow: [
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
+        ],
+      ),
+
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+
+        children: [
+          const SizedBox(height: 16.0),
+
+          Text(
+            'Траты за период',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: uiColor.secondaryText,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 16.0),
+
+          DatePicker(
+            start: _selectedFrom,
+            end: _selectedTo,
+
+            onChanged: (value) {
+              if (value.key == null || value.value == null) {
+                return;
+              }
+
+              setState(() {
+                _selectedFrom = value.key!;
+                _selectedTo = value.value!;
+              });
+            },
+
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+
+            textStyle: TextStyle(color: uiColor.text, fontSize: 16.0),
+          ),
+
+          const SizedBox(height: 16.0),
+
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 300.0,
+
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                PieChart(
+                  PieChartData(
+                    sectionsSpace: 0.0,
+                    centerSpaceRadius: 100.0,
+                    startDegreeOffset: -90.0,
+                    sections: _showingSections(context),
+                  ),
+                ),
+
+                Text(
+                  '${_total.toStringAsFixed(2)} $selectedCurrency',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32.0),
+
+          _Legend(labels: _sortedCostsPerCategory, currency: selectedCurrency!),
+
+          const SizedBox(height: 16.0),
+        ],
+      ),
+    );
+  }
+
+  List<PieChartSectionData> _showingSections(BuildContext context) {
+    return List<PieChartSectionData>.generate(
+      min(_sortedCostsPerCategory.length, DonutChart._maxSections),
+
+      (index) {
+        final cost = _sortedCostsPerCategory[index].value;
+
+        return PieChartSectionData(
+          color: DonutChart._colors[index],
+          value: cost + 1e-3,
+          showTitle: false,
+          title: cost.toStringAsFixed(2),
+          radius: 40,
+        );
+      },
+    );
+  }
+
+  Map<String, double> _getMonthlyCategoryCostsWithTrial(
+    List<SubscriptionModel> subscriptions,
+    DateTime from,
+    DateTime to,
+  ) {
+    final Map<String, double> categoryTotals = {};
+
+    final selectedCurrency =
+        BlocProvider.of<SettingsBloc>(context).state.currency;
+    final currencyRepo = RepositoryProvider.of<CurrencyRepo>(context);
+
+    for (var sub in subscriptions) {
+      if (!sub.isActive) continue;
+
+      final category =
+          sub.category == null || sub.category == 'Все'
+              ? DonutChart._defaultCategory
+              : sub.category!;
+
+      final effectiveEnd =
+          sub.endDate != null && sub.endDate!.isBefore(to) ? sub.endDate! : to;
+
+      double totalCost = 0;
+
+      if (sub.trialActive &&
+          sub.trialInterval != null &&
+          sub.trialCost != null &&
+          sub.trialEndDate != null) {
+        final trialEnd = sub.trialEndDate!;
+        final trialCharges = countCharges(
+          start: from,
+          end: to,
+          firstPay: sub.firstPay,
+          intervalDays: sub.trialInterval!,
+          cutoff: trialEnd.isBefore(effectiveEnd) ? trialEnd : effectiveEnd,
+        );
+
+        totalCost += currencyRepo.convert(
+          trialCharges * sub.trialCost!,
+          sub.currency,
+          selectedCurrency,
+        );
+
+        // If subscription continues after trial within this month
+        if (trialEnd.isBefore(to)) {
+          final firstRegularCharge = trialEnd.add(Duration(days: 1));
+
+          final regularCharges = countCharges(
+            start: from,
+            end: to,
+            firstPay: firstRegularCharge,
+            intervalDays: sub.interval,
+            cutoff: effectiveEnd,
+          );
+
+          totalCost += currencyRepo.convert(
+            regularCharges * sub.cost,
+            sub.currency,
+            selectedCurrency,
+          );
+        }
+      } else {
+        // No trial, use regular values
+        final charges = countCharges(
+          start: from,
+          end: to,
+          firstPay: sub.firstPay,
+          intervalDays: sub.interval,
+          cutoff: effectiveEnd,
+        );
+
+        totalCost += currencyRepo.convert(
+          charges * sub.cost,
+          sub.currency,
+          selectedCurrency,
+        );
       }
 
       if (totalCost >= 0) {
@@ -292,21 +608,20 @@ class _DonutChartState extends State<DonutChart> {
 
   List<MapEntry<String, double>> _calculateMonthlyCategoryStats(
     List<SubscriptionModel> allSubs,
-    DateTime selectedMonth,
+    DateTime from,
+    DateTime to,
   ) {
-    final categoryCosts = _getMonthlyCategoryCostsWithTrial(
-      allSubs,
-      selectedMonth,
-    );
+    final categoryCosts = _getMonthlyCategoryCostsWithTrial(allSubs, from, to);
 
     return _getTopNCategories(categoryCosts);
   }
 }
 
 class _Legend extends StatelessWidget {
-  final List<String> labels;
+  final List<MapEntry<String, double>> labels;
+  final String currency;
 
-  const _Legend({required this.labels});
+  const _Legend({required this.labels, required this.currency});
 
   @override
   Widget build(BuildContext context) {
@@ -315,11 +630,12 @@ class _Legend extends StatelessWidget {
       runSpacing: 12.0,
       alignment: WrapAlignment.center,
 
-      children: List.generate(min(labels.length, DonutChart._maxSections), (
+      children: List.generate(min(labels.length, DonutChartOld._maxSections), (
         index,
       ) {
         return _LegendItem(
-          color: DonutChart._colors[index],
+          color: DonutChartOld._colors[index],
+          selectedCurrency: currency,
           label: labels[index],
         );
       }),
@@ -328,38 +644,59 @@ class _Legend extends StatelessWidget {
 }
 
 class _LegendItem extends StatelessWidget {
-  final String label;
+  final MapEntry<String, double> label;
+  final String selectedCurrency;
   final Color color;
 
-  const _LegendItem({required this.label, required this.color});
+  const _LegendItem({
+    required this.label,
+    required this.selectedCurrency,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    final brightness = ThemeData.estimateBrightnessForColor(color);
+    final textColor =
+        brightness == Brightness.light ? Colors.black87 : Colors.white;
 
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16.0),
+      ),
 
-        children: [
-          CircleAvatar(radius: 6, backgroundColor: color),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
 
-          const SizedBox(width: 6),
-
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              // TODO: maybe use something else
-              maxWidth: MediaQuery.of(context).size.width / 2.0,
-            ),
-
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.titleLarge,
-              textWidthBasis: TextWidthBasis.parent,
-              overflow: TextOverflow.ellipsis,
-            ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            // TODO: maybe use something else
+            maxWidth: MediaQuery.of(context).size.width / 2.0,
           ),
-        ],
+
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: label.key,
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+
+                TextSpan(
+                  text: ' ${label.value.toStringAsFixed(2)} $selectedCurrency',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium!.copyWith(color: textColor),
+            textWidthBasis: TextWidthBasis.parent,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ),
     );
   }

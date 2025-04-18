@@ -119,8 +119,8 @@ class _InputFieldState extends State<InputField> {
         isDense: true,
 
         constraints: BoxConstraints(
-          minHeight: 36.0,
-          maxHeight: widget.validator == null ? 36.0 : 56.0,
+          minHeight: 40.0,
+          maxHeight: widget.validator == null ? 40.0 : 60.0,
         ),
       ),
 

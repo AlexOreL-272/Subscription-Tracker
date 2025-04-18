@@ -91,7 +91,10 @@ class _DecimalInputState extends State<DecimalInput> {
 
         const SizedBox(width: 4.0),
 
-        Text(widget.currency, style: widget.textStyle),
+        Padding(
+          padding: const EdgeInsets.only(top: 1.0),
+          child: Text(widget.currency, style: widget.textStyle),
+        ),
       ],
     );
   }

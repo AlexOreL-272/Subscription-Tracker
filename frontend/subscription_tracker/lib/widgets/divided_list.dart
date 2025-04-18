@@ -13,17 +13,18 @@ class DividedNamedList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
+        color: uiColor.container,
+
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        border: Border.all(color: uiColor.border, width: 1.0),
+
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
         ],
       ),
 
@@ -54,6 +55,9 @@ class NamedEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
     return SizedBox(
       height: height,
 
@@ -66,7 +70,7 @@ class NamedEntry extends StatelessWidget {
               child: Text(
                 name,
                 style: TextStyle(
-                  color: Colors.grey[900],
+                  color: textColor,
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -87,6 +91,8 @@ class ExpandableDividedNamedList extends StatefulWidget {
   final ValueChanged<bool>? onSwitch;
   final List<NamedEntry> children;
 
+  final Color? trackColor;
+
   static final _divider = Divider(
     color: WasubiColors.wasubiNeutral[400]!,
     height: 1.0,
@@ -96,6 +102,7 @@ class ExpandableDividedNamedList extends StatefulWidget {
     required this.label,
     this.isActive = false,
     this.onSwitch,
+    this.trackColor,
     required this.children,
     super.key,
   });
@@ -147,17 +154,17 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
+        color: uiColor.container,
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        border: Border.all(color: uiColor.border, width: 1.0),
+
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
         ],
       ),
 
@@ -179,9 +186,12 @@ class _ExpandableDividedNamedListState extends State<ExpandableDividedNamedList>
                   onChanged: _toggleExpansion,
 
                   trackColor: WidgetStatePropertyAll(
-                    Theme.of(context).colorScheme.primaryContainer,
+                    widget.trackColor ??
+                        Theme.of(context).colorScheme.primaryContainer,
                   ),
-                  thumbColor: WidgetStatePropertyAll(Colors.white),
+                  thumbColor: WidgetStatePropertyAll(
+                    isDark ? Color(0xFF3F3F3F) : Colors.white,
+                  ),
                   trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
 
                   padding: EdgeInsets.zero,

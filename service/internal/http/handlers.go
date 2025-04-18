@@ -259,7 +259,7 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	const handler = "http.Handler.AuthCallback"
 
 	// get user from identity provider
-	user, err := h.idPManager.HandleIdPCallback(r.FormValue("code"))
+	user, token, err := h.idPManager.HandleIdPCallback(r.FormValue("code"))
 	if err != nil {
 		h.logger.
 			With(zap.String("operation", handler)).
@@ -285,17 +285,24 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	appCallbackURL := fmt.Sprintf(
+		"com.wasubi.auth://auth?access_token=%s&refresh_token=%s",
+		token.AccessToken,
+		token.RefreshToken,
+	)
+	http.Redirect(w, r, appCallbackURL, http.StatusFound)
 
-	if err := json.NewEncoder(w).Encode(user); err != nil {
-		h.logger.
-			With(zap.String("operation", handler)).
-			Error("failed to encode response", zap.Error(err))
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusOK)
 
-		return
-	}
+	// if err := json.NewEncoder(w).Encode(user); err != nil {
+	// 	h.logger.
+	// 		With(zap.String("operation", handler)).
+	// 		Error("failed to encode response", zap.Error(err))
+	// 	http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+	// 	return
+	// }
 }
 
 func (h *Handler) LoginWithYandex(w http.ResponseWriter, r *http.Request) {

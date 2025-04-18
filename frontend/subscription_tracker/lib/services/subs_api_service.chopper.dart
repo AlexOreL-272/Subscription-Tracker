@@ -19,6 +19,24 @@ final class _$SubsApiService extends SubsApiService {
   final Type definitionType = SubsApiService;
 
   @override
+  Future<Response<LoginDto>> login({required LoginRequestDto loginRequest}) {
+    final Uri $url = Uri.parse('http://alexorel.ru/login');
+    final $body = loginRequest;
+    final Request $request = Request('POST', $url, client.baseUrl, body: $body);
+    return client.send<LoginDto, LoginDto>($request);
+  }
+
+  @override
+  Future<Response<RegisterDto>> register({
+    required RegisterRequestDto registerRequest,
+  }) {
+    final Uri $url = Uri.parse('http://alexorel.ru/register');
+    final $body = registerRequest;
+    final Request $request = Request('POST', $url, client.baseUrl, body: $body);
+    return client.send<RegisterDto, RegisterDto>($request);
+  }
+
+  @override
   Future<Response<List<SubscriptionModel>>> getSubscriptions({
     required String userId,
     required String resultType,
@@ -41,5 +59,12 @@ final class _$SubsApiService extends SubsApiService {
       parameters: $params,
     );
     return client.send<List<SubscriptionModel>, SubscriptionModel>($request);
+  }
+
+  @override
+  Future<Response<UserDto>> getUserInfo(String userId) {
+    final Uri $url = Uri.parse('http://alexorel.ru/users/${userId}');
+    final Request $request = Request('GET', $url, client.baseUrl);
+    return client.send<UserDto, UserDto>($request);
   }
 }

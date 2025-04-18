@@ -14,7 +14,7 @@ import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.
 import 'package:subscription_tracker/pages/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/decimal_input.dart';
-import 'package:subscription_tracker/pages/subscriptions/widgets/divided_list.dart';
+import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
@@ -63,8 +63,15 @@ class SubscriptionListItem extends StatelessWidget {
   }
 
   void _showDeleteDialog(BuildContext context, {VoidCallback? onDeleted}) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     Dialogs.bottomMaterialDialog(
       context: context,
+
+      color: backgroundColor,
 
       title: 'Удалить подписку',
       msg: 'Действительно удалить подписку?',
@@ -229,6 +236,7 @@ class SubscriptionPreview extends StatelessWidget {
                               getInitials(subscription.caption),
 
                               style: TextStyle(
+                                color: Colors.black87,
                                 fontSize: 24.0,
                                 fontFamily: 'Inter',
                               ),
@@ -294,6 +302,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
       seedColor: Color(_newSubscription.color),
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16.0),
 
@@ -303,7 +314,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
         },
 
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: uiColor.background,
           resizeToAvoidBottomInset: true,
 
           appBar: AppBar(
@@ -354,7 +365,11 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
           ),
 
           body: Theme(
-            data: ThemeData(colorScheme: colorScheme),
+            data: ThemeData(
+              colorScheme: colorScheme.copyWith(
+                brightness: Theme.of(context).colorScheme.brightness,
+              ),
+            ),
 
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -421,10 +436,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             value: _newSubscription.cost,
                             currency: _newSubscription.currency,
 
-                            textStyle: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            textStyle: Theme.of(context).textTheme.titleMedium,
 
                             onChanged: (value) {
                               final newCost =
@@ -606,7 +618,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
+                              color:
+                                  isDark
+                                      ? Colors.white
+                                      : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
                               fontWeight: FontWeight.w400,
                             ),
@@ -617,11 +632,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
@@ -741,11 +754,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             },
 
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
@@ -804,7 +815,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
+                              color:
+                                  isDark
+                                      ? Colors.white
+                                      : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
                               fontWeight: FontWeight.w400,
                             ),
@@ -815,11 +829,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
@@ -942,10 +954,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             value: _newSubscription.trialCost,
                             currency: _newSubscription.currency,
 
-                            textStyle: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            textStyle: Theme.of(context).textTheme.titleMedium,
 
                             onChanged: (value) {
                               final newCost =
@@ -1150,39 +1159,45 @@ class _SubscriptionDetailsHeaderState
   final _commentFocusNode = FocusNode();
 
   @override
-  void didUpdateWidget(covariant _SubscriptionDetailsHeader oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void initState() {
+    super.initState();
 
-    if (widget.caption != oldWidget.caption) {
-      _captionController.text = widget.caption;
-    }
-
-    if (widget.comment != oldWidget.comment) {
-      _commentController.text = widget.comment ?? '';
-    }
+    _captionFocusNode.addListener(_handleCaptionFocusChanged);
   }
 
   @override
   void dispose() {
+    _captionFocusNode.removeListener(_handleCaptionFocusChanged);
     _captionFocusNode.dispose();
     _captionController.dispose();
     _commentController.dispose();
     super.dispose();
   }
 
+  void _handleCaptionFocusChanged() {
+    if (!_captionFocusNode.hasFocus) {
+      widget.onCaptionChanged(_captionController.text);
+
+      setState(() {
+        _isEditing = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 248, 249, 250),
+        color: uiColor.container,
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Colors.grey[200]!, width: 1.0),
+        border: Border.all(color: uiColor.border, width: 1.0),
+
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 2.0,
-            spreadRadius: 1.0,
-          ),
+          BoxShadow(color: uiColor.shadow, blurRadius: 2.0, spreadRadius: 1.0),
         ],
       ),
 
@@ -1216,7 +1231,11 @@ class _SubscriptionDetailsHeaderState
                       child: Center(
                         child: Text(
                           getInitials(_captionController.value.text),
-                          style: TextStyle(fontSize: 42.0, fontFamily: 'Inter'),
+                          style: TextStyle(
+                            fontSize: 42.0,
+                            fontFamily: 'Inter',
+                            color: uiColor.text,
+                          ),
                         ),
                       ),
                     ),
@@ -1247,9 +1266,10 @@ class _SubscriptionDetailsHeaderState
                                       controller: _captionController,
                                       focusNode: _captionFocusNode,
 
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.w500,
+                                        color: uiColor.text,
                                       ),
 
                                       decoration: InputDecoration(
@@ -1273,9 +1293,10 @@ class _SubscriptionDetailsHeaderState
                                   )
                                   : AutoSizeText(
                                     widget.caption,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 24.0,
                                       fontWeight: FontWeight.w500,
+                                      color: uiColor.text,
                                     ),
                                     maxLines: 1,
                                     minFontSize: 16.0,
@@ -1301,6 +1322,7 @@ class _SubscriptionDetailsHeaderState
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w400,
+                                color: uiColor.text,
                               ),
                             ),
                           ],
@@ -1340,8 +1362,13 @@ class _SubscriptionDetailsHeaderState
                             ? 'Без комментариев...'
                             : null,
                     hintStyle: TextStyle(
-                      color: WasubiColors.wasubiNeutral[700]!,
+                      color: uiColor.secondaryText,
                       fontSize: 14.0,
+                    ),
+
+                    counterStyle: TextStyle(
+                      color: uiColor.secondaryText,
+                      fontSize: 12.0,
                     ),
                   ),
 
@@ -1354,7 +1381,7 @@ class _SubscriptionDetailsHeaderState
                   textInputAction: TextInputAction.done,
 
                   style: TextStyle(
-                    color: WasubiColors.wasubiNeutral[700]!,
+                    color: uiColor.secondaryText,
                     fontSize: 14.0,
                   ),
                 ),
@@ -1601,13 +1628,16 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return Form(
       key: _formKey,
 
       child: AlertDialog(
         title: const Text('Добавить категорию'),
 
-        backgroundColor: Colors.white,
+        backgroundColor: uiColor.background,
 
         content: TextFormField(
           controller: _controller,
@@ -1745,12 +1775,15 @@ class _IntervalDialogState extends State<_IntervalDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     final double pickerHeight = widget.itemHeight * widget.visibleItems;
     final double selectionOffset = (pickerHeight - widget.itemHeight) / 2;
 
     return Dialog(
       insetPadding: const EdgeInsets.all(16.0),
-      backgroundColor: Colors.white,
+      backgroundColor: uiColor.background,
 
       child: Padding(
         padding: const EdgeInsets.all(16.0),

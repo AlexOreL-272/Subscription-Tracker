@@ -161,6 +161,17 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
+        final backgroundColor =
+            isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
+        final borderColor =
+            isDark ? UIBaseColors.borderDark : UIBaseColors.borderLight;
+
+        final textColor =
+            isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: _removeOverlay,
@@ -186,11 +197,9 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
 
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: backgroundColor,
                         borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(
-                          color: WasubiColors.wasubiNeutral[400]!,
-                        ),
+                        border: Border.all(color: borderColor),
                       ),
 
                       child: Column(
@@ -200,15 +209,15 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
 
                         children: [
                           TextButton.icon(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.mode_edit_outline_outlined,
-                              color: Colors.black,
+                              color: textColor,
                             ),
 
                             label: Text(
                               'Переименовать',
                               style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(color: Colors.black),
+                                  ?.copyWith(color: textColor),
                             ),
 
                             onPressed: () {
@@ -222,7 +231,9 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
 
                             style: ButtonStyle(
                               overlayColor: WidgetStatePropertyAll(
-                                WasubiColors.wasubiNeutral[400]!,
+                                isDark
+                                    ? Color(0xFF282828)
+                                    : WasubiColors.wasubiNeutral[400]!,
                               ),
 
                               shape: WidgetStateProperty.all<OutlinedBorder>(
@@ -265,7 +276,7 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
 
                             style: ButtonStyle(
                               overlayColor: WidgetStatePropertyAll(
-                                Colors.red[100]!,
+                                isDark ? Color(0xFF282828) : Colors.red[100]!,
                               ),
 
                               shape: WidgetStateProperty.all<OutlinedBorder>(
@@ -294,80 +305,6 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
     );
 
     Overlay.of(context).insert(_overlayEntry!);
-
-    return;
-    showModalBottomSheet(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: false,
-
-      builder: (context) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: WasubiColors.wasubiNeutral[400]!),
-          ),
-
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-
-            children: [
-              TextButton.icon(
-                icon: const Icon(
-                  Icons.mode_edit_outline_outlined,
-                  color: Colors.black,
-                ),
-
-                label: Text(
-                  'Переименовать',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(color: Colors.black),
-                ),
-
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showRenameDialog(context, widget.category, widget.index);
-                },
-
-                style: ButtonStyle(
-                  overlayColor: WidgetStatePropertyAll(
-                    WasubiColors.wasubiNeutral[400]!,
-                  ),
-                ),
-              ),
-
-              const Divider(height: 1.0),
-
-              TextButton.icon(
-                icon: const Icon(Icons.delete, color: Colors.red),
-
-                label: Text(
-                  'Удалить',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(color: Colors.red),
-                ),
-
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showDeleteDialog(context, widget.category, widget.index);
-                },
-
-                style: ButtonStyle(
-                  overlayColor: WidgetStatePropertyAll(Colors.red[100]!),
-                ),
-              ),
-
-              const Divider(height: 1.0),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _removeOverlay() {
@@ -421,13 +358,18 @@ class _EditDialogState extends State<_EditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     return Form(
       key: _formKey,
 
       child: AlertDialog(
         title: const Text('Переименовать'),
 
-        backgroundColor: Colors.white,
+        backgroundColor: backgroundColor,
 
         content: TextFormField(
           controller: _controller,
@@ -556,11 +498,16 @@ class _DeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     return AlertDialog(
       title: const Text('Удалить категорию'),
       content: Text('Вы уверены, что хотите удалить категорию "$category"?'),
 
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
 
       actions: [
         TextButton(

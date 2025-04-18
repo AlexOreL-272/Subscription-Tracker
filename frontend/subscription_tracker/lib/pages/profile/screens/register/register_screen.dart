@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/widgets/register_form.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: uiColor.background,
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,

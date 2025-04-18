@@ -101,7 +101,9 @@ class DropdownState<T> extends State<Dropdown<T>> {
       child: Text(
         item.toString(),
         style:
-            widget.dropdownTextStyle ??
+            widget.dropdownTextStyle?.copyWith(
+              color: isSelected ? Colors.black87 : null,
+            ) ??
             TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
       ),
     );

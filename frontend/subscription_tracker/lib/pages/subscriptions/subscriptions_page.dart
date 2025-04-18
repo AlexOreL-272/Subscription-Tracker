@@ -8,6 +8,7 @@ import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/category_selector.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_list.dart';
+import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'package:uuid/uuid.dart';
 
 class SubscriptionsPage extends StatefulWidget {
@@ -44,8 +45,12 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
 
       appBar: AppBar(
         title: const Text(

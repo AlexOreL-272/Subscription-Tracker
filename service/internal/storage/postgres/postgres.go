@@ -60,7 +60,7 @@ func (p *PostgresStorage) SaveUser(
 		fullName,
 		surname,
 		email,
-	)
+	).Suffix("ON CONFLICT (id) DO NOTHING")
 
 	// Insert user into database
 	sqlSaveUserRequest, args, err := saveUserRequest.ToSql()
