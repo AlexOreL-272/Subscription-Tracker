@@ -11,14 +11,29 @@ String formatDate(DateTime date) {
   return format.format(extractedDate);
 }
 
+bool isLetterOrNumber(String char) {
+  if (char.isEmpty || char.length > 1) return false;
+  return RegExp(r'^[\p{L}\p{Nd}]$', unicode: true).hasMatch(char);
+}
+
 String getInitials(String caption) {
   final words = caption.split(' ');
 
-  if (words.length == 1) {
-    return words[0][0].toUpperCase();
+  String firstLetter = String.fromCharCode(words[0].runes.first);
+  if (isLetterOrNumber(firstLetter)) {
+    firstLetter = firstLetter.toUpperCase();
   }
 
-  return '${words[0][0].toUpperCase()}${words[1][0].toUpperCase()}';
+  if (words.length == 1 || words[1].isEmpty) {
+    return firstLetter;
+  }
+
+  String secondLetter = String.fromCharCode(words[1].runes.first);
+  if (isLetterOrNumber(secondLetter)) {
+    secondLetter = secondLetter.toUpperCase();
+  }
+
+  return '$firstLetter$secondLetter';
 }
 
 // assuming that interval is in days (stated in my API :) )

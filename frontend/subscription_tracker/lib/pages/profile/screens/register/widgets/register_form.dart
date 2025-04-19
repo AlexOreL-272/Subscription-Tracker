@@ -49,6 +49,10 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
           );
         }
+
+        if (state.authStatus == AuthStatus.authorized) {
+          Navigator.of(context).pop();
+        }
       },
 
       child: BlocBuilder<UserBloc, UserState>(
@@ -126,6 +130,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       return null;
                     },
                     autovalidateMode: AutovalidateMode.onUnfocus,
+                    keyboardType: TextInputType.emailAddress,
                     onSubmitted: (email) {
                       _submittedEmail = email;
                     },
@@ -178,9 +183,6 @@ class _RegisterFormState extends State<RegisterForm> {
                           ),
                         );
                       }
-
-                      // Maybe close the screen when the user is registered and logged in
-                      Navigator.of(context).pop();
                     },
                   ),
                 ],

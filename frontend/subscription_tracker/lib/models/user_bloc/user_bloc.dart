@@ -58,12 +58,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       ),
     );
 
-    await Future.delayed(const Duration(seconds: 1));
-
     if (!loginResponse.isSuccessful) {
       emit(
         UserState.error(
-          '${loginResponse.statusCode} ${loginResponse.error.toString()}',
+          'Login failed: ${loginResponse.statusCode} ${loginResponse.error.toString()}',
         ),
       );
 
@@ -222,10 +220,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   ) async {
     emit(UserState.pending());
 
-    final fullName =
-        event.middleName == null
-            ? event.name
-            : '${event.name} ${event.middleName}';
+    final fullName = '${event.name} ${event.middleName}'.trim();
 
     final registerResponse = await apiService.register(
       registerRequest: RegisterRequestDto(
@@ -236,12 +231,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       ),
     );
 
-    await Future.delayed(const Duration(seconds: 1));
-
     if (!registerResponse.isSuccessful) {
       emit(
         UserState.error(
-          '${registerResponse.statusCode} ${registerResponse.error.toString()}',
+          'Register failed: ${registerResponse.statusCode} ${registerResponse.error.toString()}',
         ),
       );
 

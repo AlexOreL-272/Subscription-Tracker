@@ -23,6 +23,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
 
     return BlocBuilder<UserBloc, UserState>(
+      buildWhen: (previous, current) {
+        return current.authStatus == AuthStatus.authorized;
+      },
+
       builder: (context, state) {
         final fullName = state.fullName ?? noData;
         final splitted = fullName.split(' ');
