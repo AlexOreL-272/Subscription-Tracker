@@ -7,6 +7,7 @@ import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
 import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
+import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class YearlyExpenseBarChart extends StatefulWidget {
@@ -21,6 +22,7 @@ class YearlyExpenseBarChart extends StatefulWidget {
 
 class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
   late List<double> _monthlyTotals;
+  late double _total;
   late double _maxTotal;
 
   late DateTime _monthStart;
@@ -48,11 +50,17 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
       _monthStart,
     );
 
+    _total = _monthlyTotals.fold<double>(0, (sum, e) => sum + e);
     _maxTotal = _monthlyTotals.reduce((a, b) => a > b ? a : b);
   }
 
   @override
   Widget build(BuildContext context) {
+    final selectedCurrency =
+        SharedData.currenciesSymbols[BlocProvider.of<SettingsBloc>(
+          context,
+        ).state.currency];
+
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
 
@@ -136,6 +144,23 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
 
                   borderData: FlBorderData(show: false),
                   gridData: FlGridData(show: true),
+
+                  extraLinesData: ExtraLinesData(
+                    horizontalLines: [
+                      HorizontalLine(
+                        y: _total / 12,
+                        color: Colors.grey.shade400,
+                        label: HorizontalLineLabel(
+                          show: true,
+                          alignment: Alignment.topCenter,
+                          style: Theme.of(context).textTheme.labelMedium,
+                          labelResolver: (value) {
+                            return 'В cреднем ${value.y.toStringAsFixed(2)} $selectedCurrency';
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
 
                   barGroups: List.generate(12, (index) {
                     final value = double.parse(

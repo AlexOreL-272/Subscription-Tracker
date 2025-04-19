@@ -476,7 +476,7 @@ class _DonutChartState extends State<DonutChart> {
   }
 
   List<PieChartSectionData> _showingSections(BuildContext context) {
-    return List<PieChartSectionData>.generate(
+    final sections = List<PieChartSectionData>.generate(
       min(_sortedCostsPerCategory.length, DonutChart._maxSections),
 
       (index) {
@@ -491,6 +491,20 @@ class _DonutChartState extends State<DonutChart> {
         );
       },
     );
+
+    if (sections.isEmpty) {
+      return [
+        PieChartSectionData(
+          color: DonutChart._colors[0],
+          value: 1e-3,
+          showTitle: false,
+          title: '0',
+          radius: 40,
+        ),
+      ];
+    }
+
+    return sections;
   }
 
   Map<String, double> _getMonthlyCategoryCostsWithTrial(
@@ -571,7 +585,7 @@ class _DonutChartState extends State<DonutChart> {
         );
       }
 
-      if (totalCost >= 0) {
+      if (totalCost > 0) {
         categoryTotals[category] = (categoryTotals[category] ?? .0) + totalCost;
       }
     }
