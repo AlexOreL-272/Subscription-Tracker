@@ -50,7 +50,7 @@ class _RegisterFormState extends State<RegisterForm> {
           );
         }
 
-        if (state.authStatus == AuthStatus.authorized) {
+        if (state.authStatus == AuthStatus.authorized && mounted) {
           Navigator.of(context).pop();
         }
       },
