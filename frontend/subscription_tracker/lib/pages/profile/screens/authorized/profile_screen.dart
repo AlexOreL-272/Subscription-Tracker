@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_event.dart';
-import 'package:subscription_tracker/models/user_bloc/user_state.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';

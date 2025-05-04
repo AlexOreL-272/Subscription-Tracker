@@ -3,16 +3,14 @@ import 'dart:convert' as convert;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:hive/hive.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:subscription_tracker/dto/auth/login_dto.dart';
-import 'package:subscription_tracker/models/user_bloc/user_event.dart';
-import 'package:subscription_tracker/models/user_bloc/user_state.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/services/subs_api_service.dart';
 
-class UserBloc extends Bloc<UserEvent, UserState> {
+class UserRepo {
   static const _boxName = 'userBox';
   static const _userKey = 'userKey';
 
@@ -21,48 +19,35 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   static const _compactionThreshold = 10;
   int _saveOperations = 0;
 
-  final apiService = SubsApiService.create();
+  UserState _state;
+  final SubsApiService apiService;
 
-  UserBloc() : super(UserState.unauthorized()) {
-    on<InitializeUserEvent>(_initialize);
-    on<UserLogInEvent>(_logIn);
-    on<UserGoogleAuthEvent>(_googleAuth);
-    on<UserLogOutEvent>(_logOut);
-    on<UserDeleteAccountEvent>(_deleteAccount);
-    on<UserRegisterEvent>(_register);
+  UserRepo({required this.apiService}) : _state = UserState.unauthorized();
 
-    add(InitializeUserEvent());
-  }
-
-  Future<void> _initialize(
-    InitializeUserEvent event,
-    Emitter<UserState> emit,
-  ) async {
-    _box = await Hive.openBox(_boxName);
+  Future<void> init() async {
+    _box = await Hive.openBox<String>(_boxName);
     final userString = _box.get(_userKey);
 
     if (userString != null) {
-      final user = UserState.fromJson(convert.jsonDecode(userString));
-
-      emit(user);
+      _state = UserState.fromJson(convert.jsonDecode(userString));
     }
   }
 
-  Future<void> _logIn(UserLogInEvent event, Emitter<UserState> emit) async {
-    emit(UserState.pending());
+  Future<void> close() async {
+    await _box.compact();
+    await _box.close();
+  }
+
+  Future<void> login({required String email, required String password}) async {
+    _state = UserState.pending();
 
     final loginResponse = await apiService.login(
-      loginRequest: LoginRequestDto(
-        email: event.email,
-        password: event.password,
-      ),
+      loginRequest: LoginRequestDto(email: email, password: password),
     );
 
     if (!loginResponse.isSuccessful) {
-      emit(
-        UserState.error(
-          'Login failed: ${loginResponse.statusCode} ${loginResponse.error.toString()}',
-        ),
+      _state = UserState.error(
+        'Login failed: ${loginResponse.statusCode} ${loginResponse.error.toString()}',
       );
 
       return;
@@ -73,16 +58,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     );
 
     if (!userInfoResponse.isSuccessful) {
-      emit(
-        UserState.error(
-          '${userInfoResponse.statusCode} ${userInfoResponse.error.toString()}',
-        ),
+      _state = UserState.error(
+        '${userInfoResponse.statusCode} ${userInfoResponse.error.toString()}',
       );
 
       return;
     }
 
-    final authorizedUserState = UserState.authorized(
+    _state = UserState.authorized(
       loginResponse.body!.id,
       userInfoResponse.body!.email,
       userInfoResponse.body!.surname,
@@ -91,22 +74,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       loginResponse.body!.refreshToken,
     );
 
-    await _box.put(_userKey, convert.jsonEncode(authorizedUserState));
+    await _box.put(_userKey, convert.jsonEncode(_state));
 
     _saveOperations++;
     if (_saveOperations >= _compactionThreshold) {
       _saveOperations = 0;
       await _box.compact();
     }
-
-    emit(authorizedUserState);
   }
 
-  Future<void> _googleAuth(
-    UserGoogleAuthEvent event,
-    Emitter<UserState> emit,
-  ) async {
-    emit(UserState.pending());
+  Future<void> googleAuth() async {
+    _state = UserState.pending();
 
     try {
       const callbackUrlScheme = 'com.wasubi.auth';
@@ -145,7 +123,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         throw Exception('Failed to get user info');
       }
 
-      final userState = UserState(
+      _state = UserState(
         authStatus: AuthStatus.authorized,
         id: decodedToken['sub'],
         email: userInfo.body!.email,
@@ -155,42 +133,35 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         refreshToken: refreshToken,
       );
 
-      await _box.put(_userKey, convert.jsonEncode(userState));
+      await _box.put(_userKey, convert.jsonEncode(_state));
 
       _saveOperations++;
       if (_saveOperations >= _compactionThreshold) {
         _saveOperations = 0;
         await _box.compact();
       }
-
-      emit(userState);
-
-      return;
     } on PlatformException catch (e) {
       if (e.code == 'CANCELED') {
         debugPrint('User explicitly canceled authentication');
+        _state = UserState.error('User explicitly canceled authentication');
       } else {
         debugPrint('Platform error during authentication: ${e.toString()}');
+        _state = UserState.error('Platform error during authentication');
       }
-
-      emit(UserState.unauthorized());
-      rethrow;
     } on TimeoutException catch (e) {
       debugPrint('Authentication timeout: ${e.message}');
 
-      emit(UserState.unauthorized());
-      rethrow;
+      _state = UserState.error('Authentication timeout');
     } catch (e, stackTrace) {
       debugPrint('Authentication failed: $e');
       debugPrint('Stack trace: $stackTrace');
 
-      emit(UserState.unauthorized());
-      rethrow;
+      _state = UserState.error('Authentication failed');
     }
   }
 
-  Future<void> _logOut(UserLogOutEvent event, Emitter<UserState> emit) async {
-    if (state.authStatus != AuthStatus.authorized) {
+  Future<void> logOut() async {
+    if (_state.authStatus != AuthStatus.authorized) {
       return;
     }
 
@@ -202,51 +173,42 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       await _box.compact();
     }
 
-    emit(UserState.unauthorized());
+    _state = UserState.unauthorized();
   }
 
-  Future<void> _deleteAccount(
-    UserDeleteAccountEvent event,
-    Emitter<UserState> emit,
-  ) async {
-    if (state.authStatus != AuthStatus.authorized) {
+  Future<void> deleteAccount() async {
+    if (_state.authStatus != AuthStatus.authorized) {
       return;
     }
+
+    _state = UserState.unauthorized();
   }
 
-  Future<void> _register(
-    UserRegisterEvent event,
-    Emitter<UserState> emit,
-  ) async {
-    emit(UserState.pending());
-
-    final fullName = '${event.name} ${event.middleName}'.trim();
+  Future<void> register({
+    required String fullName,
+    required String surname,
+    required String email,
+    required String password,
+  }) async {
+    _state = UserState.pending();
 
     final registerResponse = await apiService.register(
       registerRequest: RegisterRequestDto(
         fullName: fullName,
-        surname: event.surname,
-        email: event.email,
-        password: event.password,
+        surname: surname,
+        email: email,
+        password: password,
       ),
     );
 
     if (!registerResponse.isSuccessful) {
-      emit(
-        UserState.error(
-          'Register failed: ${registerResponse.statusCode} ${registerResponse.error.toString()}',
-        ),
+      _state = UserState.error(
+        'Register failed: ${registerResponse.statusCode} ${registerResponse.error.toString()}',
       );
 
       return;
     }
-
-    add(UserLogInEvent(event.email, event.password));
   }
 
-  @override
-  Future<void> close() {
-    _box.close();
-    return super.close();
-  }
+  UserState get user => _state;
 }

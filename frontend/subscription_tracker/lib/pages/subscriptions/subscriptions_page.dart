@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
-import 'package:subscription_tracker/models/category_bloc/category_state.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_state.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/category_selector.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_info.dart';

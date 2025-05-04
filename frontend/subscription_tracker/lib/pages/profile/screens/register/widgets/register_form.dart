@@ -1,9 +1,9 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_event.dart';
-import 'package:subscription_tracker/models/user_bloc/user_state.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/scripts/name_formatter.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/widgets/input_field.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart'

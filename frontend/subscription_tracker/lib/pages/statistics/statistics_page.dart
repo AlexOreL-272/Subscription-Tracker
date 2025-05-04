@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_state.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/statistics_screen.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
