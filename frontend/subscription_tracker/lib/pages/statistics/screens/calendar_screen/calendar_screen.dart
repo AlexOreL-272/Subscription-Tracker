@@ -28,10 +28,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final uiTheme = isDark ? UIBaseColors.dark() : UIBaseColors.light();
 
+    final now = DateTime.now();
+
     final markers = _getMarkers(
       context,
-      DateTime(2025, 5, 1),
-      DateTime(2025, 6, 1),
+      DateTime(now.year, now.month),
+      // TODO: rethink this
+      DateTime(now.year, now.month).add(const Duration(days: 365 * 20)),
     );
 
     return Padding(
