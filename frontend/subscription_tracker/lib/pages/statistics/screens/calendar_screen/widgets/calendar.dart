@@ -100,6 +100,8 @@ class _CalendarState extends State<Calendar> {
         },
 
         onDaySelected: (selectedDay, focusedDay) {
+          if (selectedDay == _selectedDay) return;
+
           setState(() {
             _selectedDay = selectedDay;
             _focusedDay = selectedDay;
@@ -115,6 +117,10 @@ class _CalendarState extends State<Calendar> {
 
         calendarStyle: CalendarStyle(
           isTodayHighlighted: false,
+
+          selectedTextStyle: Theme.of(
+            context,
+          ).textTheme.titleMedium!.copyWith(color: uiTheme.text),
 
           selectedDecoration: BoxDecoration(
             color: Colors.transparent,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
+import 'package:subscription_tracker/services/shared_data.dart';
 
 class EventTileData {
   final String caption;
@@ -77,7 +78,7 @@ class EventTile extends StatelessWidget {
             const SizedBox(width: 8.0),
 
             Text(
-              '${data.cost.toStringAsFixed(2)} ${data.currency}',
+              '${data.cost.toStringAsFixed(2)} ${SharedData.currenciesSymbols[data.currency]}',
               style: Theme.of(context).textTheme.titleLarge,
 
               textAlign: TextAlign.end,
