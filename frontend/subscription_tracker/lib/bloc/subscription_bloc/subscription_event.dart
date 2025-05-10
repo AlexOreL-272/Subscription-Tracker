@@ -8,6 +8,20 @@ class AddSubscriptionEvent extends SubscriptionEvent {
   AddSubscriptionEvent(this.subscription);
 }
 
+class FetchSubscriptionsEvent extends SubscriptionEvent {
+  final String userId;
+  final String accessToken;
+  final int? limit;
+  final int? offset;
+
+  FetchSubscriptionsEvent(
+    this.userId,
+    this.accessToken, [
+    this.limit = 1000,
+    this.offset = 0,
+  ]);
+}
+
 class UpdateSubscriptionEvent extends SubscriptionEvent {
   final SubscriptionModel subscription;
 

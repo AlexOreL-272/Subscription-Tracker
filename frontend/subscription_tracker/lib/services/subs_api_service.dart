@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
+import 'package:subscription_tracker/domain/subscriptions/requests.dart';
 import 'package:subscription_tracker/dto/auth/login_dto.dart';
+import 'package:subscription_tracker/dto/subscriptions/subscriptions_dto.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/services/json_converter.dart';
 
@@ -34,6 +36,25 @@ abstract class SubsApiService extends ChopperService {
     @Query('category') String? category,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
+  });
+
+  @POST(path: '/subscriptions')
+  Future<Response<CreateSubscriptionDto>> createSubscription({
+    // @Header('Authorization') required String authorization,
+    @Body() required CreateSubscriptionRequest request,
+  });
+
+  @PUT(path: '/subscriptions/{subscriptionId}')
+  Future<Response<UpdateSubscriptionDto>> updateSubscription({
+    // @Header('Authorization') required String authorization,
+    @Path('subscriptionId') required String subscriptionId,
+    @Body() required SubscriptionModel subscription,
+  });
+
+  @DELETE(path: '/subscriptions/{subscriptionId}')
+  Future<Response<String>> deleteSubscription({
+    // @Header('Authorization') required String authorization,
+    @Path('subscriptionId') required String subscriptionId,
   });
 
   @GET(path: '/users/{userId}')

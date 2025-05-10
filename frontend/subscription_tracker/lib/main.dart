@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/main_screen.dart';
 import 'package:subscription_tracker/bloc/category_bloc/category_bloc.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
@@ -20,7 +21,7 @@ final _apiService = SubsApiService.create();
 final _categoryRepo = CategoryRepo();
 final _currencyRepo = CurrencyRepo();
 final _settingsRepo = SettingsRepo();
-final _subscriptionsRepo = SubscriptionsRepo();
+final _subscriptionsRepo = SubscriptionsRepo(apiService: _apiService);
 final _userRepo = UserRepo(apiService: _apiService);
 
 Future<void> main() async {
@@ -36,6 +37,13 @@ Future<void> main() async {
   await _subscriptionsRepo.init();
   await _userRepo.init();
 
+  if (_userRepo.user.authStatus == AuthStatus.authorized) {
+    await _subscriptionsRepo.fetchSubscriptions(
+      userId: _userRepo.user.id!,
+      accessToken: '',
+    );
+  }
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -43,7 +51,11 @@ Future<void> main() async {
           create: (context) => CategoryBloc(categoryRepo: _categoryRepo),
         ),
         BlocProvider<SubscriptionBloc>(
-          create: (context) => SubscriptionBloc(subsRepo: _subscriptionsRepo),
+          create:
+              (context) => SubscriptionBloc(
+                subsRepo: _subscriptionsRepo,
+                userRepo: _userRepo,
+              ),
         ),
         BlocProvider<UserBloc>(
           create:
