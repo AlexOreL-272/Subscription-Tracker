@@ -22,16 +22,21 @@ mixin _$SubscriptionModel {
   String? get comment => throw _privateConstructorUsedError;
   double get cost => throw _privateConstructorUsedError;
   String get currency => throw _privateConstructorUsedError;
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   DateTime get firstPay => throw _privateConstructorUsedError;
   int get interval => throw _privateConstructorUsedError;
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   DateTime? get endDate => throw _privateConstructorUsedError;
   int? get notification => throw _privateConstructorUsedError;
   int get color => throw _privateConstructorUsedError;
   String? get category => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: false)
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: false)
   bool get trialActive => throw _privateConstructorUsedError;
   int? get trialInterval => throw _privateConstructorUsedError;
   double? get trialCost => throw _privateConstructorUsedError;
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   DateTime? get trialEndDate => throw _privateConstructorUsedError;
   int? get trialNotification => throw _privateConstructorUsedError;
   String? get supportLink => throw _privateConstructorUsedError;
@@ -57,16 +62,19 @@ abstract class $SubscriptionModelCopyWith<$Res> {
     String? comment,
     double cost,
     String currency,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     DateTime firstPay,
     int interval,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     DateTime? endDate,
     int? notification,
     int color,
     String? category,
-    bool isActive,
-    bool trialActive,
+    @JsonKey(defaultValue: false) bool isActive,
+    @JsonKey(defaultValue: false) bool trialActive,
     int? trialInterval,
     double? trialCost,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     DateTime? trialEndDate,
     int? trialNotification,
     String? supportLink,
@@ -227,16 +235,19 @@ abstract class _$$SubscriptionModelImplCopyWith<$Res>
     String? comment,
     double cost,
     String currency,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     DateTime firstPay,
     int interval,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     DateTime? endDate,
     int? notification,
     int color,
     String? category,
-    bool isActive,
-    bool trialActive,
+    @JsonKey(defaultValue: false) bool isActive,
+    @JsonKey(defaultValue: false) bool trialActive,
     int? trialInterval,
     double? trialCost,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     DateTime? trialEndDate,
     int? trialNotification,
     String? supportLink,
@@ -389,16 +400,19 @@ class _$SubscriptionModelImpl extends _SubscriptionModel {
     this.comment,
     required this.cost,
     required this.currency,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     required this.firstPay,
     required this.interval,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     this.endDate,
     this.notification,
     required this.color,
     this.category,
-    required this.isActive,
-    required this.trialActive,
+    @JsonKey(defaultValue: false) required this.isActive,
+    @JsonKey(defaultValue: false) required this.trialActive,
     this.trialInterval,
     this.trialCost,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     this.trialEndDate,
     this.trialNotification,
     this.supportLink,
@@ -416,10 +430,12 @@ class _$SubscriptionModelImpl extends _SubscriptionModel {
   @override
   final String currency;
   @override
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   final DateTime firstPay;
   @override
   final int interval;
   @override
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   final DateTime? endDate;
   @override
   final int? notification;
@@ -428,14 +444,17 @@ class _$SubscriptionModelImpl extends _SubscriptionModel {
   @override
   final String? category;
   @override
+  @JsonKey(defaultValue: false)
   final bool isActive;
   @override
+  @JsonKey(defaultValue: false)
   final bool trialActive;
   @override
   final int? trialInterval;
   @override
   final double? trialCost;
   @override
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   final DateTime? trialEndDate;
   @override
   final int? trialNotification;
@@ -531,16 +550,19 @@ abstract class _SubscriptionModel extends SubscriptionModel {
     final String? comment,
     required final double cost,
     required final String currency,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     required final DateTime firstPay,
     required final int interval,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     final DateTime? endDate,
     final int? notification,
     required final int color,
     final String? category,
-    required final bool isActive,
-    required final bool trialActive,
+    @JsonKey(defaultValue: false) required final bool isActive,
+    @JsonKey(defaultValue: false) required final bool trialActive,
     final int? trialInterval,
     final double? trialCost,
+    @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
     final DateTime? trialEndDate,
     final int? trialNotification,
     final String? supportLink,
@@ -559,10 +581,12 @@ abstract class _SubscriptionModel extends SubscriptionModel {
   @override
   String get currency;
   @override
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   DateTime get firstPay;
   @override
   int get interval;
   @override
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   DateTime? get endDate;
   @override
   int? get notification;
@@ -571,14 +595,17 @@ abstract class _SubscriptionModel extends SubscriptionModel {
   @override
   String? get category;
   @override
+  @JsonKey(defaultValue: false)
   bool get isActive;
   @override
+  @JsonKey(defaultValue: false)
   bool get trialActive;
   @override
   int? get trialInterval;
   @override
   double? get trialCost;
   @override
+  @JsonKey(toJson: _formatDatetoJson, fromJson: _formatDateFromJson)
   DateTime? get trialEndDate;
   @override
   int? get trialNotification;

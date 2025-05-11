@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+import 'package:subscription_tracker/domain/subscriptions/requests.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
+import 'package:subscription_tracker/services/subs_api_service.dart';
 
 class SubscriptionsRepo {
   static const _boxName = 'subscriptionsBox';
@@ -10,6 +12,10 @@ class SubscriptionsRepo {
   int _saveOperations = 0;
 
   late final Map<String, SubscriptionModel> _subscriptions;
+
+  final SubsApiService apiService;
+
+  SubscriptionsRepo({required this.apiService});
 
   Future<void> init() async {
     _box = await Hive.openBox<Map>(_boxName);
@@ -22,12 +28,59 @@ class SubscriptionsRepo {
     });
   }
 
+  Future<void> fetchSubscriptions({
+    required String userId,
+    required String accessToken,
+    int limit = 1000,
+    int offset = 0,
+  }) async {
+    final response = await apiService.getSubscriptions(
+      userId: userId,
+      resultType: 'full',
+      limit: limit,
+      offset: offset,
+    );
+
+    if (!response.isSuccessful) {
+      if (response.statusCode == 404) {
+        return;
+      }
+
+      // TODO: handle expired access token
+      return;
+    }
+
+    for (final subscription in response.body!) {
+      if (_subscriptions.containsKey(subscription.id)) {
+        continue;
+      }
+
+      _subscriptions[subscription.id] = subscription;
+      _box.put(subscription.id, subscription.toJson());
+    }
+  }
+
+  Future<void> saveSubscriptions(String userId) async {
+    for (final subscription in _subscriptions.values) {
+      await apiService.createSubscription(
+        request: CreateSubscriptionRequest(
+          userId: userId,
+          subscription: subscription,
+        ),
+      );
+    }
+  }
+
   Future<void> close() async {
     await _box.compact();
     await _box.close();
   }
 
-  Future<void> put(SubscriptionModel subscription) async {
+  Future<void> put(
+    SubscriptionModel subscription, [
+    bool needsSync = false,
+    String? userId,
+  ]) async {
     await _box.put(subscription.id, subscription.toJson());
 
     _saveOperations++;
@@ -36,10 +89,22 @@ class SubscriptionsRepo {
       await _box.compact();
     }
 
+    if (needsSync) {
+      apiService.createSubscription(
+        request: CreateSubscriptionRequest(
+          userId: userId!,
+          subscription: subscription,
+        ),
+      );
+    }
+
     _subscriptions[subscription.id] = subscription;
   }
 
-  Future<void> update(SubscriptionModel subscription) async {
+  Future<void> update(
+    SubscriptionModel subscription, [
+    bool needsSync = false,
+  ]) async {
     await _box.put(subscription.id, subscription.toJson());
 
     _saveOperations++;
@@ -48,16 +113,27 @@ class SubscriptionsRepo {
       await _box.compact();
     }
 
+    if (needsSync) {
+      apiService.updateSubscription(
+        subscriptionId: subscription.id,
+        subscription: subscription,
+      );
+    }
+
     _subscriptions[subscription.id] = subscription;
   }
 
-  Future<void> delete(String id) async {
+  Future<void> delete(String id, [bool needsSync = false]) async {
     await _box.delete(id);
 
     _saveOperations++;
     if (_saveOperations >= _compactionThreshold) {
       _saveOperations = 0;
       await _box.compact();
+    }
+
+    if (needsSync) {
+      apiService.deleteSubscription(subscriptionId: id);
     }
 
     _subscriptions.remove(id);
