@@ -28,7 +28,7 @@ class SubscriptionsRepo {
     });
   }
 
-  Future<void> fetchSubscriptions({
+  Future<List<SubscriptionModel>> fetchSubscriptions({
     required String userId,
     required String accessToken,
     int limit = 1000,
@@ -43,12 +43,14 @@ class SubscriptionsRepo {
 
     if (!response.isSuccessful) {
       if (response.statusCode == 404) {
-        return;
+        return [];
       }
 
       // TODO: handle expired access token
-      return;
+      return [];
     }
+
+    final newSubs = <SubscriptionModel>[];
 
     for (final subscription in response.body!) {
       if (_subscriptions.containsKey(subscription.id)) {
@@ -56,8 +58,11 @@ class SubscriptionsRepo {
       }
 
       _subscriptions[subscription.id] = subscription;
+      newSubs.add(subscription);
       _box.put(subscription.id, subscription.toJson());
     }
+
+    return newSubs;
   }
 
   Future<void> saveSubscriptions(String userId) async {

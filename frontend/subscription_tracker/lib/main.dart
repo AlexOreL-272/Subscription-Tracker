@@ -54,6 +54,7 @@ Future<void> main() async {
           create:
               (context) => SubscriptionBloc(
                 subsRepo: _subscriptionsRepo,
+                categoryRepo: _categoryRepo,
                 userRepo: _userRepo,
               ),
         ),

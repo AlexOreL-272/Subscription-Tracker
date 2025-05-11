@@ -2,15 +2,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_state.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
+import 'package:subscription_tracker/repo/category_repo/category_repo.dart';
 import 'package:subscription_tracker/repo/subscriptions_repo/subscriptions_repo.dart';
 import 'package:subscription_tracker/repo/user_repo/user_repo.dart';
 
 class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   final SubscriptionsRepo subsRepo;
+  final CategoryRepo categoryRepo;
   final UserRepo userRepo;
 
-  SubscriptionBloc({required this.subsRepo, required this.userRepo})
-    : super(SubscriptionState.sample()) {
+  SubscriptionBloc({
+    required this.subsRepo,
+    required this.categoryRepo,
+    required this.userRepo,
+  }) : super(SubscriptionState.sample()) {
     on<InitializeSubscriptionsEvent>(_initializeSubscriptions);
     on<AddSubscriptionEvent>(_addSubscription);
     on<FetchSubscriptionsEvent>(_fetchSubscriptions);
@@ -57,12 +62,23 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       }
     }
 
-    await subsRepo.fetchSubscriptions(
+    final newSubs = await subsRepo.fetchSubscriptions(
       userId: userRepo.user.id!,
       accessToken: userRepo.user.accessToken!,
     );
 
     emit(SubscriptionState(subsRepo.subscriptions));
+
+    for (final newSub in newSubs) {
+      if (categoryRepo.categories.contains(newSub.category) ||
+          newSub.category == 'Все' ||
+          newSub.category == '' ||
+          newSub.category == null) {
+        continue;
+      }
+
+      categoryRepo.put(newSub.category!);
+    }
   }
 
   Future<void> _saveSubscriptions(

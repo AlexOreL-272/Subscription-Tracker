@@ -9,6 +9,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
   CategoryBloc({required this.categoryRepo}) : super(CategoryState.zero()) {
     on<InitializeCategoriesEvent>(_initialize);
     on<AddCategoryEvent>(_addCategory);
+    on<ForceUpdateCategoriesEvent>(_forceUpdateCategories);
     on<RenameCategoryEvent>(_renameCategory);
     on<DeleteCategoryEvent>(_deleteCategory);
 
@@ -27,6 +28,13 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     Emitter<CategoryState> emit,
   ) async {
     await categoryRepo.put(event.category);
+    emit(CategoryState(categoryRepo.categories));
+  }
+
+  Future<void> _forceUpdateCategories(
+    ForceUpdateCategoriesEvent event,
+    Emitter<CategoryState> emit,
+  ) async {
     emit(CategoryState(categoryRepo.categories));
   }
 

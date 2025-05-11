@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/bloc/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_event.dart';
 import 'package:subscription_tracker/bloc/category_bloc/category_state.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
@@ -81,6 +82,10 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                         BlocProvider.of<SubscriptionBloc>(
                           context,
                         ).add(FetchSubscriptionsEvent());
+
+                        BlocProvider.of<CategoryBloc>(
+                          context,
+                        ).add(ForceUpdateCategoriesEvent());
                       },
                     )
                     : null,
@@ -154,10 +159,6 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
           ),
 
           body: BlocListener<CategoryBloc, CategoryState>(
-            listenWhen:
-                (previous, current) =>
-                    previous.categories != current.categories,
-
             listener: (context, state) {
               if (mounted) {
                 setState(() {
