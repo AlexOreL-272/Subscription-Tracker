@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/register_screen.dart';
@@ -65,6 +67,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Color(0xFFECA519),
               onPressed: () async {
                 BlocProvider.of<UserBloc>(context).add(UserGoogleAuthEvent());
+
+                BlocProvider.of<SubscriptionBloc>(
+                  context,
+                ).add(SaveSubscriptionsEvent());
+
+                BlocProvider.of<SubscriptionBloc>(
+                  context,
+                ).add(FetchSubscriptionsEvent());
               },
             ),
           ),

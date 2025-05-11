@@ -9,17 +9,11 @@ class AddSubscriptionEvent extends SubscriptionEvent {
 }
 
 class FetchSubscriptionsEvent extends SubscriptionEvent {
-  final String userId;
-  final String accessToken;
-  final int? limit;
-  final int? offset;
+  FetchSubscriptionsEvent();
+}
 
-  FetchSubscriptionsEvent(
-    this.userId,
-    this.accessToken, [
-    this.limit = 1000,
-    this.offset = 0,
-  ]);
+class SaveSubscriptionsEvent extends SubscriptionEvent {
+  SaveSubscriptionsEvent();
 }
 
 class UpdateSubscriptionEvent extends SubscriptionEvent {

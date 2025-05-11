@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
@@ -362,6 +364,14 @@ class _LoginFormState extends State<LoginForm> {
                       BlocProvider.of<UserBloc>(context).add(
                         UserLogInEvent(_submittedEmail, _submittedPassword),
                       );
+
+                      BlocProvider.of<SubscriptionBloc>(
+                        context,
+                      ).add(SaveSubscriptionsEvent());
+
+                      BlocProvider.of<SubscriptionBloc>(
+                        context,
+                      ).add(FetchSubscriptionsEvent());
                     }
                   },
                 ),

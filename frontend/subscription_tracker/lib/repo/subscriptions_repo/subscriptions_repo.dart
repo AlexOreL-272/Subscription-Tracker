@@ -56,7 +56,18 @@ class SubscriptionsRepo {
       }
 
       _subscriptions[subscription.id] = subscription;
-      await _box.put(subscription.id, subscription.toJson());
+      _box.put(subscription.id, subscription.toJson());
+    }
+  }
+
+  Future<void> saveSubscriptions(String userId) async {
+    for (final subscription in _subscriptions.values) {
+      await apiService.createSubscription(
+        request: CreateSubscriptionRequest(
+          userId: userId,
+          subscription: subscription,
+        ),
+      );
     }
   }
 

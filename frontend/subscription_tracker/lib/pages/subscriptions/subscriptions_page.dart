@@ -54,8 +54,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
 
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
-        final user = state;
-        final isAuthorized = user.authStatus == AuthStatus.authorized;
+        final isAuthorized = state.authStatus == AuthStatus.authorized;
 
         return Scaffold(
           backgroundColor: backgroundColor,
@@ -79,9 +78,9 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                       icon: const Icon(Icons.refresh),
 
                       onPressed: () {
-                        BlocProvider.of<SubscriptionBloc>(context).add(
-                          FetchSubscriptionsEvent(user.id!, user.accessToken!),
-                        );
+                        BlocProvider.of<SubscriptionBloc>(
+                          context,
+                        ).add(FetchSubscriptionsEvent());
                       },
                     )
                     : null,
