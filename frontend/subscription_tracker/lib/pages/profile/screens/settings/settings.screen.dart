@@ -120,6 +120,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: CurrencySelector(
                       currency:
                           BlocProvider.of<SettingsBloc>(context).state.currency,
+
+                      colorScheme: ColorScheme.fromSeed(
+                        seedColor:
+                            BlocProvider.of<SettingsBloc>(context).state.color,
+
+                        dynamicSchemeVariant:
+                            isDark
+                                ? DynamicSchemeVariant.tonalSpot
+                                : DynamicSchemeVariant.vibrant,
+                      ),
+
                       onChanged: (value) {
                         if (value.isEmpty ||
                             value ==

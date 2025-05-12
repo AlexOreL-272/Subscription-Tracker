@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:subscription_tracker/services/shared_data.dart';
 
@@ -16,7 +17,14 @@ class CurrencyRepo {
     for (int i = 0; i < currencies.length; i++) {
       final fromCurrency = currencies[i];
       final url = '$_baseUrl/$fromCurrency';
-      final response = await http.get(Uri.parse(url));
+      http.Response response;
+
+      try {
+        response = await http.get(Uri.parse(url));
+      } catch (e) {
+        debugPrint(e.toString());
+        continue;
+      }
 
       // TODO: need to think what to do
       if (response.statusCode != 200 && response.statusCode != 304) {

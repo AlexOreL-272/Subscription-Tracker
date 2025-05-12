@@ -5,11 +5,13 @@ import 'package:subscription_tracker/widgets/theme_definitor.dart';
 class CurrencySelector extends StatefulWidget {
   final String currency;
   final ValueChanged<String> onChanged;
+  final ColorScheme? colorScheme;
 
   const CurrencySelector({
     super.key,
     required this.currency,
     required this.onChanged,
+    this.colorScheme,
   });
 
   @override
@@ -21,10 +23,8 @@ class _CurrencySelectorState extends State<CurrencySelector> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = widget.colorScheme ?? Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
 
     return TextButton.icon(
       onPressed: () async {
@@ -42,21 +42,21 @@ class _CurrencySelectorState extends State<CurrencySelector> {
       label: Text(
         _selectedCurrency,
         style: textTheme.titleMedium!.copyWith(
-          color:
-              isDark ? colorScheme.onPrimary : colorScheme.onPrimaryContainer,
+          color: colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w400,
         ),
       ),
 
       icon: Icon(
         Icons.keyboard_arrow_right,
-        color: isDark ? colorScheme.onPrimary : colorScheme.onPrimaryContainer,
+        color: colorScheme.onPrimaryContainer,
       ),
 
       iconAlignment: IconAlignment.end,
 
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all<Color>(
-          isDark ? colorScheme.primary : colorScheme.primaryContainer,
+          colorScheme.primaryContainer,
         ),
 
         shape: WidgetStateProperty.all<OutlinedBorder>(
@@ -118,11 +118,16 @@ class _CurrencyScreenState extends State<_CurrencyScreen> {
         surfaceTintColor: Colors.transparent,
 
         leading: IconButton(
-          icon: const Icon(Icons.keyboard_arrow_down),
+          icon: Icon(Icons.keyboard_arrow_down, color: uiColor.text),
           onPressed: () => Navigator.pop(context, _selectedCurrency),
         ),
 
-        title: Text('Выберите валюту'),
+        title: Text(
+          'Выберите валюту',
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(color: uiColor.text),
+        ),
 
         centerTitle: true,
       ),
@@ -183,7 +188,8 @@ class _CurrencyScreenState extends State<_CurrencyScreen> {
 
                       child: Text(
                         label,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: Theme.of(context).textTheme.titleMedium!
+                            .copyWith(color: uiColor.secondaryText),
                       ),
                     ),
                   ),

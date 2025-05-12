@@ -47,7 +47,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
 
           children: [
-            const SizedBox(height: 4.0),
+            const SizedBox(height: 16.0),
 
             Calendar(
               markers: markers.keys.toSet(),

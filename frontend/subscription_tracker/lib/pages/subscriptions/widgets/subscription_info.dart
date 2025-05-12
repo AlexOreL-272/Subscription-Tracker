@@ -7,6 +7,8 @@ import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:subscription_tracker/bloc/category_bloc/category_bloc.dart';
 import 'package:subscription_tracker/bloc/category_bloc/category_event.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_event.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
@@ -14,6 +16,7 @@ import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.
 import 'package:subscription_tracker/pages/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/decimal_input.dart';
+import 'package:subscription_tracker/widgets/currency_selector.dart';
 import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
@@ -369,6 +372,8 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
               colorScheme: colorScheme.copyWith(
                 brightness: Theme.of(context).colorScheme.brightness,
               ),
+
+              textTheme: textTheme,
             ),
 
             child: Padding(
@@ -462,15 +467,13 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                         NamedEntry(
                           name: 'Валюта',
 
-                          child: Dropdown<String>(
-                            value: _newSubscription.currency,
-
-                            items: SharedData.currencies,
+                          child: CurrencySelector(
+                            currency: _newSubscription.currency,
 
                             onChanged: (value) {
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
-                                  currency: value!,
+                                  currency: value,
                                 );
 
                                 if (value != widget.subscription.currency) {
@@ -481,36 +484,6 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                                 }
                               });
                             },
-
-                            icon: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-
-                            buttonTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
-
-                            dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
-
-                            buttonDecoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-
-                            dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
-                              ),
-                            ),
                           ),
                         ),
 

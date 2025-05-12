@@ -26,6 +26,8 @@ class SubscriptionsRepo {
 
       return MapEntry(stringKey, SubscriptionModel.fromJson(jsonValue));
     });
+
+    _adjustSubscriptionFirstPay();
   }
 
   Future<List<SubscriptionModel>> fetchSubscriptions({
@@ -61,6 +63,8 @@ class SubscriptionsRepo {
       newSubs.add(subscription);
       _box.put(subscription.id, subscription.toJson());
     }
+
+    _adjustSubscriptionFirstPay();
 
     return newSubs;
   }
@@ -162,4 +166,24 @@ class SubscriptionsRepo {
   }
 
   Map<String, SubscriptionModel> get subscriptions => _subscriptions;
+
+  void _adjustSubscriptionFirstPay() {
+    final subs = _subscriptions.values.toList();
+
+    for (final subscription in subs) {
+      if (subscription.firstPay.isAfter(DateTime.now())) {
+        continue;
+      }
+
+      DateTime firstPay = subscription.firstPay;
+
+      while (firstPay.isBefore(DateTime.now())) {
+        firstPay = firstPay.add(Duration(days: subscription.interval));
+      }
+
+      _subscriptions[subscription.id] = subscription.copyWith(
+        firstPay: firstPay,
+      );
+    }
+  }
 }
