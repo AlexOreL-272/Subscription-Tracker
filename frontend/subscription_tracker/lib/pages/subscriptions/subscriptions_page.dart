@@ -15,6 +15,8 @@ import 'package:subscription_tracker/pages/subscriptions/widgets/subscription_li
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class SubscriptionsPage extends StatefulWidget {
   const SubscriptionsPage({super.key});
 
@@ -61,8 +63,8 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
           backgroundColor: backgroundColor,
 
           appBar: AppBar(
-            title: const Text(
-              'Мои подписки',
+            title: Text(
+              AppLocalizations.of(context)!.subscriptionsPageTitle,
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w500,

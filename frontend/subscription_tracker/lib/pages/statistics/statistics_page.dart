@@ -7,6 +7,8 @@ import 'package:subscription_tracker/pages/statistics/screens/calendar_screen/wi
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/statistics_screen.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key});
 
@@ -46,7 +48,7 @@ class _StatisticsPageState extends State<StatisticsPage>
         surfaceTintColor: Colors.transparent,
 
         title: Text(
-          'Статистика',
+          AppLocalizations.of(context)!.statisticsPageTitle,
           style: Theme.of(context).textTheme.titleLarge,
         ),
 

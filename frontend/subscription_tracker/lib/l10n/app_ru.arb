@@ -1,0 +1,54 @@
+{
+    "subscriptionsPageTitle": "Мои подписки",
+    "statisticsPageTitle": "Статистика",
+    "profilePageTitle": "Профиль",
+
+    "subscriptionsPageNavBarLabel": "Подписки",
+    "statisticsPageNavBarLabel": "Статистика",
+    "profilePageNavBarLabel": "Профиль",
+
+    "addCategoryDialogTitle": "Добавить категорию",
+    "addCategoryDialogContent": "Введите название категории",
+
+    "editCategoryDialogHint": "Введите название категории",
+    "editCategoryDialogLabel": "Название",
+
+    "deleteCategoryDialogTitle": "Удалить категорию",
+    "deleteCategoryDialogContent": "Вы уверены, что хотите удалить категорию \"{category}\"?",
+
+    "selectDateDialogTitle": "Выберите дату",
+    "selectPeriodDialogTitle": "Выберите период оплаты",
+
+    "nextPaymentSubscriptionInfo": "Следующий платёж: {nextPayment}",
+
+    "mainInfoSubscriptionDetailsHeader": "Основная информация",
+    "additionalInfoSubscriptionDetailsHeader": "Дополнительная информация",
+    "contactInfoSubscriptionDetailsHeader": "Контактная информация",
+
+    "activeSubscriptionInfo": "Активна",
+    "pausedSubscriptionInfo": "Приостановлена",
+
+    "deleteDialogOption": "Удалить",
+    "addDialogOption": "Добавить",
+    "renameDialogOption": "Переименовать",
+    "cancelDialogOption": "Отмена",
+    "saveDialogOption": "Сохранить",
+    "okDialogOption": "OK",
+    "neverDialogOption": "Никогда",
+
+    "emptyValueValidatorError": "Введите хотя бы один символ",
+    "alreadyExistsValidatorError": "Это название уже используется",
+
+    "costSubscriptionInfo": "Цена",
+    "currencySubscriptionInfo": "Валюта",
+    "firstPaySubscriptionInfo": "Следующая оплата",
+    "intervalSubscriptionInfo": "Период",
+    "endDateSubscriptionInfo": "Подписка истекает",
+    "colorSubscriptionInfo": "Цвет карточки",
+    "categorySubscriptionInfo": "Категория",
+    "trialActiveSubscriptionInfo": "Пробный период",
+    "trialPeriodSubscriptionInfo": "Период",
+    "trialCostSubscriptionInfo": "Цена",
+    "trialEndDateSubscriptionInfo": "Конец периода",
+    "supportLinkSubscriptionInfo": "URL"
+}

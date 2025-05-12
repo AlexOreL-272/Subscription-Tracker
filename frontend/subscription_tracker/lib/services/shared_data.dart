@@ -32,8 +32,8 @@ class SharedData {
     'Евро',
   ];
 
-  static const selectCustomValue = 'Выбрать';
-  static const Map<String, int> intervals = {
+  static const selectCustomValueRU = 'Выбрать';
+  static const Map<String, int> intervalsRU = {
     '1 День': 1,
     '1 Неделя': 7,
     '2 Недели': 14,
@@ -41,6 +41,18 @@ class SharedData {
     '3 Месяца': 90,
     '6 Месяцев': 180,
     '1 Год': 365,
-    selectCustomValue: 0,
+    selectCustomValueRU: 0,
+  };
+
+  static const selectCustomValueEN = 'Select';
+  static const Map<String, int> intervalsEN = {
+    '1 Day': 1,
+    '1 Week': 7,
+    '2 Weeks': 14,
+    '1 Month': 30,
+    '3 Months': 90,
+    '6 Months': 180,
+    '1 Year': 365,
+    selectCustomValueEN: 0,
   };
 }

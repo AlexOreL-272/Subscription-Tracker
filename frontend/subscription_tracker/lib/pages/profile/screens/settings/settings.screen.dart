@@ -70,8 +70,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     child: TextToggleSwitch(
                       options: ['Русский', 'English'],
+
+                      initialIndex:
+                          BlocProvider.of<SettingsBloc>(
+                                    context,
+                                  ).state.language ==
+                                  'ru'
+                              ? 0
+                              : 1,
+
                       onChanged: (value) {
-                        print('Language changed to $value');
+                        final locale = value == 0 ? 'ru' : 'en';
+
+                        BlocProvider.of<SettingsBloc>(
+                          context,
+                        ).add(UpdateLanguageEvent(locale));
                       },
 
                       height: NamedEntry.contentHeight,

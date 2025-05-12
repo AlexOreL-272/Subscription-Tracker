@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class DatePicker extends StatelessWidget {
   final DateTime? value;
   final BoxDecoration? decoration;
@@ -35,7 +37,7 @@ class DatePicker extends StatelessWidget {
 
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Выберите дату'),
+          title: Text(AppLocalizations.of(context)!.selectDateDialogTitle),
 
           content: SizedBox(
             width: double.maxFinite,
@@ -78,7 +80,7 @@ class DatePicker extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.pop(context),
 
-              child: const Text('Отмена'),
+              child: Text(AppLocalizations.of(context)!.cancelDialogOption),
             ),
 
             TextButton(
@@ -87,7 +89,7 @@ class DatePicker extends StatelessWidget {
                 Navigator.pop(context);
               },
 
-              child: const Text('OK'),
+              child: Text(AppLocalizations.of(context)!.okDialogOption),
             ),
           ],
         );

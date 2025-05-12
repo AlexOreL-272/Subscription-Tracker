@@ -1,0 +1,218 @@
+{
+    "subscriptionsPageTitle": "My subscriptions",
+    "@subscriptionsPageTitle": {
+        "description": "Name of subscriptions page"
+    },
+
+    "statisticsPageTitle": "Statistics",
+    "@statisticsPageTitle": {
+        "description": "Name of statistics page"
+    },
+
+    "profilePageTitle": "Profile",
+    "@profilePageTitle": {
+        "description": "Name of profile page"
+    },
+
+    "subscriptionsPageNavBarLabel": "Subscriptions",
+    "@subscriptionsPageNavBarLabel": {
+        "description": "Label of subscriptions page in navbar"
+    },
+
+    "statisticsPageNavBarLabel": "Statistics",
+    "@statisticsPageNavBarLabel": {
+        "description": "Label of statistics page in navbar"
+    },
+
+    "profilePageNavBarLabel": "Profile",
+    "@profilePageNavBarLabel": {
+        "description": "Label of profile page in navbar"
+    },
+
+    "deleteDialogOption": "Delete",
+    "@deleteDialogOption": {
+        "description": "Option to delete something"
+    },
+
+    "addCategoryDialogTitle": "Add category",
+    "@addCategoryDialogTitle": {
+        "description": "Title of add category dialog"
+    },
+
+    "addCategoryDialogContent": "Enter category name",
+    "@addCategoryDialogContent": {
+        "description": "Content of add category dialog"
+    },
+
+    "editCategoryDialogHint": "Edit category",
+    "@editCategoryDialogHint": {
+        "description": "Title of edit category dialog"
+    },
+
+    "editCategoryDialogLabel": "Enter category name",
+    "@editCategoryDialogLabel": {
+        "description": "Name"
+    },
+
+    "deleteCategoryDialogTitle": "Delete category",
+    "@deleteCategoryDialogTitle": {
+        "description": "Title of delete category dialog"
+    },
+
+    "deleteCategoryDialogContent": "Are you sure you want to delete category \"{category}\"?",
+    "@deleteCategoryDialogContent": {
+        "description": "Content of delete category dialog",
+        "placeholders": {
+            "category": {
+                "type": "String",
+                "example": "Music"
+            }
+        }
+    },
+
+    "selectDateDialogTitle": "Select date",
+    "@selectDateDialogTitle": {
+        "description": "Title of select date dialog"
+    },
+
+    "selectPeriodDialogTitle": "Select payment period",
+    "@selectPeriodDialogTitle": {
+        "description": "Title of select period dialog"
+    },
+
+    "mainInfoSubscriptionDetailsHeader": "Subscription info",
+    "@mainInfoSubscriptionDetailsHeader": {
+        "description": "Title of main info subscription info"
+    },
+
+    "additionalInfoSubscriptionDetailsHeader": "Additional info",
+    "@additionalInfoSubscriptionDetailsHeader": {
+        "description": "Title of additional info subscription info"
+    },
+
+    "contactInfoSubscriptionDetailsHeader": "Contact info",
+    "@contactInfoSubscriptionDetailsHeader": {
+        "description": "Title of contact info subscription info"
+    },
+
+    "activeSubscriptionInfo": "Active",
+    "@activeSubscriptionInfo": {
+        "description": "Info about active subscription"
+    },
+
+    "pausedSubscriptionInfo": "Paused",
+    "@pausedSubscriptionInfo": {
+        "description": "Info about trial subscription"
+    },
+
+    "nextPaymentSubscriptionInfo": "Next payment: {nextPayment}",
+    "@nextPaymentSubscriptionInfo": {
+        "description": "Info about next payment",
+        "placeholders": {
+            "nextPayment": {
+                "type": "String",
+                "example": "2022-01-01"
+            }
+        }
+    },
+
+    "addDialogOption": "Add",
+    "@addDialogOption": {
+        "description": "Option to add something"
+    },
+
+    "renameDialogOption": "Rename",
+    "@renameDialogOption": {
+        "description": "Option to rename something"
+    },
+
+    "cancelDialogOption": "Cancel",
+    "@cancelDialogOption": {
+        "description": "Option to cancel something"
+    },
+
+    "saveDialogOption": "Save",
+    "@saveDialogOption": {
+        "description": "Option to save something"
+    },
+
+    "okDialogOption": "OK",
+    "@okDialogOption": {
+        "description": "Option to OK something"
+    },
+
+    "neverDialogOption": "Never",
+    "@neverDialogOption": {
+        "description": "Option to never something"
+    },
+
+    "emptyValueValidatorError": "Please enter at least one character",
+    "@emptyValueValidatorError": {
+        "description": "Error message for empty value validator"
+    },
+
+    "alreadyExistsValidatorError": "This name is already used",
+    "@alreadyExistsValidatorError": {
+        "description": "Error message for already exists validator"
+    },
+
+    "costSubscriptionInfo": "Cost",
+    "@costSubscriptionInfo": {
+        "description": "Info about cost subscription"
+    },
+
+    "currencySubscriptionInfo": "Currency",
+    "@currencySubscriptionInfo": {
+        "description": "Info about currency subscription"
+    },
+
+    "firstPaySubscriptionInfo": "First payment",
+    "@firstPaySubscriptionInfo": {
+        "description": "Info about first payment subscription"
+    },
+
+    "intervalSubscriptionInfo": "Interval",
+    "@intervalSubscriptionInfo": {
+        "description": "Info about interval subscription"
+    },
+
+    "endDateSubscriptionInfo": "End date",
+    "@endDateSubscriptionInfo": {
+        "description": "Info about end date subscription"
+    },
+
+    "colorSubscriptionInfo": "Card color",
+    "@colorSubscriptionInfo": {
+        "description": "Info about color subscription"
+    },
+
+    "categorySubscriptionInfo": "Category",
+    "@categorySubscriptionInfo": {
+        "description": "Info about category subscription"
+    },
+
+    "trialActiveSubscriptionInfo": "Trial",
+    "@trialActiveSubscriptionInfo": {
+        "description": "Info about trial active subscription"
+    },
+
+    "trialPeriodSubscriptionInfo": "Period",
+    "@trialPeriodSubscriptionInfo": {
+        "description": "Info about trial period subscription"
+    },
+
+    "trialCostSubscriptionInfo": "Cost",
+    "@trialCostSubscriptionInfo": {
+        "description": "Info about trial cost subscription"
+    },
+
+    "trialEndDateSubscriptionInfo": "End date",
+    "@trialEndDateSubscriptionInfo": {
+        "description": "Info about trial end date subscription"
+    },
+
+    "supportLinkSubscriptionInfo": "URL",
+    "@supportLinkSubscriptionInfo": {
+        "description": "Info about support link subscription"
+    }
+}

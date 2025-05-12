@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class NavBar extends StatefulWidget {
   final void Function(int) onTapped;
 
@@ -44,7 +46,10 @@ class _NavBarState extends State<NavBar> {
                   Expanded(
                     child: NavBarItem(
                       isSelected: _selectedIndex == 0,
-                      label: 'Подписки',
+                      label:
+                          AppLocalizations.of(
+                            context,
+                          )!.subscriptionsPageNavBarLabel,
                       icon: Icons.menu,
                       onTapped: () {
                         widget.onTapped(0);
@@ -56,7 +61,10 @@ class _NavBarState extends State<NavBar> {
                   Expanded(
                     child: NavBarItem(
                       isSelected: _selectedIndex == 1,
-                      label: 'Статистика',
+                      label:
+                          AppLocalizations.of(
+                            context,
+                          )!.statisticsPageNavBarLabel,
                       icon: Icons.insert_chart_outlined_sharp,
                       onTapped: () {
                         widget.onTapped(1);
@@ -68,7 +76,8 @@ class _NavBarState extends State<NavBar> {
                   Expanded(
                     child: NavBarItem(
                       isSelected: _selectedIndex == 2,
-                      label: 'Профиль',
+                      label:
+                          AppLocalizations.of(context)!.profilePageNavBarLabel,
                       icon: Icons.person_outline_rounded,
                       onTapped: () {
                         widget.onTapped(2);
