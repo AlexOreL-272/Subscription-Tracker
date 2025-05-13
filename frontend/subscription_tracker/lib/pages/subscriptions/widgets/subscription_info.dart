@@ -203,6 +203,7 @@ class SubscriptionPreview extends StatelessWidget {
                         subscription.cost,
                         subscription.currency,
                         subscription.interval,
+                        BlocProvider.of<SettingsBloc>(context).state.language,
                       ),
                       style: TextStyle(
                         color: colorScheme.onPrimaryContainer,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/widgets/register_form.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -18,7 +20,7 @@ class RegisterScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
 
         title: Text(
-          'Регистрация',
+          AppLocalizations.of(context)!.registerScreenTitle,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         centerTitle: true,
@@ -50,7 +52,7 @@ class RegisterScreen extends StatelessWidget {
             ),
 
             child: Text(
-              'Отмена',
+              AppLocalizations.of(context)!.cancelDialogOption,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),

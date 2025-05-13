@@ -10,10 +10,9 @@ import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
-class YearlyExpenseBarChart extends StatefulWidget {
-  static const _shortDateFormat = RussianDateFormat.MMM();
-  static const _defaultDateFormat = RussianDateFormat.ddMMMMyyyy();
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+class YearlyExpenseBarChart extends StatefulWidget {
   const YearlyExpenseBarChart({super.key});
 
   @override
@@ -37,7 +36,12 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
 
     _monthLabels = List.generate(12, (i) {
       final date = DateTime(_monthStart.year, _monthStart.month + i);
-      return YearlyExpenseBarChart._shortDateFormat.format(date);
+      final lang = BlocProvider.of<SettingsBloc>(context).state.language;
+      final isRussian = lang == 'ru';
+      final CustomDateFormat shortDateFormat = CustomDateFormat.MMM(
+        isRussian: isRussian,
+      );
+      return shortDateFormat.format(date);
     });
 
     _monthlyTotals = _calculateMonthlyExpenses(
@@ -64,6 +68,13 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
 
+    final lang = BlocProvider.of<SettingsBloc>(context).state.language;
+    final isRussian = lang == 'ru';
+
+    final CustomDateFormat defaultDateFormat = CustomDateFormat.ddMMMMyyyy(
+      isRussian: isRussian,
+    );
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: uiColor.container,
@@ -88,7 +99,7 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
 
           children: [
             Text(
-              'Расходы за следующий год',
+              AppLocalizations.of(context)!.barChartTitle,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: uiColor.secondaryText,
                 fontWeight: FontWeight.bold,
@@ -155,7 +166,9 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
                           alignment: Alignment.topCenter,
                           style: Theme.of(context).textTheme.labelMedium,
                           labelResolver: (value) {
-                            return 'В cреднем ${value.y.toStringAsFixed(2)} $selectedCurrency';
+                            final label =
+                                AppLocalizations.of(context)!.inAverage;
+                            return '$label ${value.y.toStringAsFixed(2)} $selectedCurrency';
                           },
                         ),
                       ),
@@ -200,7 +213,7 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
             const SizedBox(height: 8.0),
 
             Text(
-              '${YearlyExpenseBarChart._defaultDateFormat.format(_monthStart)} - ${YearlyExpenseBarChart._defaultDateFormat.format(DateTime(_monthStart.year + 1, _monthStart.month).subtract(const Duration(days: 1)))}',
+              '${defaultDateFormat.format(_monthStart)} - ${defaultDateFormat.format(DateTime(_monthStart.year + 1, _monthStart.month).subtract(const Duration(days: 1)))}',
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ],

@@ -214,5 +214,290 @@
     "supportLinkSubscriptionInfo": "URL",
     "@supportLinkSubscriptionInfo": {
         "description": "Info about support link subscription"
+    },
+
+
+    "statisticsScreenTabTitle": "Statistics",
+    "@statisticsScreenTabTitle": {
+        "description": "Title of statistics screen tab"
+    },
+
+    "calendarScreenTabTitle": "Calendar",
+    "@calendarScreenTabTitle": {
+        "description": "Title of calendar screen tab"
+    },
+
+    "pieChartTitle": "Payment for period",
+    "@pieChartTitle": {
+        "description": "Title of pie chart"
+    },
+
+    "barChartTitle": "Expenses for following year",
+    "@barChartTitle": {
+        "description": "Title of bar chart"
+    },
+
+    "inAverage": "Average",
+    "@inAverage": {
+        "description": "Label for average value"
+    },
+
+
+    "settingsScreenTitle": "Settings",
+    "@settingsScreenTitle": {
+        "description": "Title of settings screen"
+    },
+
+    "settingsMainSectionTitle": "Main",
+    "@settingsMainSectionTitle": {
+        "description": "Title of main settings section"
+    },
+
+    "settingsLanguageSectionTitle": "Language",
+    "@settingsLanguageSectionTitle": {
+        "description": "Title of language settings section"
+    },
+
+    "settingsThemeSectionTitle": "Theme",
+    "@settingsThemeSectionTitle": {
+        "description": "Title of theme settings section"
+    },
+
+    "settingsLightThemeLabel": "Light",
+    "@settingsLightThemeLabel": {
+        "description": "Label of light theme setting"
+    },
+
+    "settingsDarkThemeLabel": "Dark",
+    "@settingsDarkThemeLabel": {
+        "description": "Label of dark theme setting"
+    },
+
+    "settingsCurrencySectionTitle": "Currency",
+    "@settingsCurrencySectionTitle": {
+        "description": "Title of currency settings section"
+    },
+
+    "settingsCurrencySectionDescription": "This currency will be used to display subscription statistics",
+    "@settingsCurrencySectionDescription": {
+        "description": "Description of currency settings section"
+    },
+
+    "settingsUISectionTitle": "UI color",
+    "@settingsUISectionTitle": {
+        "description": "Title of UI settings section"
+    },
+
+    "settingsContactInfoSectionTitle": "Contact info",
+    "@settingsContactInfoSectionTitle": {
+        "description": "Title of contact info settings section"
+    },
+
+    "settingsEmailLabel": "E-Mail",
+    "@settingsEmailLabel": {
+        "description": "Label of email setting"
+    },
+
+    "settingsSupportDescription": "Contact me if you have any questions, suggestions or you've found a bug ❤️",
+    "@settingsEmailDescription": {
+        "description": "Description of email setting"
+    },
+
+    "settingsDangerZoneSectionTitle": "Danger zone",
+    "@settingsDangerZoneSectionTitle": {
+        "description": "Title of danger zone settings section"
+    },
+
+    "settingsDeleteAllDataLabel": "Delete all data",
+    "@settingsDeleteAllDataLabel": {
+        "description": "Label of delete all data setting"
+    },
+
+    "settingsDeleteAccountLabel": "Delete account",
+    "@settingsDeleteAccountLabel": {
+        "description": "Label of delete account setting"
+    },
+
+    "settingsAnnotation": "I would like to thank for helping in testing the app: Ansam, ED1LOAD, Xenocious",
+    "@settingsAnnotation": {
+        "description": "Annotation for settings screen"
+    },
+
+
+    "noData": "No Data",
+    "@noData": {
+        "description": "Label for no data"
+    },
+
+    "profileYourData": "Your data",
+    "@profileYourData": {
+        "description": "Title of your data section"
+    },
+
+    "profileSurnameLabel": "Surname",
+    "@profileSurnameLabel": {
+        "description": "Label of surname setting"
+    },
+
+    "profileNameLabel": "Name",
+    "@profileNameLabel": {
+        "description": "Label of name setting"
+    },
+
+    "profileMiddleNameLabel": "Middle name",
+    "@profileMiddleNameLabel": {
+        "description": "Label of middle name setting"
+    },
+
+    "profileEmailLabel": "E-Mail",
+    "@profileEmailLabel": {
+        "description": "Label of email setting"
+    },
+
+    "profileAccountManagement": "Account management",
+    "@profileAccountManagement": {
+        "description": "Title of account management section"
+    },
+
+    "profileLogoutLabel": "Logout from account",
+    "@profileLogoutLabel": {
+        "description": "Label of logout from account setting"
+    },
+
+    "profileLogoutButtonLabel": "Logout",
+    "@profileLogoutButtonLabel": {
+        "description": "Label of logout button"
+    },
+
+
+    "registerScreenTitle": "Register",
+    "@registerScreenTitle": {
+        "description": "Title of register screen"
+    },
+
+    "registerSurnameLabel": "Surname",
+    "@registerSurnameLabel": {
+        "description": "Label of surname setting"
+    },
+
+    "registerNameLabel": "Name",
+    "@registerNameLabel": {
+        "description": "Label of name setting"
+    },
+
+    "registerMiddleNameLabel": "Middle name",
+    "@registerMiddleNameLabel": {
+        "description": "Label of middle name setting"
+    },
+
+    "registerEmailLabel": "E-Mail",
+    "@registerEmailLabel": {
+        "description": "Label of email setting"
+    },
+
+    "registerPasswordLabel": "Password",
+    "@registerPasswordLabel": {
+        "description": "Label of password setting"
+    },
+
+    "registerRepeatPasswordLabel": "Repeat password",
+    "@registerRepeatPasswordLabel": {
+        "description": "Label of repeat password setting"
+    },
+
+    "registerButtonLabel": "Register",
+    "@registerButtonLabel": {
+        "description": "Label of register button"
+    },
+
+    "registerButtonPendingLabel": "Registering...",
+    "@registerButtonPendingLabel": {
+        "description": "Label of register button when pending"
+    },
+
+    "registerSurnameValidatorError": "Please enter surname",
+    "@registerSurnameValidatorError": {
+        "description": "Error message for surname validator"
+    },
+
+    "registerNameValidatorError": "Please enter name",
+    "@registerNameValidatorError": {
+        "description": "Error message for name validator"
+    },
+
+    "registerNoEmailValidatorError": "Please enter e-mail",
+    "@registerNoEmailValidatorError": {
+        "description": "Error message for email validator"
+    },
+
+    "invalidEmailValidatorError": "Invalid e-mail format",
+    "@invalidEmailValidatorError": {
+        "description": "Error message for invalid email validator"
+    },
+
+    "passwordsDontMatchValidatorError": "Passwords don't match",
+    "@passwordsDontMatchValidatorError": {
+        "description": "Error message for passwords don't match validator"
+    },
+
+    "unexpectedErrorValidatorError": "Unexpected error",
+    "@unexpectedErrorValidatorError": {
+        "description": "Error message for unexpected error validator"
+    },
+
+
+    "unauthorizedScreenHeader": "Welcome!",
+    "@unauthorizedScreenHeader": {
+        "description": "Header of unauthorized screen"
+    },
+
+    "unauthorizedScreenDescription": "In order to synchronize data between devices, please log in to your account",
+    "@unauthorizedScreenDescription": {
+        "description": "Description of unauthorized screen"
+    },
+
+    "googleLoginButtonLabel": "Log in with Google",
+    "@googleLoginButtonLabel": {
+        "description": "Label of google login button"
+    },
+
+    "yandexLoginButtonLabel": "Log in with Yandex",
+    "@yandexLoginButtonLabel": {
+        "description": "Label of yandex login button"
+    },
+
+    "orLabel": "Or",
+    "@orLabel": {
+        "description": "Label of or"
+    },
+
+    "loginFormEmailLabel": "E-Mail",
+    "@loginFormEmailLabel": {
+        "description": "Label of email input"
+    },
+
+    "loginFormPasswordLabel": "Password",
+    "@loginFormPasswordLabel": {
+        "description": "Label of password input"
+    },
+
+    "loginFormButtonLabel": "Log in",
+    "@loginFormButtonLabel": {
+        "description": "Label of login button"
+    },
+
+    "loginFormButtonPendingLabel": "Logging in...",
+    "@loginFormButtonPendingLabel": {
+        "description": "Label of login button when pending"
+    },
+
+    "noAccountLabel": "Don't have an account?",
+    "@noAccountLabel": {
+        "description": "Label of no account"
+    },
+
+    "noAccountDescription": "Register",
+    "@noAccountDescription": {
+        "description": "Description of no account"
     }
 }

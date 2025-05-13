@@ -9,6 +9,8 @@ import 'package:subscription_tracker/pages/profile/screens/register/widgets/inpu
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart'
     as register;
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
 
@@ -33,7 +35,8 @@ class _RegisterFormState extends State<RegisterForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                state.errorMessage ?? 'Произошла ошибка',
+                state.errorMessage ??
+                    AppLocalizations.of(context)!.unexpectedErrorValidatorError,
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(color: Colors.white),
@@ -80,11 +83,13 @@ class _RegisterFormState extends State<RegisterForm> {
                 children: [
                   // surname
                   InputField(
-                    label: 'Фамилия',
+                    label: AppLocalizations.of(context)!.registerSurnameLabel,
                     formatters: [const NameFormatter()],
                     validator: (surname) {
                       if (surname == null || surname.isEmpty) {
-                        return 'Введите фамилию';
+                        return AppLocalizations.of(
+                          context,
+                        )!.registerSurnameValidatorError;
                       }
 
                       return null;
@@ -96,11 +101,13 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   // name
                   InputField(
-                    label: 'Имя',
+                    label: AppLocalizations.of(context)!.registerNameLabel,
                     formatters: [const NameFormatter()],
                     validator: (name) {
                       if (name == null || name.isEmpty) {
-                        return 'Введите имя';
+                        return AppLocalizations.of(
+                          context,
+                        )!.registerNameValidatorError;
                       }
 
                       return null;
@@ -112,7 +119,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   // middle name
                   InputField(
-                    label: 'Отчество',
+                    label:
+                        AppLocalizations.of(context)!.registerMiddleNameLabel,
                     formatters: [const NameFormatter()],
                     onSubmitted: (middleName) {
                       _submittedMiddleName = middleName;
@@ -121,10 +129,12 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   // email
                   InputField(
-                    label: 'E-Mail',
+                    label: AppLocalizations.of(context)!.registerEmailLabel,
                     validator: (email) {
                       if (email == null || !EmailValidator.validate(email)) {
-                        return 'Неверный формат e-mail';
+                        return AppLocalizations.of(
+                          context,
+                        )!.invalidEmailValidatorError;
                       }
 
                       return null;
@@ -138,7 +148,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   // password
                   InputField(
-                    label: 'Пароль',
+                    label: AppLocalizations.of(context)!.registerPasswordLabel,
                     obscureText: true,
                     onSubmitted: (password) {
                       setState(() {
@@ -149,10 +159,15 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   // repeat password
                   InputField(
-                    label: 'Повторите пароль',
+                    label:
+                        AppLocalizations.of(
+                          context,
+                        )!.registerRepeatPasswordLabel,
                     validator: (password) {
                       if (password != _submittedPassword) {
-                        return 'Пароли не совпадают';
+                        return AppLocalizations.of(
+                          context,
+                        )!.passwordsDontMatchValidatorError;
                       }
 
                       return null;
@@ -164,7 +179,12 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   // register button
                   register.FilledButton(
-                    label: 'Зарегистрироваться',
+                    label:
+                        state.authStatus == AuthStatus.pending
+                            ? AppLocalizations.of(
+                              context,
+                            )!.registerButtonPendingLabel
+                            : AppLocalizations.of(context)!.registerButtonLabel,
                     color: Theme.of(context).colorScheme.primary,
                     width: MediaQuery.of(context).size.width / 1.5,
                     height: 36.0,

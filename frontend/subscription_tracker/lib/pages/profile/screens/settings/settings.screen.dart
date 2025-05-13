@@ -13,6 +13,8 @@ import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/widgets/named_switch.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -38,7 +40,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
 
-        title: Text('Настройки', style: Theme.of(context).textTheme.titleLarge),
+        title: Text(
+          AppLocalizations.of(context)!.settingsScreenTitle,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
 
         centerTitle: true,
       ),
@@ -54,7 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               // Main settings
               Text(
-                'Основные',
+                AppLocalizations.of(context)!.settingsMainSectionTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -66,7 +71,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   // Language
                   NamedEntry(
-                    name: 'Язык',
+                    name:
+                        AppLocalizations.of(
+                          context,
+                        )!.settingsLanguageSectionTitle,
 
                     child: TextToggleSwitch(
                       options: ['Русский', 'English'],
@@ -97,7 +105,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   // Theme mode
                   NamedEntry(
-                    name: 'Тема',
+                    name:
+                        AppLocalizations.of(context)!.settingsThemeSectionTitle,
 
                     child: TextToggleSwitch(
                       initialIndex:
@@ -105,7 +114,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? 1
                               : 0,
 
-                      options: ['Светлая', 'Темная'],
+                      options: [
+                        AppLocalizations.of(context)!.settingsLightThemeLabel,
+                        AppLocalizations.of(context)!.settingsDarkThemeLabel,
+                      ],
                       onChanged: (value) {
                         BlocProvider.of<SettingsBloc>(
                           context,
@@ -128,7 +140,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               DividedNamedList(
                 children: [
                   NamedEntry(
-                    name: 'Валюта',
+                    name:
+                        AppLocalizations.of(
+                          context,
+                        )!.settingsCurrencySectionTitle,
 
                     child: CurrencySelector(
                       currency:
@@ -166,7 +181,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
 
                 child: Text(
-                  'В этой валюте будет отображаться статистика по подпискам',
+                  AppLocalizations.of(
+                    context,
+                  )!.settingsCurrencySectionDescription,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: uiColor.secondaryText,
                   ),
@@ -177,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // UI color mode
               Text(
-                'Цвет интерфейса',
+                AppLocalizations.of(context)!.settingsUISectionTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -197,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // Dev info
               Text(
-                'Контактная информация',
+                AppLocalizations.of(context)!.settingsContactInfoSectionTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -208,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               DividedNamedList(
                 children: [
                   NamedEntry(
-                    name: 'E-Mail',
+                    name: AppLocalizations.of(context)!.settingsEmailLabel,
 
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -222,7 +239,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
 
                 child: Text(
-                  'Свяжитесь со мной если у вас есть вопросы, предложения или Вы заметили ошибку ❤️',
+                  AppLocalizations.of(context)!.settingsSupportDescription,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: uiColor.secondaryText,
                   ),
@@ -233,14 +250,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // danger zone
               ExpandableDividedNamedList(
-                label: 'Необратимые действия',
+                label:
+                    AppLocalizations.of(
+                      context,
+                    )!.settingsDangerZoneSectionTitle,
 
                 trackColor:
                     isDark ? Theme.of(context).colorScheme.primary : null,
 
                 children: [
                   NamedEntry(
-                    name: 'Удалить все данные',
+                    name:
+                        AppLocalizations.of(
+                          context,
+                        )!.settingsDeleteAllDataLabel,
 
                     child: DeleteButton(
                       onPressed: () {
@@ -252,7 +275,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   if (BlocProvider.of<UserBloc>(context).state.authStatus ==
                       AuthStatus.authorized) ...{
                     NamedEntry(
-                      name: 'Удалить аккаунт',
+                      name:
+                          AppLocalizations.of(
+                            context,
+                          )!.settingsDeleteAccountLabel,
 
                       child: DeleteButton(
                         onPressed: () async {
@@ -285,7 +311,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
 
                 child: Text(
-                  'Выражаю благодарность за помощь в тестировании приложения: Ansam, ED1LOAD, Xenocious',
+                  AppLocalizations.of(context)!.settingsAnnotation,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: uiColor.secondaryText,
                   ),

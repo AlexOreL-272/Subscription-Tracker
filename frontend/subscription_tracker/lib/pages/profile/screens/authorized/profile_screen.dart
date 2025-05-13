@@ -7,6 +7,8 @@ import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.
 import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -15,12 +17,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const noData = 'Н/Д';
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
+    final noData = AppLocalizations.of(context)!.noData;
 
     return BlocBuilder<UserBloc, UserState>(
       buildWhen: (previous, current) {
@@ -90,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // main info
               Text(
-                'Ваши данные',
+                AppLocalizations.of(context)!.profileYourData,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -101,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               DividedNamedList(
                 children: [
                   NamedEntry(
-                    name: 'Фамилия',
+                    name: AppLocalizations.of(context)!.profileSurnameLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -112,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   NamedEntry(
-                    name: 'Имя',
+                    name: AppLocalizations.of(context)!.profileNameLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(name, style: TextStyle(color: textColor)),
@@ -120,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   NamedEntry(
-                    name: 'Отчество',
+                    name: AppLocalizations.of(context)!.profileMiddleNameLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -131,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   NamedEntry(
-                    name: 'E-Mail',
+                    name: AppLocalizations.of(context)!.profileEmailLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -147,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // logout
               Text(
-                'Управление аккаунтом',
+                AppLocalizations.of(context)!.profileAccountManagement,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -158,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               DividedNamedList(
                 children: [
                   NamedEntry(
-                    name: 'Выйти из аккаунта',
+                    name: AppLocalizations.of(context)!.profileLogoutLabel,
 
                     child: TextButton.icon(
                       onPressed: () {
@@ -170,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: const Icon(Icons.logout),
 
                       label: Text(
-                        'Выйти',
+                        AppLocalizations.of(context)!.profileLogoutButtonLabel,
 
                         style: Theme.of(
                           context,

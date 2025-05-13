@@ -13,6 +13,8 @@ import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class DonutChartOld extends StatefulWidget {
   static const List<Color> _colors = [
     Colors.blueAccent,
@@ -337,7 +339,6 @@ class DonutChart extends StatefulWidget {
 
   static const int _maxSections = 5;
   static const String _defaultCategory = 'Остальное';
-  static const dateFormat = RussianDateFormat.ddMMMMyyyy();
 
   const DonutChart({super.key});
 
@@ -407,7 +408,7 @@ class _DonutChartState extends State<DonutChart> {
           const SizedBox(height: 16.0),
 
           Text(
-            'Траты за период',
+            AppLocalizations.of(context)!.pieChartTitle,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: uiColor.secondaryText,
               fontWeight: FontWeight.bold,

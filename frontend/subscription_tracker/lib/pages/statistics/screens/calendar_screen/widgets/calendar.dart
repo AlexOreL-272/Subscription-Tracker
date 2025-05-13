@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
 import 'package:subscription_tracker/common/scripts/scripts.dart';
 import 'package:subscription_tracker/pages/statistics/screens/calendar_screen/widgets/cell.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
@@ -79,6 +81,9 @@ class _CalendarState extends State<Calendar> {
 
     final primary = Theme.of(context).colorScheme.primary;
 
+    final lang = BlocProvider.of<SettingsBloc>(context).state.language;
+    final isRussian = lang == 'ru';
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: uiTheme.container,
@@ -88,6 +93,8 @@ class _CalendarState extends State<Calendar> {
       child: TableCalendar(
         firstDay: DateTime(now.year, now.month),
         lastDay: now.add(const Duration(days: 365 * 20)),
+
+        locale: lang,
 
         focusedDay: _focusedDay,
         calendarFormat: _calendarFormat,
@@ -161,7 +168,7 @@ class _CalendarState extends State<Calendar> {
 
         headerStyle: HeaderStyle(
           titleTextFormatter: (date, _) {
-            return RussianDateFormat.MMMMyyyy().format(date);
+            return CustomDateFormat.MMMMyyyy(isRussian: isRussian).format(date);
           },
           formatButtonVisible: false,
           titleCentered: true,

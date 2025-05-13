@@ -39,8 +39,13 @@ String getInitials(String caption) {
 // assuming that interval is in days (stated in my API :) )
 // and is either a predefined value like N day(s), N week(s), N month(s) or N year(s)
 // or a custom value in days
-String formatCost(double cost, String currency, int interval) {
-  final formattedInterval = formatPreviewPeriod(interval);
+String formatCost(
+  double cost,
+  String currency,
+  int interval, [
+  String lang = 'ru',
+]) {
+  final formattedInterval = formatPreviewPeriod(interval, false, lang);
   return '${cost.toStringAsFixed(2)} $currency / $formattedInterval';
 }
 

@@ -63,9 +63,17 @@ class _StatisticsPageState extends State<StatisticsPage>
             child: TabSelector(
               tabController: _tabController,
               labels: <Widget>[
-                const Center(child: Text('Статистика')),
+                Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.statisticsScreenTabTitle,
+                  ),
+                ),
 
-                const Center(child: Text('Календарь')),
+                Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.calendarScreenTabTitle,
+                  ),
+                ),
               ],
 
               onChanged: (value) {},

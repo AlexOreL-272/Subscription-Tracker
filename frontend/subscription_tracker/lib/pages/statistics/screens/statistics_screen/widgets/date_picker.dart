@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/common/scripts/scripts.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/widgets/pie_chart.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DatePicker extends StatelessWidget {
   final DateTime start;
@@ -33,7 +38,7 @@ class DatePicker extends StatelessWidget {
 
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Выберите дату'),
+          title: Text(AppLocalizations.of(context)!.selectDateDialogTitle),
 
           content: SizedBox(
             width: double.maxFinite,
@@ -78,7 +83,7 @@ class DatePicker extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.pop(context),
 
-              child: const Text('Отмена'),
+              child: Text(AppLocalizations.of(context)!.cancelDialogOption),
             ),
 
             TextButton(
@@ -88,7 +93,7 @@ class DatePicker extends StatelessWidget {
                 Navigator.pop(context);
               },
 
-              child: const Text('OK'),
+              child: Text(AppLocalizations.of(context)!.okDialogOption),
             ),
           ],
         );
@@ -103,8 +108,15 @@ class DatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = BlocProvider.of<SettingsBloc>(context).state.language;
+    final isRussian = lang == 'ru';
+
+    final CustomDateFormat dateFormat = CustomDateFormat.ddMMMMyyyy(
+      isRussian: isRussian,
+    );
+
     final formattedDate =
-        '${DonutChart.dateFormat.format(start)} - ${DonutChart.dateFormat.format(end)}';
+        '${dateFormat.format(start)} - ${dateFormat.format(end)}';
 
     return GestureDetector(
       onTap: () => _showCustomDatePicker(context),

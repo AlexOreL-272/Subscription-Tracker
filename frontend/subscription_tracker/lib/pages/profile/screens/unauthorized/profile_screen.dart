@@ -6,11 +6,12 @@ import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.da
 import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
 import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
-import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/profile/screens/register/register_screen.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_form.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -36,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             alignment: Alignment.center,
 
             child: Text(
-              'Добро пожаловать!',
+              AppLocalizations.of(context)!.unauthorizedScreenHeader,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
@@ -51,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               alignment: Alignment.center,
 
               child: Text(
-                'Войдите в аккаунт, чтобы синхронизировать данные между устройствами',
+                AppLocalizations.of(context)!.unauthorizedScreenDescription,
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
@@ -65,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
 
             child: OutlinedLoginButton(
-              label: 'Войти через Google',
+              label: AppLocalizations.of(context)!.googleLoginButtonLabel,
               icon: Icons.g_translate_outlined,
               color: Color(0xFFECA519),
               onPressed: () async {
@@ -93,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
 
             child: OutlinedLoginButton(
-              label: 'Войти через Yandex',
+              label: AppLocalizations.of(context)!.yandexLoginButtonLabel,
               icon: Icons.currency_yen_sharp,
               color: Color(0xFFDE3B40),
               onPressed: () {
@@ -121,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
 
                 Text(
-                  'Или',
+                  AppLocalizations.of(context)!.orLabel,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.grey.shade400,
                   ),
@@ -159,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               children: [
                 Text(
-                  'Нет аккаунта?',
+                  AppLocalizations.of(context)!.noAccountLabel,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: WasubiColors.wasubiNeutral[600]!,
                   ),
@@ -199,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
 
                     child: Text(
-                      'Зарегистрироваться',
+                      AppLocalizations.of(context)!.noAccountDescription,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                       ),
