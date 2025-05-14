@@ -1,9 +1,17 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subscription_tracker/domain/subscriptions/requests.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/services/subs_api_service.dart';
 
 class SubscriptionsRepo {
+  static final _platform = MethodChannel(
+    'com.example.subscription_tracker/update_widget',
+  );
   static const _boxName = 'subscriptionsBox';
 
   late final Box<Map> _box;
@@ -28,6 +36,8 @@ class SubscriptionsRepo {
     });
 
     _adjustSubscriptionFirstPay();
+
+    await _updateAndroidWidget();
   }
 
   Future<List<SubscriptionModel>> fetchSubscriptions({
@@ -108,6 +118,8 @@ class SubscriptionsRepo {
     }
 
     _subscriptions[subscription.id] = subscription;
+
+    await _updateAndroidWidget();
   }
 
   Future<void> update(
@@ -130,6 +142,8 @@ class SubscriptionsRepo {
     }
 
     _subscriptions[subscription.id] = subscription;
+
+    await _updateAndroidWidget();
   }
 
   Future<void> delete(String id, [bool needsSync = false]) async {
@@ -146,6 +160,8 @@ class SubscriptionsRepo {
     }
 
     _subscriptions.remove(id);
+
+    await _updateAndroidWidget();
   }
 
   Future<void> updateCategories(String oldCategory, String? newCategory) async {
@@ -186,4 +202,52 @@ class SubscriptionsRepo {
       );
     }
   }
+
+  String _getSubscriptionsString() {
+    return jsonEncode(
+      _subscriptions.values
+          .map(
+            (subscription) => _SubscriptionWidgetData(
+              caption: subscription.caption,
+              cost: subscription.cost,
+              currency: subscription.currency,
+              firstPay: subscription.firstPay,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Future<void> _updateAndroidWidget() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('subscriptions', _getSubscriptionsString());
+
+      // Then notify the platform to update the widget
+      await _platform.invokeMethod('updateWidget');
+    } catch (e) {
+      debugPrint('Error updating widget: $e');
+    }
+  }
+}
+
+class _SubscriptionWidgetData {
+  final String caption;
+  final double cost;
+  final String currency;
+  final DateTime firstPay;
+
+  const _SubscriptionWidgetData({
+    required this.caption,
+    required this.cost,
+    required this.currency,
+    required this.firstPay,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'caption': caption,
+    'cost': cost,
+    'currency': currency,
+    'firstPay': firstPay.toIso8601String(),
+  };
 }

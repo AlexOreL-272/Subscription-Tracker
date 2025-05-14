@@ -1,0 +1,65 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/subscription_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/glassy_task_background"
+    android:padding="12dp"
+    android:orientation="horizontal"
+    android:layout_marginHorizontal="4dp"
+    android:gravity="center_vertical">
+
+    <!-- Date (left block) -->
+    <LinearLayout
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginEnd="12dp">
+
+        <TextView
+            android:id="@+id/date_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="29"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:alpha="0.95"/>
+
+        <TextView
+            android:id="@+id/date_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="May"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:alpha="0.95"/>
+    </LinearLayout>
+
+    <!-- Details (right block) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/sub_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Netflix Premium"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:alpha="0.95"/>
+
+        <TextView
+            android:id="@+id/sub_cost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="123.45 USD"
+            android:textSize="14sp"
+            android:textColor="#E6FFFFFF"
+            android:alpha="0.85"/>
+    </LinearLayout>
+</LinearLayout>
