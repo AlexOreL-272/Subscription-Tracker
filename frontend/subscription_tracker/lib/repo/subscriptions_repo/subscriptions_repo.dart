@@ -204,8 +204,11 @@ class SubscriptionsRepo {
   }
 
   String _getSubscriptionsString() {
+    final subscriptions = _subscriptions.values.toList();
+    subscriptions.sort((a, b) => a.firstPay.compareTo(b.firstPay));
+
     return jsonEncode(
-      _subscriptions.values
+      subscriptions
           .map(
             (subscription) => _SubscriptionWidgetData(
               caption: subscription.caption,
