@@ -166,7 +166,7 @@ class EnglishDateFormat implements CustomDateFormat {
     final month =
         _isShortMonth
             ? monthNamesShort[date.month - 1]
-            : monthNames[date.month];
+            : monthNames[date.month - 1];
 
     final day = date.day.toString().padLeft(2, '0');
     final year = date.year.toString().padLeft(4, '0');

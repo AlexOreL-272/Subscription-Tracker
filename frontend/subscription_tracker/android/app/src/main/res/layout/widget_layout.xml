@@ -3,12 +3,12 @@
     android:layout_height="wrap_content"
     android:padding="12dp"
     android:background="@drawable/glassy_widget_background">
-    
+
     <TextView
         android:id="@+id/widget_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ближайшие оплаты"
+        android:text="Following payments"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/widget_title"
         android:gravity="center"
-        android:text="No tasks available"
+        android:text="No active subscriptions"
         android:textColor="#E6FFFFFF"
         android:padding="16dp"
         android:visibility="gone"/>
