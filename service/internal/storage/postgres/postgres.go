@@ -99,11 +99,11 @@ func (p *PostgresStorage) GetUserByID(
 	// Execute select request
 	var user []domain.User
 	if err := p.db.Select(&user, sqlSelectUserRequest, args...); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ctxerror.New(op, storage.ErrNotFound)
-		}
-
 		return nil, ctxerror.New(op, err)
+	}
+
+	if len(user) == 0 {
+		return nil, ctxerror.New(op, storage.ErrNotFound)
 	}
 
 	return &user[0], nil

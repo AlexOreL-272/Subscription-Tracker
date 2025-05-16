@@ -349,7 +349,7 @@ func (h *Handler) YandexCallback(w http.ResponseWriter, r *http.Request) {
 
 		h.logger.Debug("user not found in keycloak, registering...")
 
-		_, err := h.authClient.Register(r.Context(), domain.UserCredentials{
+		registerResp, err := h.authClient.Register(r.Context(), domain.UserCredentials{
 			FullName: user.FullName,
 			Surname:  user.LastName,
 			Email:    user.Email,
@@ -360,6 +360,21 @@ func (h *Handler) YandexCallback(w http.ResponseWriter, r *http.Request) {
 				With(zap.String("operation", handler)).
 				Error("failed to register user", zap.Error(err))
 			http.Error(w, "failed to register user", http.StatusInternalServerError)
+		}
+
+		_, err = h.userSaver.SaveUser(
+			registerResp.Id,
+			user.FullName,
+			user.LastName,
+			user.Email,
+		)
+		if err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to save user to database", zap.Error(err))
+			http.Error(w, "failed to save user to database", http.StatusInternalServerError)
+
+			return
 		}
 
 		loginResp, err = h.authClient.Login(r.Context(), user.Email, user.PsuId)
