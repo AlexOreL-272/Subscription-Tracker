@@ -3,6 +3,7 @@ package keycloak
 import (
 	"context"
 	"errors"
+	"net/http"
 
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
@@ -91,6 +92,12 @@ func (k *KeycloakClient) Login(
 		password,
 	)
 	if err != nil {
+		if gocloakErr, ok := err.(*gocloak.APIError); ok {
+			if gocloakErr.Code == http.StatusUnauthorized {
+				return nil, ctxerror.New(op, ErrNoSuchUser)
+			}
+		}
+
 		return nil, ctxerror.New(op, err)
 	}
 
@@ -100,6 +107,12 @@ func (k *KeycloakClient) Login(
 		k.realm,
 	)
 	if err != nil {
+		if gocloakErr, ok := err.(*gocloak.APIError); ok {
+			if gocloakErr.Code == http.StatusNotFound {
+				return nil, ctxerror.New(op, ErrNoSuchUser)
+			}
+		}
+
 		return nil, ctxerror.New(op, err)
 	}
 

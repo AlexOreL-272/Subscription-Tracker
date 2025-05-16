@@ -11,6 +11,7 @@ import (
 	emailverifier "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/email/verifier"
 	idprovider "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers"
 	yandexauth "github.com/AlexOreL-272/Subscription-Tracker/internal/auth/identity_providers/yandex"
+	"github.com/AlexOreL-272/Subscription-Tracker/internal/auth/keycloak"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/domain"
 	htmlgenerator "github.com/AlexOreL-272/Subscription-Tracker/internal/html_generator"
 	"github.com/AlexOreL-272/Subscription-Tracker/internal/storage"
@@ -28,6 +29,7 @@ type Handler struct {
 	subProvider      storage.SubscriptionProvider
 	subEditor        storage.SubscriptionEditor
 	subDeleter       storage.SubscriptionDeleter
+	appRedirectURL   string
 	notifSender      notifications.NotificationSender
 	emailVerifier    emailverifier.Verifier
 	passwordResetter auth.PasswordResetter
@@ -45,6 +47,7 @@ func New(
 	subProvider storage.SubscriptionProvider,
 	subEditor storage.SubscriptionEditor,
 	subDeleter storage.SubscriptionDeleter,
+	appRedirectURL string,
 	notifSender notifications.NotificationSender,
 	emailVerifier emailverifier.Verifier,
 	passwordResetter auth.PasswordResetter,
@@ -62,6 +65,7 @@ func New(
 		subProvider:      subProvider,
 		subEditor:        subEditor,
 		subDeleter:       subDeleter,
+		appRedirectURL:   appRedirectURL,
 		notifSender:      notifSender,
 		emailVerifier:    emailVerifier,
 		passwordResetter: passwordResetter,
@@ -283,10 +287,12 @@ func (h *Handler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	appCallbackURL := fmt.Sprintf(
-		"com.wasubi.auth://auth?access_token=%s&refresh_token=%s",
+		"%s?access_token=%s&refresh_token=%s",
+		h.appRedirectURL,
 		token.AccessToken,
 		token.RefreshToken,
 	)
+
 	http.Redirect(w, r, appCallbackURL, http.StatusFound)
 
 	// w.Header().Set("Content-Type", "application/json")
@@ -323,17 +329,62 @@ func (h *Handler) YandexCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("%+v\n", user)
+	loginResp, err := h.authClient.Login(
+		r.Context(),
+		user.Email,
+		user.PsuId,
+	)
+	if err != nil {
+		if errors.Is(err, keycloak.ErrNoSuchUser) {
+			h.logger.Debug("user not found in keycloak, registering...")
 
-	// info := struct {
-	// 	Email    string `json:"email"`
-	// 	Password string `json:"password"`
-	// }{
-	// 	Email:    user.Email,
-	// 	Password: user.PsuId,
-	// }
+			resp, err := h.authClient.Register(r.Context(), domain.UserCredentials{
+				FullName: user.FullName,
+				Surname:  user.LastName,
+				Email:    user.Email,
+				Password: user.PsuId,
+			})
+			if err != nil {
+				h.logger.
+					With(zap.String("operation", handler)).
+					Error("failed to register user", zap.Error(err))
+				http.Error(w, "failed to register user", http.StatusInternalServerError)
+			}
 
-	// http.Post("/login", "application/json", bytes.NewBuffer())
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			if err := json.NewEncoder(w).Encode(resp); err != nil {
+				h.logger.
+					With(zap.String("operation", handler)).
+					Error("failed to encode response", zap.Error(err))
+				http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+				return
+			}
+
+			return
+		}
+
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to login user", zap.Error(err))
+		http.Error(w, "failed to login user", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
+		h.logger.
+			With(zap.String("operation", handler)).
+			Error("failed to encode response", zap.Error(err))
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+
+		return
+	}
 }
 
 func (h *Handler) VerifyEmail(w http.ResponseWriter, r *http.Request) {
