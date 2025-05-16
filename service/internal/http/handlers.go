@@ -338,56 +338,47 @@ func (h *Handler) YandexCallback(w http.ResponseWriter, r *http.Request) {
 		user.PsuId,
 	)
 	if err != nil {
-		if errors.Is(err, keycloak.ErrNoSuchUser) {
-			h.logger.Debug("user not found in keycloak, registering...")
-
-			resp, err := h.authClient.Register(r.Context(), domain.UserCredentials{
-				FullName: user.FullName,
-				Surname:  user.LastName,
-				Email:    user.Email,
-				Password: user.PsuId,
-			})
-			if err != nil {
-				h.logger.
-					With(zap.String("operation", handler)).
-					Error("failed to register user", zap.Error(err))
-				http.Error(w, "failed to register user", http.StatusInternalServerError)
-			}
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-
-			if err := json.NewEncoder(w).Encode(resp); err != nil {
-				h.logger.
-					With(zap.String("operation", handler)).
-					Error("failed to encode response", zap.Error(err))
-				http.Error(w, "failed to encode response", http.StatusInternalServerError)
-
-				return
-			}
+		if !errors.Is(err, keycloak.ErrNoSuchUser) {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to login user", zap.Error(err))
+			http.Error(w, "failed to login user", http.StatusInternalServerError)
 
 			return
 		}
 
-		h.logger.
-			With(zap.String("operation", handler)).
-			Error("failed to login user", zap.Error(err))
-		http.Error(w, "failed to login user", http.StatusInternalServerError)
+		h.logger.Debug("user not found in keycloak, registering...")
 
-		return
+		_, err := h.authClient.Register(r.Context(), domain.UserCredentials{
+			FullName: user.FullName,
+			Surname:  user.LastName,
+			Email:    user.Email,
+			Password: user.PsuId,
+		})
+		if err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to register user", zap.Error(err))
+			http.Error(w, "failed to register user", http.StatusInternalServerError)
+		}
+
+		loginResp, err = h.authClient.Login(r.Context(), user.Email, user.PsuId)
+		if err != nil {
+			h.logger.
+				With(zap.String("operation", handler)).
+				Error("failed to login user", zap.Error(err))
+			http.Error(w, "failed to login user", http.StatusInternalServerError)
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	appCallbackURL := fmt.Sprintf(
+		"%s?access_token=%s&refresh_token=%s",
+		h.appRedirectURL,
+		loginResp.AccessToken,
+		loginResp.RefreshToken,
+	)
 
-	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
-		h.logger.
-			With(zap.String("operation", handler)).
-			Error("failed to encode response", zap.Error(err))
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
-
-		return
-	}
+	http.Redirect(w, r, appCallbackURL, http.StatusFound)
 }
 
 func (h *Handler) VerifyEmail(w http.ResponseWriter, r *http.Request) {

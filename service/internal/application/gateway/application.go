@@ -114,7 +114,7 @@ func New(
 	yandexAuth := yandexauth.New(
 		cfg.Yandex.ClientID,
 		cfg.Yandex.ClientSecret,
-		fmt.Sprintf("http://localhost:8080/%s", yandexAuthRedirectPath),
+		fmt.Sprintf("http://alexorel.ru/%s", yandexAuthRedirectPath),
 	)
 
 	notifSender := kernel.New(
