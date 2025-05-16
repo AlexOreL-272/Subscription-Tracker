@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_state.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/profile/screens/settings/settings.screen.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/profile_screen.dart'
     as unauthorized;
 import 'package:subscription_tracker/pages/profile/screens/authorized/profile_screen.dart'
     as authorized;
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -25,7 +27,10 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
 
-        title: Text('Профиль', style: Theme.of(context).textTheme.titleLarge),
+        title: Text(
+          AppLocalizations.of(context)!.profilePageTitle,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
 
         centerTitle: true,
 

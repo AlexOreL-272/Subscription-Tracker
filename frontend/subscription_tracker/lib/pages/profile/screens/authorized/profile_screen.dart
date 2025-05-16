@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_state.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,11 +17,18 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const noData = 'Н/Д';
-
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
+
+    final noData = AppLocalizations.of(context)!.noData;
+
     return BlocBuilder<UserBloc, UserState>(
+      buildWhen: (previous, current) {
+        return current.authStatus == AuthStatus.authorized;
+      },
+
       builder: (context, state) {
         final fullName = state.fullName ?? noData;
         final splitted = fullName.split(' ');
@@ -82,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // main info
               Text(
-                'Ваши данные',
+                AppLocalizations.of(context)!.profileYourData,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -93,34 +103,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
               DividedNamedList(
                 children: [
                   NamedEntry(
-                    name: 'Фамилия',
+                    name: AppLocalizations.of(context)!.profileSurnameLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(state.surname ?? noData),
+                      child: Text(
+                        state.surname ?? noData,
+                        style: TextStyle(color: textColor),
+                      ),
                     ),
                   ),
 
                   NamedEntry(
-                    name: 'Имя',
+                    name: AppLocalizations.of(context)!.profileNameLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(name),
+                      child: Text(name, style: TextStyle(color: textColor)),
                     ),
                   ),
 
                   NamedEntry(
-                    name: 'Отчество',
+                    name: AppLocalizations.of(context)!.profileMiddleNameLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(middleName),
+                      child: Text(
+                        middleName,
+                        style: TextStyle(color: textColor),
+                      ),
                     ),
                   ),
 
                   NamedEntry(
-                    name: 'E-Mail',
+                    name: AppLocalizations.of(context)!.profileEmailLabel,
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(state.email ?? noData),
+                      child: Text(
+                        state.email ?? noData,
+                        style: TextStyle(color: textColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16.0),
+
+              // logout
+              Text(
+                AppLocalizations.of(context)!.profileAccountManagement,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              // logout
+              DividedNamedList(
+                children: [
+                  NamedEntry(
+                    name: AppLocalizations.of(context)!.profileLogoutLabel,
+
+                    child: TextButton.icon(
+                      onPressed: () {
+                        BlocProvider.of<UserBloc>(
+                          context,
+                        ).add(UserLogOutEvent());
+                      },
+
+                      icon: const Icon(Icons.logout),
+
+                      label: Text(
+                        AppLocalizations.of(context)!.profileLogoutButtonLabel,
+
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+
+                      style: ButtonStyle(
+                        padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(horizontal: 8.0),
+                        ),
+                      ),
                     ),
                   ),
                 ],

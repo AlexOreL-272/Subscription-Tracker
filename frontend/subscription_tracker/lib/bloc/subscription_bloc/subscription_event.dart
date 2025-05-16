@@ -8,6 +8,14 @@ class AddSubscriptionEvent extends SubscriptionEvent {
   AddSubscriptionEvent(this.subscription);
 }
 
+class FetchSubscriptionsEvent extends SubscriptionEvent {
+  FetchSubscriptionsEvent();
+}
+
+class SaveSubscriptionsEvent extends SubscriptionEvent {
+  SaveSubscriptionsEvent();
+}
+
 class UpdateSubscriptionEvent extends SubscriptionEvent {
   final SubscriptionModel subscription;
 

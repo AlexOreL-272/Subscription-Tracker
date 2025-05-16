@@ -125,6 +125,7 @@ class _InputFieldState extends State<InputField> {
       ),
 
       style: Theme.of(context).textTheme.titleSmall,
+      keyboardType: widget.keyboardType,
 
       autovalidateMode: widget.autovalidateMode,
 

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_bloc.dart';
-import 'package:subscription_tracker/models/user_bloc/user_event.dart';
-import 'package:subscription_tracker/models/user_bloc/user_state.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_bloc.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_event.dart';
+import 'package:subscription_tracker/bloc/user_bloc/user_state.dart';
 import 'package:subscription_tracker/pages/profile/screens/unauthorized/widgets/login_button.dart'
     as login;
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class _EmailField extends StatefulWidget {
   final ValueChanged<String> onSubmitted;
@@ -57,12 +61,12 @@ class _EmailFieldState extends State<_EmailField> {
           _hasError = !(email != null && EmailValidator.validate(email));
         });
 
-        if (email == null) {
-          return 'Введите e-mail';
+        if (email == null || email.isEmpty) {
+          return AppLocalizations.of(context)!.registerNoEmailValidatorError;
         }
 
         if (_hasError) {
-          return 'Неверный формат e-mail';
+          return AppLocalizations.of(context)!.invalidEmailValidatorError;
         }
 
         return null;
@@ -73,12 +77,12 @@ class _EmailFieldState extends State<_EmailField> {
         prefixIcon: Icon(Icons.alternate_email_rounded),
         prefixIconColor: textColor,
 
-        hintText: 'E-Mail',
+        hintText: AppLocalizations.of(context)!.loginFormEmailLabel,
         hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: WasubiColors.wasubiNeutral[400]!,
         ),
 
-        labelText: 'E-Mail',
+        labelText: AppLocalizations.of(context)!.loginFormEmailLabel,
         labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: WasubiColors.wasubiNeutral[400]!,
         ),
@@ -186,7 +190,7 @@ class _PasswordFieldState extends State<_PasswordField> {
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     final textColor = isDark ? UIBaseColors.textDark : UIBaseColors.textLight;
 
-    return TextField(
+    return TextFormField(
       controller: _controller,
       focusNode: _focusNode,
 
@@ -211,12 +215,12 @@ class _PasswordFieldState extends State<_PasswordField> {
           ),
         ),
 
-        hintText: 'Пароль',
+        hintText: AppLocalizations.of(context)!.loginFormPasswordLabel,
         hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: WasubiColors.wasubiNeutral[400]!,
         ),
 
-        labelText: 'Пароль',
+        labelText: AppLocalizations.of(context)!.loginFormPasswordLabel,
         labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: WasubiColors.wasubiNeutral[400]!,
         ),
@@ -270,13 +274,10 @@ class _PasswordFieldState extends State<_PasswordField> {
 
       style: Theme.of(context).textTheme.titleMedium,
 
-      onSubmitted: widget.onSubmitted,
+      onFieldSubmitted: widget.onSubmitted,
       onTapOutside: (event) {
         widget.onSubmitted(_controller.text);
         _focusNode.unfocus();
-      },
-      onEditingComplete: () {
-        widget.onSubmitted(_controller.text);
       },
     );
   }
@@ -352,8 +353,10 @@ class _LoginFormState extends State<LoginForm> {
                 login.FilledButton(
                   label:
                       state.authStatus == AuthStatus.pending
-                          ? 'Входим...'
-                          : 'Войти',
+                          ? AppLocalizations.of(
+                            context,
+                          )!.loginFormButtonPendingLabel
+                          : AppLocalizations.of(context)!.loginFormButtonLabel,
 
                   color: Theme.of(context).colorScheme.primary,
                   height: 44.0,
@@ -365,6 +368,14 @@ class _LoginFormState extends State<LoginForm> {
                       BlocProvider.of<UserBloc>(context).add(
                         UserLogInEvent(_submittedEmail, _submittedPassword),
                       );
+
+                      BlocProvider.of<SubscriptionBloc>(
+                        context,
+                      ).add(SaveSubscriptionsEvent());
+
+                      BlocProvider.of<SubscriptionBloc>(
+                        context,
+                      ).add(FetchSubscriptionsEvent());
                     }
                   },
                 ),

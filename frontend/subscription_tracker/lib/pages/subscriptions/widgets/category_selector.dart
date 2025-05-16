@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
-import 'package:subscription_tracker/models/category_bloc/category_event.dart';
-import 'package:subscription_tracker/models/category_bloc/category_state.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_event.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_state.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CategorySelector extends StatefulWidget {
   final selectedIndex;
@@ -215,7 +217,7 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
                             ),
 
                             label: Text(
-                              'Переименовать',
+                              AppLocalizations.of(context)!.renameDialogOption,
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(color: textColor),
                             ),
@@ -260,7 +262,7 @@ class _EditDeleteOverlayState extends State<_EditDeleteOverlay> {
                             icon: const Icon(Icons.delete, color: Colors.red),
 
                             label: Text(
-                              'Удалить',
+                              AppLocalizations.of(context)!.deleteDialogOption,
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(color: Colors.red),
                             ),
@@ -367,7 +369,7 @@ class _EditDialogState extends State<_EditDialog> {
       key: _formKey,
 
       child: AlertDialog(
-        title: const Text('Переименовать'),
+        title: Text(AppLocalizations.of(context)!.renameDialogOption),
 
         backgroundColor: backgroundColor,
 
@@ -377,13 +379,13 @@ class _EditDialogState extends State<_EditDialog> {
 
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Введите хотя бы один символ';
+              return AppLocalizations.of(context)!.emptyValueValidatorError;
             }
 
             if (BlocProvider.of<CategoryBloc>(
               context,
             ).state.categories.contains(value)) {
-              return 'Это название уже используется';
+              return AppLocalizations.of(context)!.alreadyExistsValidatorError;
             }
 
             return null;
@@ -392,12 +394,12 @@ class _EditDialogState extends State<_EditDialog> {
           autovalidateMode: AutovalidateMode.onUnfocus,
 
           decoration: InputDecoration(
-            hintText: 'Введите новое название категории',
+            hintText: AppLocalizations.of(context)!.editCategoryDialogHint,
             hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: WasubiColors.wasubiNeutral[400]!,
             ),
 
-            labelText: 'Название',
+            labelText: AppLocalizations.of(context)!.editCategoryDialogLabel,
             labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: WasubiColors.wasubiNeutral[400]!,
             ),
@@ -461,7 +463,7 @@ class _EditDialogState extends State<_EditDialog> {
           TextButton(
             onPressed: () => Navigator.pop(context),
 
-            child: const Text('Отмена'),
+            child: Text(AppLocalizations.of(context)!.cancelDialogOption),
           ),
 
           TextButton(
@@ -482,7 +484,7 @@ class _EditDialogState extends State<_EditDialog> {
               }
             },
 
-            child: const Text('Сохранить'),
+            child: Text(AppLocalizations.of(context)!.saveDialogOption),
           ),
         ],
       ),
@@ -504,15 +506,17 @@ class _DeleteDialog extends StatelessWidget {
         isDark ? UIBaseColors.backgroundDark : UIBaseColors.backgroundLight;
 
     return AlertDialog(
-      title: const Text('Удалить категорию'),
-      content: Text('Вы уверены, что хотите удалить категорию "$category"?'),
+      title: Text(AppLocalizations.of(context)!.deleteCategoryDialogTitle),
+      content: Text(
+        AppLocalizations.of(context)!.deleteCategoryDialogContent(category),
+      ),
 
       backgroundColor: backgroundColor,
 
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Отмена'),
+          child: Text(AppLocalizations.of(context)!.cancelDialogOption),
         ),
 
         TextButton(
@@ -528,7 +532,7 @@ class _DeleteDialog extends StatelessWidget {
             Navigator.pop(context);
           },
 
-          child: const Text('Удалить'),
+          child: Text(AppLocalizations.of(context)!.deleteDialogOption),
         ),
       ],
     );

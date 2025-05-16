@@ -6,6 +6,8 @@ class AddCategoryEvent extends CategoryEvent {
   AddCategoryEvent(this.category);
 }
 
+class ForceUpdateCategoriesEvent extends CategoryEvent {}
+
 class RenameCategoryEvent extends CategoryEvent {
   final int index;
   final String newName;

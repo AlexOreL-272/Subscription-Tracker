@@ -4,14 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/common/scripts/scripts.dart';
-import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/common/scripts/scripts.dart';
 import 'package:subscription_tracker/pages/statistics/screens/statistics_screen/widgets/date_picker.dart';
 import 'package:subscription_tracker/repo/currency_rates/currency_repo.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DonutChartOld extends StatefulWidget {
   static const List<Color> _colors = [
@@ -337,7 +339,6 @@ class DonutChart extends StatefulWidget {
 
   static const int _maxSections = 5;
   static const String _defaultCategory = 'Остальное';
-  static const dateFormat = RussianDateFormat.ddMMMMyyyy();
 
   const DonutChart({super.key});
 
@@ -407,7 +408,7 @@ class _DonutChartState extends State<DonutChart> {
           const SizedBox(height: 16.0),
 
           Text(
-            'Траты за период',
+            AppLocalizations.of(context)!.pieChartTitle,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: uiColor.secondaryText,
               fontWeight: FontWeight.bold,
@@ -476,7 +477,7 @@ class _DonutChartState extends State<DonutChart> {
   }
 
   List<PieChartSectionData> _showingSections(BuildContext context) {
-    return List<PieChartSectionData>.generate(
+    final sections = List<PieChartSectionData>.generate(
       min(_sortedCostsPerCategory.length, DonutChart._maxSections),
 
       (index) {
@@ -491,6 +492,20 @@ class _DonutChartState extends State<DonutChart> {
         );
       },
     );
+
+    if (sections.isEmpty) {
+      return [
+        PieChartSectionData(
+          color: DonutChart._colors[0],
+          value: 1e-3,
+          showTitle: false,
+          title: '0',
+          radius: 40,
+        ),
+      ];
+    }
+
+    return sections;
   }
 
   Map<String, double> _getMonthlyCategoryCostsWithTrial(
@@ -571,7 +586,7 @@ class _DonutChartState extends State<DonutChart> {
         );
       }
 
-      if (totalCost >= 0) {
+      if (totalCost > 0) {
         categoryTotals[category] = (categoryTotals[category] ?? .0) + totalCost;
       }
     }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:subscription_tracker/models/settings_bloc/settings_bloc.dart';
-import 'package:subscription_tracker/models/settings_bloc/settings_state.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_state.dart';
 import 'package:subscription_tracker/widgets/navbar.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'pages/subscriptions/subscriptions_page.dart';
 import 'pages/statistics/statistics_page.dart';
 import 'pages/profile/profile_page.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -38,6 +41,17 @@ class _AppState extends State<App> {
       builder: (context, state) {
         return MaterialApp(
           title: 'Subscription Tracker',
+
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+
+          supportedLocales: const [Locale('ru'), Locale('en')],
+
+          locale: Locale(state.language),
 
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(

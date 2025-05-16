@@ -5,20 +5,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_dialogs/dialogs.dart';
 import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
-import 'package:subscription_tracker/models/category_bloc/category_bloc.dart';
-import 'package:subscription_tracker/models/category_bloc/category_event.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_bloc.dart';
-import 'package:subscription_tracker/models/subscription_bloc/subscription_event.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_bloc.dart';
+import 'package:subscription_tracker/bloc/category_bloc/category_event.dart';
+import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_bloc.dart';
+import 'package:subscription_tracker/bloc/subscription_bloc/subscription_event.dart';
 import 'package:subscription_tracker/models/subscription_model.dart';
 import 'package:subscription_tracker/pages/subscriptions/common/scripts/scripts.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/color_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/date_picker.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/decimal_input.dart';
+import 'package:subscription_tracker/widgets/currency_selector.dart';
 import 'package:subscription_tracker/widgets/divided_list.dart';
 import 'package:subscription_tracker/pages/subscriptions/widgets/slideable.dart';
 import 'package:subscription_tracker/services/shared_data.dart';
 import 'package:subscription_tracker/widgets/dropdown_button.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SubscriptionListItem extends StatelessWidget {
   final SubscriptionModel subscription;
@@ -199,6 +203,7 @@ class SubscriptionPreview extends StatelessWidget {
                         subscription.cost,
                         subscription.currency,
                         subscription.interval,
+                        BlocProvider.of<SettingsBloc>(context).state.language,
                       ),
                       style: TextStyle(
                         color: colorScheme.onPrimaryContainer,
@@ -208,7 +213,9 @@ class SubscriptionPreview extends StatelessWidget {
                     ),
 
                     Text(
-                      'Следующий платёж: ${formatDate(subscription.firstPay)}',
+                      AppLocalizations.of(context)!.nextPaymentSubscriptionInfo(
+                        formatDate(subscription.firstPay),
+                      ),
                       style: TextStyle(
                         color: colorScheme.onPrimaryContainer,
                         fontSize: 12.0,
@@ -276,26 +283,33 @@ class SubscriptionDetails extends StatefulWidget {
 class _SubscriptionDetailsState extends State<SubscriptionDetails> {
   late bool _hasChanged = widget.isNew;
   late var _newSubscription = widget.subscription;
-  late final String formattedInitialPeriod = formatPreviewPeriod(
-    widget.subscription.interval,
-    false,
-  );
-
-  late final String formattedInitialTrialPeriod = formatPreviewPeriod(
-    widget.subscription.trialInterval ?? 1,
-    false,
-  );
 
   @override
   Widget build(BuildContext context) {
+    final language = BlocProvider.of<SettingsBloc>(context).state.language;
+
+    final formattedInitialPeriod = formatPreviewPeriod(
+      widget.subscription.interval,
+      false,
+      language,
+    );
+
+    final formattedInitialTrialPeriod = formatPreviewPeriod(
+      widget.subscription.trialInterval ?? 1,
+      false,
+      language,
+    );
+
     final formattedInterval = formatPreviewPeriod(
       _newSubscription.interval,
       false,
+      language,
     );
 
     final formattedTrialInterval = formatPreviewPeriod(
       _newSubscription.trialInterval ?? 1,
       false,
+      language,
     );
 
     final colorScheme = ColorScheme.fromSeed(
@@ -304,6 +318,14 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final uiColor = isDark ? UIBaseColors.dark() : UIBaseColors.light();
+
+    final intervals =
+        language == 'ru' ? SharedData.intervalsRU : SharedData.intervalsEN;
+
+    final selectIntervalValue =
+        language == 'ru'
+            ? SharedData.selectCustomValueRU
+            : SharedData.selectCustomValueEN;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16.0),
@@ -350,7 +372,7 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                 ),
 
                 child: Text(
-                  'Сохранить',
+                  AppLocalizations.of(context)!.saveDialogOption,
 
                   style: TextStyle(
                     color:
@@ -369,6 +391,8 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
               colorScheme: colorScheme.copyWith(
                 brightness: Theme.of(context).colorScheme.brightness,
               ),
+
+              textTheme: textTheme,
             ),
 
             child: Padding(
@@ -417,7 +441,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     const SizedBox(height: 16.0),
 
                     Text(
-                      'Основная информация',
+                      AppLocalizations.of(
+                        context,
+                      )!.mainInfoSubscriptionDetailsHeader,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16.0,
@@ -430,7 +456,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       children: [
                         // cost
                         NamedEntry(
-                          name: 'Цена',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.costSubscriptionInfo,
 
                           child: DecimalInput(
                             value: _newSubscription.cost,
@@ -460,17 +489,18 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                         // currency
                         NamedEntry(
-                          name: 'Валюта',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.currencySubscriptionInfo,
 
-                          child: Dropdown<String>(
-                            value: _newSubscription.currency,
-
-                            items: SharedData.currencies,
+                          child: CurrencySelector(
+                            currency: _newSubscription.currency,
 
                             onChanged: (value) {
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
-                                  currency: value!,
+                                  currency: value,
                                 );
 
                                 if (value != widget.subscription.currency) {
@@ -481,42 +511,15 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                                 }
                               });
                             },
-
-                            icon: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-
-                            buttonTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
-
-                            dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                            ),
-
-                            buttonDecoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-
-                            dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
-                              ),
-                            ),
                           ),
                         ),
 
                         // next payment
                         NamedEntry(
-                          name: 'Следующая оплата',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.firstPaySubscriptionInfo,
 
                           child: DatePicker(
                             value: _newSubscription.firstPay,
@@ -554,23 +557,26 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                         // period
                         NamedEntry(
-                          name: 'Период',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.intervalSubscriptionInfo,
 
                           child: Dropdown<String>(
                             value: formattedInterval,
 
                             items: [
-                              if (!SharedData.intervals.keys.contains(
+                              if (!intervals.keys.contains(
                                 formattedInitialPeriod,
                               )) ...{
                                 formattedInitialPeriod,
                               },
 
-                              ...SharedData.intervals.keys,
+                              ...intervals.keys,
                             ],
 
                             onChanged: (value) async {
-                              if (value == SharedData.selectCustomValue) {
+                              if (value == selectIntervalValue) {
                                 final interval = await _selectInterval(context);
 
                                 if (interval != null) {
@@ -593,10 +599,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
-                                  interval: SharedData.intervals[value]!,
+                                  interval: SharedData.intervalsRU[value]!,
                                 );
 
-                                if (SharedData.intervals[value]! !=
+                                if (SharedData.intervalsRU[value]! !=
                                     widget.subscription.interval) {
                                   _hasChanged = true;
                                 } else if (_newSubscription ==
@@ -641,7 +647,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                         // end of subscription
                         NamedEntry(
-                          name: 'Подписка истекает',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.endDateSubscriptionInfo,
 
                           child: DatePicker(
                             value: _newSubscription.endDate,
@@ -718,8 +727,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     const SizedBox(height: 16.0),
 
                     // additional info
-                    const Text(
-                      'Дополнительная информация',
+                    Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.additionalInfoSubscriptionDetailsHeader,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16.0,
@@ -732,7 +743,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       children: [
                         // card color
                         NamedEntry(
-                          name: 'Цвет карточки',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.colorSubscriptionInfo,
 
                           child: ColorPicker(
                             color: Color(_newSubscription.color),
@@ -763,7 +777,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                         // category
                         NamedEntry(
-                          name: 'Категория',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.categorySubscriptionInfo,
 
                           child: Dropdown<String>(
                             value: _newSubscription.category ?? 'Все',
@@ -772,10 +789,13 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                                 BlocProvider.of<CategoryBloc>(
                                   context,
                                 ).state.categories +
-                                ['Добавить'],
+                                [AppLocalizations.of(context)!.addDialogOption],
 
                             onChanged: (value) async {
-                              if (value == 'Добавить') {
+                              if (value ==
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.addDialogOption) {
                                 final newCategory = await _addCategory(context);
 
                                 if (newCategory == null) {
@@ -843,7 +863,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                     // trial period
                     ExpandableDividedNamedList(
                       isActive: _newSubscription.trialActive,
-                      label: 'Пробный период',
+                      label:
+                          AppLocalizations.of(
+                            context,
+                          )!.trialActiveSubscriptionInfo,
 
                       onSwitch: (value) {
                         setState(() {
@@ -862,23 +885,26 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       children: [
                         // period
                         NamedEntry(
-                          name: 'Период',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.trialPeriodSubscriptionInfo,
 
                           child: Dropdown<String>(
                             value: formattedTrialInterval,
 
                             items: [
-                              if (!SharedData.intervals.keys.contains(
+                              if (!intervals.keys.contains(
                                 formattedInitialTrialPeriod,
                               )) ...{
                                 formattedInitialTrialPeriod,
                               },
 
-                              ...SharedData.intervals.keys,
+                              ...intervals.keys,
                             ],
 
                             onChanged: (value) async {
-                              if (value == SharedData.selectCustomValue) {
+                              if (value == selectIntervalValue) {
                                 final interval = await _selectInterval(context);
 
                                 if (interval != null) {
@@ -901,10 +927,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                               setState(() {
                                 _newSubscription = _newSubscription.copyWith(
-                                  trialInterval: SharedData.intervals[value]!,
+                                  trialInterval: SharedData.intervalsRU[value]!,
                                 );
 
-                                if (SharedData.intervals[value]! !=
+                                if (SharedData.intervalsRU[value]! !=
                                     widget.subscription.trialInterval) {
                                   _hasChanged = true;
                                 } else if (_newSubscription ==
@@ -926,7 +952,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownTextStyle: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
+                              color:
+                                  isDark
+                                      ? Colors.white
+                                      : colorScheme.onPrimaryContainer,
                               fontSize: 16.0,
                               fontWeight: FontWeight.w400,
                             ),
@@ -937,18 +966,19 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                             ),
 
                             dropdownDecoration: BoxDecoration(
-                              color: Colors.white,
+                              color: uiColor.container,
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: WasubiColors.wasubiNeutral[400]!,
-                              ),
+                              border: Border.all(color: uiColor.border),
                             ),
                           ),
                         ),
 
                         // cost
                         NamedEntry(
-                          name: 'Цена',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.trialCostSubscriptionInfo,
 
                           child: DecimalInput(
                             value: _newSubscription.trialCost,
@@ -978,7 +1008,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                         // end of trial period
                         NamedEntry(
-                          name: 'Конец периода',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.trialEndDateSubscriptionInfo,
 
                           child: DatePicker(
                             value: _newSubscription.trialEndDate,
@@ -1017,7 +1050,9 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                                 Navigator.of(context).pop();
                               },
 
-                              child: const Text('Никогда'),
+                              child: Text(
+                                AppLocalizations.of(context)!.neverDialogOption,
+                              ),
                             ),
 
                             decoration: BoxDecoration(
@@ -1051,8 +1086,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
 
                     const SizedBox(height: 16.0),
 
-                    const Text(
-                      'Контактная информация',
+                    Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.contactInfoSubscriptionDetailsHeader,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16.0,
@@ -1065,7 +1102,10 @@ class _SubscriptionDetailsState extends State<SubscriptionDetails> {
                       children: [
                         // support link
                         NamedEntry(
-                          name: 'URL',
+                          name:
+                              AppLocalizations.of(
+                                context,
+                              )!.supportLinkSubscriptionInfo,
 
                           child: _DefaultTextInput(
                             label: _newSubscription.supportLink,
@@ -1318,7 +1358,13 @@ class _SubscriptionDetailsHeaderState
                             ),
 
                             Text(
-                              widget.isActive ? 'Активна' : 'Приостановлена',
+                              widget.isActive
+                                  ? AppLocalizations.of(
+                                    context,
+                                  )!.activeSubscriptionInfo
+                                  : AppLocalizations.of(
+                                    context,
+                                  )!.pausedSubscriptionInfo,
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w400,
@@ -1508,14 +1554,14 @@ class _AddCategoryDialogOldState extends State<_AddCategoryDialogOld> {
               crossAxisAlignment: CrossAxisAlignment.center,
 
               children: [
-                const Text(
-                  'Добавить категорию',
+                Text(
+                  AppLocalizations.of(context)!.addCategoryDialogTitle,
 
                   style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
                 ),
 
-                const Text(
-                  'Введите название категории',
+                Text(
+                  AppLocalizations.of(context)!.addCategoryDialogContent,
 
                   style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400),
                 ),
@@ -1570,7 +1616,7 @@ class _AddCategoryDialogOldState extends State<_AddCategoryDialogOld> {
                           },
 
                           child: Text(
-                            'Отмена',
+                            AppLocalizations.of(context)!.cancelDialogOption,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontSize: 14.0,
@@ -1586,7 +1632,7 @@ class _AddCategoryDialogOldState extends State<_AddCategoryDialogOld> {
                           },
 
                           child: Text(
-                            'Добавить',
+                            AppLocalizations.of(context)!.addDialogOption,
 
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
@@ -1635,7 +1681,7 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
       key: _formKey,
 
       child: AlertDialog(
-        title: const Text('Добавить категорию'),
+        title: Text(AppLocalizations.of(context)!.addCategoryDialogTitle),
 
         backgroundColor: uiColor.background,
 
@@ -1645,13 +1691,13 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
 
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Введите хотя бы один символ';
+              return AppLocalizations.of(context)!.emptyValueValidatorError;
             }
 
             if (BlocProvider.of<CategoryBloc>(
               context,
             ).state.categories.contains(value)) {
-              return 'Это название уже используется';
+              return AppLocalizations.of(context)!.alreadyExistsValidatorError;
             }
 
             return null;
@@ -1660,12 +1706,12 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
           autovalidateMode: AutovalidateMode.onUnfocus,
 
           decoration: InputDecoration(
-            hintText: 'Музыка',
+            hintText: AppLocalizations.of(context)!.editCategoryDialogHint,
             hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: WasubiColors.wasubiNeutral[400]!,
             ),
 
-            labelText: 'Название',
+            labelText: AppLocalizations.of(context)!.editCategoryDialogLabel,
             labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: WasubiColors.wasubiNeutral[400]!,
             ),
@@ -1733,7 +1779,7 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
           TextButton(
             onPressed: () => Navigator.pop(context),
 
-            child: const Text('Отмена'),
+            child: Text(AppLocalizations.of(context)!.cancelDialogOption),
           ),
 
           TextButton(
@@ -1743,7 +1789,7 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
               }
             },
 
-            child: const Text('Добавить'),
+            child: Text(AppLocalizations.of(context)!.addDialogOption),
           ),
         ],
       ),
@@ -1793,7 +1839,7 @@ class _IntervalDialogState extends State<_IntervalDialog> {
 
           children: [
             Text(
-              'Выберите период оплаты',
+              AppLocalizations.of(context)!.selectPeriodDialogTitle,
 
               style: Theme.of(context).textTheme.titleLarge,
             ),
@@ -1899,7 +1945,7 @@ class _IntervalDialogState extends State<_IntervalDialog> {
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
 
-                  child: const Text('Отмена'),
+                  child: Text(AppLocalizations.of(context)!.cancelDialogOption),
                 ),
 
                 const SizedBox(width: 8.0),
@@ -1908,7 +1954,7 @@ class _IntervalDialogState extends State<_IntervalDialog> {
                   onPressed: () {
                     Navigator.of(context).pop(_calculateIntervalInDays());
                   },
-                  child: const Text('OK'),
+                  child: Text(AppLocalizations.of(context)!.okDialogOption),
                 ),
               ],
             ),

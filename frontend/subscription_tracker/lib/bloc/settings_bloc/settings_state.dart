@@ -33,4 +33,18 @@ class SettingsState {
       'isDark': isDark,
     };
   }
+
+  SettingsState copyWith({
+    String? language,
+    String? currency,
+    Color? color,
+    bool? isDark,
+  }) {
+    return SettingsState(
+      language: language ?? this.language,
+      currency: currency ?? this.currency,
+      color: color ?? this.color,
+      isDark: isDark ?? this.isDark,
+    );
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class DeleteButton extends StatelessWidget {
   final VoidCallback onPressed;
 
@@ -11,7 +13,7 @@ class DeleteButton extends StatelessWidget {
       onPressed: onPressed,
 
       label: Text(
-        'Удалить',
+        AppLocalizations.of(context)!.deleteDialogOption,
         style: Theme.of(
           context,
         ).textTheme.titleMedium?.copyWith(color: Colors.red),
