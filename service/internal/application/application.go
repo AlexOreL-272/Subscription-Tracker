@@ -21,6 +21,7 @@ func New(
 		Redis:        cfg.Redis,
 		Yandex:       cfg.Yandex,
 		Notification: cfg.Notification,
+		App:          cfg.App,
 	}
 
 	apiGateway := gatewayapp.New(gatewayConfig, logger)

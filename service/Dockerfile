@@ -14,8 +14,9 @@ COPY --from=builder /app/main /app/main
 
 RUN upx /app/main
 
-FROM scratch
+FROM ubuntu:latest
 COPY --from=runtime /app/main /main
 ENV CONFIG_PATH=/opt/wasubi/configs/service/config.yaml
+RUN apt-get update && apt-get install -y ca-certificates
 
 CMD ["/main"]

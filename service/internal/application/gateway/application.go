@@ -30,7 +30,7 @@ var (
 	// urlPrefix = "/api/v1"
 
 	authRedirectPath       = "/auth/callback"
-	yandexAuthRedirectPath = "/yandex/callback"
+	yandexAuthRedirectPath = "yandex/callback"
 )
 
 type Application struct {
@@ -45,6 +45,7 @@ type GatewayConfig struct {
 	Redis        config.Redis
 	Yandex       config.Yandex
 	Notification config.Notification
+	App          config.App
 }
 
 func New(
@@ -113,7 +114,7 @@ func New(
 	yandexAuth := yandexauth.New(
 		cfg.Yandex.ClientID,
 		cfg.Yandex.ClientSecret,
-		fmt.Sprintf("http://alexorel.ru%s", yandexAuthRedirectPath),
+		fmt.Sprintf("http://localhost:8080/%s", yandexAuthRedirectPath),
 	)
 
 	notifSender := kernel.New(
@@ -161,12 +162,13 @@ func New(
 		postgresDB,         // storage.SubscriptionSaver
 		postgresDB,         // storage.SubscriptionProvider
 		postgresDB,         // storage.SubscriptionEditor
-		postgresDB,         // storage.SubscriptionDeleter
-		notifSender,        // notifications.NotificationSender
-		emailVerifier,      // emailverifier.Verifier
-		passwordResetter,   // auth.PasswordResetter
-		emailGenerator,     // htmlgenerator.EmailHTMLGenerator
-		logger,             // *zap.Logger
+		postgresDB,         // storage.SubscriptionDeleter\
+		cfg.App.AppCallbackURL,
+		notifSender,      // notifications.NotificationSender
+		emailVerifier,    // emailverifier.Verifier
+		passwordResetter, // auth.PasswordResetter
+		emailGenerator,   // htmlgenerator.EmailHTMLGenerator
+		logger,           // *zap.Logger
 
 		yandexAuth, // yandexauth.YandexAuth
 	)
@@ -253,7 +255,7 @@ func setupRouter(
 	router.Get(authRedirectPath, handler.AuthCallback)
 
 	router.Get("/yandex/login", handler.LoginWithYandex)
-	router.Get(yandexAuthRedirectPath, handler.YandexCallback)
+	router.Get(fmt.Sprintf("/%s", yandexAuthRedirectPath), handler.YandexCallback)
 
 	// <=========== EMAIL ENDPOINTS ===========>
 	router.Get("/verify_email", handler.VerifyEmail)

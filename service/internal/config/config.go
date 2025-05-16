@@ -14,6 +14,7 @@ type Config struct {
 	Notification Notification `yaml:"notification" env-required:"true"`
 	Logger       Logger       `yaml:"logger" env-required:"true"`
 	Yandex       Yandex       `yaml:"yandex" env-required:"true"`
+	App          App          `yaml:"app" env-required:"true"`
 }
 
 type EnvType string
@@ -74,6 +75,10 @@ type Static struct {
 type Yandex struct {
 	ClientID     string `yaml:"clientId" env:"YANDEX_CLIENT_ID" env-default:""`
 	ClientSecret string `yaml:"clientSecret" env:"YANDEX_CLIENT_SECRET" env-default:""`
+}
+
+type App struct {
+	AppCallbackURL string `yaml:"appCallbackUrl" env:"APP_CALLBACK_URL" env-default:""`
 }
 
 type Logger struct {

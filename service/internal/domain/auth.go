@@ -1,10 +1,11 @@
 package domain
 
 type YandexUser struct {
-	PsuId    string `json:"psuid"`
-	FullName string `json:"full_name"`
-	LstName  string `json:"last_name"`
-	Email    string `json:"default_email"`
+	PsuId     string `json:"psuid"`
+	FullName  string `json:"real_name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"default_email"`
 }
 
 type UserInfo struct {
