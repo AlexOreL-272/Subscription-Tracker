@@ -160,6 +160,83 @@ class UserRepo {
     }
   }
 
+  Future<void> yandexAuth() async {
+    _state = UserState.pending();
+
+    try {
+      const callbackUrlScheme = 'com.wasubi.auth';
+      const authUrl = 'http://alexorel.ru/yandex/login';
+
+      final result = await FlutterWebAuth2.authenticate(
+        url: authUrl,
+        callbackUrlScheme: callbackUrlScheme,
+      ).timeout(
+        const Duration(seconds: 120),
+        onTimeout: () {
+          throw TimeoutException('Authentication timed out after 2 minutes');
+        },
+      );
+
+      if (result.isEmpty) {
+        throw Exception('Empty response from authentication flow');
+      }
+
+      final uri = Uri.parse(result);
+
+      final accessToken = uri.queryParameters['access_token'] ?? '';
+      final refreshToken = uri.queryParameters['refresh_token'] ?? '';
+
+      if (accessToken.isEmpty || refreshToken.isEmpty) {
+        debugPrint('Available query parameters: ${uri.queryParameters}');
+        throw Exception('No valid token found in callback. Received: $result');
+      }
+
+      final decodedToken = JwtDecoder.decode(accessToken);
+      final id = decodedToken['sub'];
+
+      final userInfo = await apiService.getUserInfo(id);
+
+      if (!userInfo.isSuccessful) {
+        throw Exception('Failed to get user info');
+      }
+
+      _state = UserState(
+        authStatus: AuthStatus.authorized,
+        id: decodedToken['sub'],
+        email: userInfo.body!.email,
+        surname: userInfo.body!.surname,
+        fullName: userInfo.body!.fullName,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+
+      await _box.put(_userKey, convert.jsonEncode(_state));
+
+      _saveOperations++;
+      if (_saveOperations >= _compactionThreshold) {
+        _saveOperations = 0;
+        await _box.compact();
+      }
+    } on PlatformException catch (e) {
+      if (e.code == 'CANCELED') {
+        debugPrint('User explicitly canceled authentication');
+        _state = UserState.error('User explicitly canceled authentication');
+      } else {
+        debugPrint('Platform error during authentication: ${e.toString()}');
+        _state = UserState.error('Platform error during authentication');
+      }
+    } on TimeoutException catch (e) {
+      debugPrint('Authentication timeout: ${e.message}');
+
+      _state = UserState.error('Authentication timeout');
+    } catch (e, stackTrace) {
+      debugPrint('Authentication failed: $e');
+      debugPrint('Stack trace: $stackTrace');
+
+      _state = UserState.error('Authentication failed');
+    }
+  }
+
   Future<void> logOut() async {
     if (_state.authStatus != AuthStatus.authorized) {
       return;

@@ -9,6 +9,8 @@ class UserLogInEvent extends UserEvent {
 
 class UserGoogleAuthEvent extends UserEvent {}
 
+class UserYandexAuthEvent extends UserEvent {}
+
 class UserLogOutEvent extends UserEvent {}
 
 class UserRegisterEvent extends UserEvent {

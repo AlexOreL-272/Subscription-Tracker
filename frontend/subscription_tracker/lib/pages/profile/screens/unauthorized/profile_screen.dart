@@ -98,7 +98,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: Icons.currency_yen_sharp,
               color: Color(0xFFDE3B40),
               onPressed: () {
-                print('Login via Yandex');
+                BlocProvider.of<UserBloc>(context).add(UserYandexAuthEvent());
+
+                BlocProvider.of<SubscriptionBloc>(
+                  context,
+                ).add(SaveSubscriptionsEvent());
+
+                BlocProvider.of<SubscriptionBloc>(
+                  context,
+                ).add(FetchSubscriptionsEvent());
+
+                BlocProvider.of<CategoryBloc>(
+                  context,
+                ).add(ForceUpdateCategoriesEvent());
               },
             ),
           ),

@@ -14,6 +14,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<InitializeUserEvent>(_initialize);
     on<UserLogInEvent>(_logIn);
     on<UserGoogleAuthEvent>(_googleAuth);
+    on<UserYandexAuthEvent>(_yandexAuth);
     on<UserLogOutEvent>(_logOut);
     on<UserDeleteAccountEvent>(_deleteAccount);
     on<UserRegisterEvent>(_register);
@@ -43,6 +44,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     emit(UserState.pending());
 
     await userRepo.googleAuth();
+
+    emit(userRepo.user);
+  }
+
+  Future<void> _yandexAuth(
+    UserYandexAuthEvent event,
+    Emitter<UserState> emit,
+  ) async {
+    emit(UserState.pending());
+
+    await userRepo.yandexAuth();
 
     emit(userRepo.user);
   }
