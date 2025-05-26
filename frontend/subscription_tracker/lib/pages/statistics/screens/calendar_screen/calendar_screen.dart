@@ -177,7 +177,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final regularCharges = _getPaymentDates(
           start: monthStart,
           end: monthEnd,
-          firstPay: sub.firstPay,
+          firstPay: sub.firstPay.subtract(Duration(days: sub.interval)),
           intervalDays: sub.interval,
           cutoff: endDate,
         );

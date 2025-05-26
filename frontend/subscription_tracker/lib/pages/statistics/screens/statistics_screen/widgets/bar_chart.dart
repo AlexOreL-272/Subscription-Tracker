@@ -314,7 +314,7 @@ class _YearlyExpenseBarChartState extends State<YearlyExpenseBarChart> {
           final regularCharges = countCharges(
             start: monthStart,
             end: monthEnd,
-            firstPay: sub.firstPay,
+            firstPay: sub.firstPay.subtract(Duration(days: sub.interval)),
             intervalDays: sub.interval,
             cutoff: endDate,
           );

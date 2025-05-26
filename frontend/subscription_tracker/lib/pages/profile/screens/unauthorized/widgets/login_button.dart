@@ -5,13 +5,13 @@ import 'package:subscription_tracker/widgets/theme_definitor.dart';
 
 class OutlinedLoginButton extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final String iconPath;
   final Color color;
   final VoidCallback onPressed;
 
   const OutlinedLoginButton({
     required this.label,
-    required this.icon,
+    required this.iconPath,
     required this.color,
     required this.onPressed,
     super.key,
@@ -19,14 +19,7 @@ class OutlinedLoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton.icon(
-      icon: Icon(icon),
-
-      label: Text(
-        label,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color),
-      ),
-
+    return TextButton(
       onPressed: onPressed,
 
       style: ButtonStyle(
@@ -45,6 +38,22 @@ class OutlinedLoginButton extends StatelessWidget {
 
         iconSize: WidgetStateProperty.all(20.0),
         iconColor: WidgetStateProperty.all(color),
+      ),
+
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+
+        children: [
+          Image.asset(iconPath, width: 24.0),
+          SizedBox(width: 16.0),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: color),
+          ),
+        ],
       ),
     );
   }

@@ -136,7 +136,7 @@ class _CalendarState extends State<Calendar> {
             borderRadius: BorderRadius.circular(8.0),
           ),
 
-          markersMaxCount: 1,
+          markersMaxCount: 3,
 
           markerDecoration: BoxDecoration(
             color: primary.withAlpha(150),

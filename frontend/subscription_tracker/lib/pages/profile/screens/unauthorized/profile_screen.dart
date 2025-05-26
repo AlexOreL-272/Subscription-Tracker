@@ -23,6 +23,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -67,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             child: OutlinedLoginButton(
               label: AppLocalizations.of(context)!.googleLoginButtonLabel,
-              icon: Icons.g_translate_outlined,
+              iconPath: 'assets/logo/g.webp',
               color: Color(0xFFECA519),
               onPressed: () async {
                 BlocProvider.of<UserBloc>(context).add(UserGoogleAuthEvent());
@@ -95,7 +97,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             child: OutlinedLoginButton(
               label: AppLocalizations.of(context)!.yandexLoginButtonLabel,
-              icon: Icons.currency_yen_sharp,
+              iconPath:
+                  isDark
+                      ? 'assets/logo/yandex_dark.webp'
+                      : 'assets/logo/yandex_light.webp',
               color: Color(0xFFDE3B40),
               onPressed: () {
                 BlocProvider.of<UserBloc>(context).add(UserYandexAuthEvent());
