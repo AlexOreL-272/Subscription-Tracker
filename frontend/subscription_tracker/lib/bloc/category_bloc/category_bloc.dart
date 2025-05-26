@@ -35,6 +35,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     ForceUpdateCategoriesEvent event,
     Emitter<CategoryState> emit,
   ) async {
+    await Future.delayed(const Duration(seconds: 5));
+
     emit(CategoryState(categoryRepo.categories));
   }
 

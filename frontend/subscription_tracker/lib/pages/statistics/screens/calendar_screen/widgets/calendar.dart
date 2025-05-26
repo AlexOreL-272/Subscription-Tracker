@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:subscription_tracker/bloc/settings_bloc/settings_bloc.dart';
 import 'package:subscription_tracker/common/scripts/scripts.dart';
 import 'package:subscription_tracker/pages/statistics/screens/calendar_screen/widgets/cell.dart';
+import 'package:subscription_tracker/pages/statistics/screens/calendar_screen/widgets/event_tile.dart';
 import 'package:subscription_tracker/widgets/theme_definitor.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -58,7 +59,7 @@ class CalendarOld extends StatelessWidget {
 }
 
 class Calendar extends StatefulWidget {
-  final Set<DateTime> markers;
+  final Map<DateTime, List<EventTileData>> markers;
   final void Function(DateTime) onSelected;
 
   const Calendar({required this.markers, required this.onSelected, super.key});
@@ -119,7 +120,7 @@ class _CalendarState extends State<Calendar> {
 
         eventLoader: (day) {
           final key = DateTime(day.year, day.month, day.day);
-          return widget.markers.contains(key) ? [1] : [];
+          return widget.markers[key] ?? [];
         },
 
         calendarStyle: CalendarStyle(

@@ -50,7 +50,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             const SizedBox(height: 16.0),
 
             Calendar(
-              markers: markers.keys.toSet(),
+              markers: markers,
 
               onSelected: (date) {
                 final key = DateTime(date.year, date.month, date.day);
@@ -174,10 +174,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
           }
         }
       } else {
+        DateTime firstPay = sub.firstPay;
+        while (firstPay.isAfter(monthStart)) {
+          firstPay = firstPay.subtract(Duration(days: sub.interval));
+        }
+
         final regularCharges = _getPaymentDates(
           start: monthStart,
           end: monthEnd,
-          firstPay: sub.firstPay.subtract(Duration(days: sub.interval)),
+          firstPay: firstPay,
           intervalDays: sub.interval,
           cutoff: endDate,
         );

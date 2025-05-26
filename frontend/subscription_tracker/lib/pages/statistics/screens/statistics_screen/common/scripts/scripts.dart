@@ -8,6 +8,10 @@ int countCharges({
   int count = 0;
   DateTime current = firstPay;
 
+  while (current.isAfter(start)) {
+    current = current.subtract(Duration(days: intervalDays));
+  }
+
   while (!current.isAfter(cutoff)) {
     if (!current.isBefore(start) && !current.isAfter(end)) {
       count++;

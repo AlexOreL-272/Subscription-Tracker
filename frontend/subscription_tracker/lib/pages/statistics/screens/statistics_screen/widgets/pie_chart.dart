@@ -574,7 +574,7 @@ class _DonutChartState extends State<DonutChart> {
         final charges = countCharges(
           start: from,
           end: to,
-          firstPay: sub.firstPay.subtract(Duration(days: sub.interval)),
+          firstPay: sub.firstPay,
           intervalDays: sub.interval,
           cutoff: effectiveEnd,
         );

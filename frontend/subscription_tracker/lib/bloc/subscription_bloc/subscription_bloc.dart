@@ -56,7 +56,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     while (userRepo.user.authStatus != AuthStatus.authorized) {
       await Future.delayed(const Duration(milliseconds: 100));
 
-      if (DateTime.now().difference(start).inSeconds >= 5) {
+      if (DateTime.now().difference(start).inSeconds >= 10) {
         emit(SubscriptionState(subsRepo.subscriptions));
         return;
       }
