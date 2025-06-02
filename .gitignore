@@ -22,4 +22,11 @@ go.work
 go.work.sum
 
 # env file
-.env
+*.env
+
+go.sum
+
+config.yaml
+
+#logs
+logs/

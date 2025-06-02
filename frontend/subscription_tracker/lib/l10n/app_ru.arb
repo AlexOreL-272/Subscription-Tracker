@@ -1,0 +1,121 @@
+{
+    "subscriptionsPageTitle": "Мои подписки",
+    "statisticsPageTitle": "Статистика",
+    "profilePageTitle": "Профиль",
+
+    "subscriptionsPageNavBarLabel": "Подписки",
+    "statisticsPageNavBarLabel": "Статистика",
+    "profilePageNavBarLabel": "Профиль",
+
+    "addCategoryDialogTitle": "Добавить категорию",
+    "addCategoryDialogContent": "Введите название категории",
+
+    "editCategoryDialogHint": "Введите название категории",
+    "editCategoryDialogLabel": "Название",
+
+    "deleteCategoryDialogTitle": "Удалить категорию",
+    "deleteCategoryDialogContent": "Вы уверены, что хотите удалить категорию \"{category}\"?",
+
+    "selectDateDialogTitle": "Выберите дату",
+    "selectPeriodDialogTitle": "Выберите период оплаты",
+
+    "nextPaymentSubscriptionInfo": "Следующий платёж: {nextPayment}",
+
+    "mainInfoSubscriptionDetailsHeader": "Основная информация",
+    "additionalInfoSubscriptionDetailsHeader": "Дополнительная информация",
+    "contactInfoSubscriptionDetailsHeader": "Контактная информация",
+
+    "activeSubscriptionInfo": "Активна",
+    "pausedSubscriptionInfo": "Приостановлена",
+
+    "deleteDialogOption": "Удалить",
+    "addDialogOption": "Добавить",
+    "renameDialogOption": "Переименовать",
+    "cancelDialogOption": "Отмена",
+    "saveDialogOption": "Сохранить",
+    "okDialogOption": "OK",
+    "neverDialogOption": "Никогда",
+
+    "emptyValueValidatorError": "Введите хотя бы один символ",
+    "alreadyExistsValidatorError": "Это название уже используется",
+
+    "costSubscriptionInfo": "Цена",
+    "currencySubscriptionInfo": "Валюта",
+    "firstPaySubscriptionInfo": "Следующая оплата",
+    "intervalSubscriptionInfo": "Период",
+    "endDateSubscriptionInfo": "Подписка истекает",
+    "colorSubscriptionInfo": "Цвет карточки",
+    "categorySubscriptionInfo": "Категория",
+    "trialActiveSubscriptionInfo": "Пробный период",
+    "trialPeriodSubscriptionInfo": "Период",
+    "trialCostSubscriptionInfo": "Цена",
+    "trialEndDateSubscriptionInfo": "Конец периода",
+    "supportLinkSubscriptionInfo": "URL",
+
+
+    "statisticsScreenTabTitle": "Статистика",
+    "calendarScreenTabTitle": "Календарь",
+
+    "pieChartTitle": "Траты за период",
+    "barChartTitle": "Расходы за следующий год",
+    "inAverage": "В cреднем",
+
+
+    "settingsScreenTitle": "Настройки",
+    "settingsMainSectionTitle": "Основные",
+    "settingsLanguageSectionTitle": "Язык",
+    "settingsThemeSectionTitle": "Тема",
+    "settingsLightThemeLabel": "Светлая",
+    "settingsDarkThemeLabel": "Темная",
+    "settingsCurrencySectionTitle": "Валюта",
+    "settingsCurrencySectionDescription": "В этой валюте будет отображаться статистика по подпискам",
+    "settingsUISectionTitle": "Цвет интерфейса",
+    "settingsContactInfoSectionTitle": "Контактная информация",
+    "settingsEmailLabel": "E-Mail",
+    "settingsSupportDescription": "Свяжитесь со мной если у вас есть вопросы, предложения или Вы заметили ошибку ❤️",
+    "settingsDangerZoneSectionTitle": "Необратимые действия",
+    "settingsDeleteAllDataLabel": "Удалить все данные",
+    "settingsDeleteAccountLabel": "Удалить аккаунт",
+    "settingsAnnotation": "Выражаю благодарность за помощь в тестировании приложения: Ansam, ED1LOAD, Xenocious",
+
+
+    "noData": "Н/Д",
+    "profileYourData": "Ваши данные",
+    "profileSurnameLabel": "Фамилия",
+    "profileNameLabel": "Имя",
+    "profileMiddleNameLabel": "Отчество",
+    "profileEmailLabel": "E-Mail",
+    "profileAccountManagement": "Управление аккаунтом",
+    "profileLogoutLabel": "Выйти из аккаунта",
+    "profileLogoutButtonLabel": "Выйти",
+
+
+    "registerScreenTitle": "Регистрация",
+    "registerSurnameLabel": "Фамилия",
+    "registerNameLabel": "Имя",
+    "registerMiddleNameLabel": "Отчество",
+    "registerEmailLabel": "E-Mail",
+    "registerPasswordLabel": "Пароль",
+    "registerRepeatPasswordLabel": "Повторите пароль",
+    "registerButtonLabel": "Зарегистрироваться",
+    "registerButtonPendingLabel": "Регистрируем...",
+    "registerSurnameValidatorError": "Введите фамилию",
+    "registerNameValidatorError": "Введите имя",
+    "registerNoEmailValidatorError": "Введите e-mail",
+    "invalidEmailValidatorError": "Неверный формат e-mail",
+    "passwordsDontMatchValidatorError": "Пароли не совпадают",
+    "unexpectedErrorValidatorError": "Произошла ошибка",
+
+
+    "unauthorizedScreenHeader": "Добро пожаловать!",
+    "unauthorizedScreenDescription": "Войдите в аккаунт, чтобы синхронизировать данные между устройствами",
+    "googleLoginButtonLabel": "Войти через Google",
+    "yandexLoginButtonLabel": "Войти через Yandex",
+    "orLabel": "Или",
+    "loginFormEmailLabel": "E-Mail",
+    "loginFormPasswordLabel": "Пароль",
+    "loginFormButtonLabel": "Войти",
+    "loginFormButtonPendingLabel": "Входим...",
+    "noAccountLabel": "Нет аккаунта?",
+    "noAccountDescription": "Зарегистрироваться"
+}
